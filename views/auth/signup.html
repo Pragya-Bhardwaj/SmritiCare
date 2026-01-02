@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+</head>
+<body>
+  <h2>Signup</h2>
+  <form action="/auth/signup" method="POST">
+    <input name="name" placeholder="Name" required />
+    <input name="email" type="email" placeholder="Email" required />
+    <input name="password" type="password" placeholder="Password" required />
+    
+    <select name="role" required>
+      <option value="">Select Role</option>
+      <option value="caregiver">Caregiver</option>
+      <option value="patient">Patient</option>
+    </select>
+
+    <button type="submit">Signup</button>
+  </form>
+  <a href="/auth/login">Login</a>
+</body>
+</html>

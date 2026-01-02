@@ -3,6 +3,12 @@ const express = require("express");
 const session = require("express-session");
 const connectDB = require("./config/db");
 
+const authRoutes = require("./routes/authRoutes");
+
+const caregiverRoutes = require("./routes/caregiverRoutes");
+const patientRoutes = require("./routes/patientRoutes");
+
+
 const app = express();
 connectDB();
 
@@ -17,6 +23,11 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+app.use("/auth", authRoutes);
+app.use("/caregiver", caregiverRoutes);
+app.use("/patient", patientRoutes);
+
 
 // Static files
 app.use(express.static("public"));
