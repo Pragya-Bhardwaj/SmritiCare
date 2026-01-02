@@ -1,0 +1,33 @@
+{
+  "name": "smriticare",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pragya-Bhardwaj/SmritiCare.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Pragya-Bhardwaj/SmritiCare/issues"
+  },
+  "homepage": "https://github.com/Pragya-Bhardwaj/SmritiCare#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "mongoose": "^9.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
