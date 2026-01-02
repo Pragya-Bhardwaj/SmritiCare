@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Memory Board</title>
+</head>
+<body>
+  <h2>Memory Board</h2>
+
+  <% memories.forEach(memory => { %>
+    <div>
+      <h3><%= memory.title %></h3>
+      <p><%= memory.description %></p>
+    </div>
+  <% }) %>
+
+  <a href="/patient/dashboard">Back</a>
+</body>
+</html>

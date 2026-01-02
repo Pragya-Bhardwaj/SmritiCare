@@ -7,6 +7,8 @@ const authRoutes = require("./routes/authRoutes");
 
 const caregiverRoutes = require("./routes/caregiverRoutes");
 const patientRoutes = require("./routes/patientRoutes");
+const memoryRoutes = require("./routes/memoryRoutes");
+
 
 
 const app = express();
@@ -27,6 +29,8 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/patient", patientRoutes);
+app.use(memoryRoutes);
+
 
 
 // Static files

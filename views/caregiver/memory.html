@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Memory Board</title>
+</head>
+<body>
+  <h2>Add Memory</h2>
+
+  <form method="POST" action="/caregiver/memory">
+    <input name="title" placeholder="Memory Title" required />
+    <textarea name="description" placeholder="Description" required></textarea>
+    <button type="submit">Add Memory</button>
+  </form>
+
+  <hr />
+
+  <h2>Memory Board</h2>
+
+  <% memories.forEach(memory => { %>
+    <div>
+      <h3><%= memory.title %></h3>
+      <p><%= memory.description %></p>
+    </div>
+  <% }) %>
+
+  <a href="/caregiver/dashboard">Back</a>
+</body>
+</html>
