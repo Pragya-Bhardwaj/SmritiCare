@@ -1,0 +1,104 @@
+/* ================= AUTH LAYOUT ================= */
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0ecff, #f4f0ff);
+  padding: 20px;
+}
+
+.auth-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+/* ================= FORM ================= */
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-card input,
+.auth-card select {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+}
+
+.auth-card input:focus,
+.auth-card select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ================= BUTTON ================= */
+
+.auth-btn {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #3b82f6;
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+/* ================= LINKS ================= */
+
+.auth-link {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.auth-link a {
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ================= INVITE CODE ================= */
+
+.invite-code {
+  margin: 20px 0;
+  padding: 18px;
+  background: #f0f6ff;
+  border-radius: 18px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #1d4ed8;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+  }
+}

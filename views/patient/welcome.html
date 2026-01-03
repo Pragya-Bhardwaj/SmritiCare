@@ -5,14 +5,22 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h2>Welcome!</h2>
-  <p>Your invite code:</p>
-  <h1 id="code"></h1>
+  <link rel="stylesheet" href="/css/auth.css">
 
-  <p>Share this code with your caregiver.</p>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 class="auth-title">Welcome!</h2>
+    <p class="auth-subtitle">Share this invite code with your caregiver</p>
 
-  <a href="/patient/dashboard">Go to Dashboard</a>
+    <div class="invite-code" id="code">----</div>
 
-  <script src="/js/patientWelcome.js"></script>
+    <form action="/patient/dashboard">
+      <button class="auth-btn">Go to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<script src="/js/patientWelcome.js"></script>
+
 </body>
 </html>

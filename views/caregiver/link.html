@@ -5,13 +5,21 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h2>Enter Patient Invite Code</h2>
+ <link rel="stylesheet" href="/css/auth.css">
 
-  <input id="code" placeholder="PAT-XXXX">
-  <button onclick="link()">Link</button>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 class="auth-title">Link Patient</h2>
+    <p class="auth-subtitle">Enter the invite code shared by patient</p>
 
-  <p id="msg"></p>
+    <input id="code" placeholder="PAT-XXXX">
+    <button class="auth-btn" onclick="link()">Link Patient</button>
 
-  <script src="/js/caregiverLink.js"></script>
+    <p id="msg" class="auth-subtitle"></p>
+  </div>
+</div>
+
+<script src="/js/caregiverLink.js"></script>
+
 </body>
 </html>

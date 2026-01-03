@@ -4,20 +4,33 @@
   <title>Signup</title>
 </head>
 <body>
-  <h2>Signup</h2>
-  <form action="/auth/signup" method="POST">
-    <input name="name" placeholder="Name" required />
-    <input name="email" type="email" placeholder="Email" required />
-    <input name="password" type="password" placeholder="Password" required />
-    
-    <select name="role" required>
-      <option value="">Select Role</option>
-      <option value="caregiver">Caregiver</option>
-      <option value="patient">Patient</option>
-    </select>
+  <link rel="stylesheet" href="/css/auth.css">
 
-    <button type="submit">Signup</button>
-  </form>
-  <a href="/auth/login">Login</a>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-subtitle">Signup to get started</p>
+
+    <form action="/auth/signup" method="POST">
+      <input name="name" placeholder="Full Name" required>
+      <input name="email" type="email" placeholder="Email" required>
+      <input name="password" type="password" placeholder="Password" required>
+
+      <select name="role" required>
+        <option value="">Select Role</option>
+        <option value="caregiver">Caregiver</option>
+        <option value="patient">Patient</option>
+      </select>
+
+      <button class="auth-btn">Signup</button>
+    </form>
+
+    <div class="auth-link">
+      Already have an account?
+      <a href="/auth/login">Login</a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

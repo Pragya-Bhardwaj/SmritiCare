@@ -4,12 +4,25 @@
   <title>Login</title>
 </head>
 <body>
-  <h2>Login</h2>
-  <form action="/auth/login" method="POST">
-    <input name="email" type="email" placeholder="Email" required />
-    <input name="password" type="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
-  <a href="/auth/signup">Signup</a>
+  <link rel="stylesheet" href="/css/auth.css">
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 class="auth-title">Welcome Back</h2>
+    <p class="auth-subtitle">Login to continue</p>
+
+    <form action="/auth/login" method="POST">
+      <input name="email" type="email" placeholder="Email" required>
+      <input name="password" type="password" placeholder="Password" required>
+      <button class="auth-btn">Login</button>
+    </form>
+
+    <div class="auth-link">
+      Don’t have an account?
+      <a href="/auth/signup">Signup</a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
