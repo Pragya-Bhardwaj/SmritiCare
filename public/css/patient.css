@@ -1,0 +1,207 @@
+/* ============================= */
+/* PATIENT DASHBOARD LAYOUT */
+/* ============================= */
+
+.dashboard {
+  display: flex;
+  min-height: calc(100vh - 72px);
+  background: #f7f9fc;
+}
+
+/* ============================= */
+/* SIDEBAR */
+/* ============================= */
+
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #eef1f6;
+}
+
+.sidebar h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  color: #64748b;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.sidebar a.active {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* Logout pinned bottom */
+.logout-btn {
+  margin-top: auto;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #b91c1c;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ============================= */
+/* MAIN */
+/* ============================= */
+
+.main {
+  flex: 1;
+  padding: 32px;
+  overflow-x: hidden;
+}
+
+/* ============================= */
+/* WELCOME CARD */
+/* ============================= */
+
+.welcome {
+  margin-top: 25px;
+  background: linear-gradient(90deg, #6ea8fe, #c4a7f5);
+  color: #ffffff;
+  padding: 30px;
+  border-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.heart {
+  font-size: 38px;
+  opacity: 0.85;
+}
+
+/* ============================= */
+/* DASHBOARD GRID */
+/* ============================= */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar a {
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    margin-left: auto;
+  }
+}
+
+/* ============================= */
+/* TOPBAR (MATCH CAREGIVER) */
+/* ============================= */
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.user strong {
+  font-size: 16px;
+}
+
+.user p {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ============================= */
+/* TEXT HELPERS */
+/* ============================= */
+
+.small {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.sub {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+/* ============================= */
+/* SECTION TITLE */
+/* ============================= */
+
+.section-title {
+  margin: 30px 0 16px;
+  font-size: 20px;
+}
+
+/* ============================= */
+/* BUTTONS (MATCH CAREGIVER) */
+/* ============================= */
+
+.btn {
+  margin-top: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-secondary {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 18px;
+}

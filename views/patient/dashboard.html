@@ -1,12 +1,9 @@
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/patient.css">
+
 <header>
   <div class="nav container">
-    <div class="nav-title">SmritiCare – Patient</div>
-    <div class="nav-links">
-      <a href="/patient/dashboard">Dashboard</a>
-      <a href="/patient/memory">Memory Board</a>
-      <a href="/auth/logout">Logout</a>
-    </div>
+    <div class="nav-title">SmritiCare</div>
   </div>
 </header>
 
@@ -15,45 +12,75 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h3>Patient Menu</h3>
-    <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/memory">Memory Board</a>
-    <a href="#">Reminders</a>
-    <a href="#">Medication</a>
-    <a href="#">Self Care</a>
-    <a href="#">Profile</a>
+    
+
+    <a href="/patient/dashboard" class="active"> Dashboard</a>
+    <a href="/patient/memory"> Memory Board</a>
+    <a href="#"> Reminders</a>
+    <a href="#"> Medication</a>
+    <a href="#"> Self Care</a>
+    <a href="#"> Profile</a>
+
+    <a href="/auth/logout" class="logout-btn">🚪 Logout</a>
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main class="main">
-    <h2>Welcome</h2>
-    <p class="muted">Your daily care information is shown here.</p>
+  
 
-    <div class="dashboard-grid">
-      <div class="card">
-        <h3>Memory Board</h3>
-        <p>View important memories.</p>
-        <a href="/patient/memory" class="btn btn-primary">Open</a>
-      </div>
+<main class="main">
 
-      <div class="card">
-        <h3>Reminders</h3>
-        <p>View your daily reminders.</p>
-        <button class="btn btn-secondary">Coming Soon</button>
-      </div>
-
-      <div class="card">
-        <h3>Medication</h3>
-        <p>Check your medicines.</p>
-        <button class="btn btn-secondary">Coming Soon</button>
-      </div>
-
-      <div class="card">
-        <h3>Self Care</h3>
-        <p>Helpful daily self-care tips.</p>
-        <button class="btn btn-secondary">Coming Soon</button>
+  <!-- TOPBAR (MATCH CAREGIVER) -->
+  <header class="topbar">
+    <div class="user">
+      <div>
+        <strong>Patient</strong>
+        <p>SmritiCare User</p>
       </div>
     </div>
-  </main>
+  </header>
+
+  <!-- WELCOME CARD -->
+  <section class="welcome">
+    <div>
+      <p class="small">Welcome back</p>
+      <h1>We’re here to help you today.</h1>
+      <p class="sub">💙 Take things one step at a time.</p>
+    </div>
+    <div class="heart">🌼</div>
+  </section>
+
+  <h2 class="section-title">Your Care Overview</h2>
+
+  <!-- DASHBOARD GRID -->
+  <div class="dashboard-grid">
+
+    <div class="card">
+      <h3>Memory Board</h3>
+      <p>View important people and moments.</p>
+      <a href="/patient/memory" class="btn btn-primary">Open</a>
+    </div>
+
+    <div class="card">
+      <h3>Reminders</h3>
+      <p>See your daily reminders.</p>
+      <button class="btn btn-secondary">Coming Soon</button>
+    </div>
+
+    <div class="card">
+      <h3>Medication</h3>
+      <p>Check your medicines.</p>
+      <button class="btn btn-secondary">Coming Soon</button>
+    </div>
+
+    <div class="card">
+      <h3>Self Care</h3>
+      <p>Simple daily wellness tips.</p>
+      <button class="btn btn-secondary">Coming Soon</button>
+    </div>
+
+  </div>
+</main>
+
+ 
 
 </div>
