@@ -2,27 +2,56 @@
 <html>
 <head>
   <title>Memory Board</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/caregiver.css">
 </head>
+
 <body>
-  <h2>Add Memory</h2>
+<div class="app">
 
-  <form method="POST" action="/caregiver/memory">
-    <input name="title" placeholder="Memory Title" required />
-    <textarea name="description" placeholder="Description" required></textarea>
-    <button type="submit">Add Memory</button>
-  </form>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+  <h2 class="logo">SmritiCare</h2>
 
-  <hr />
+  <nav>
+    <a href="/caregiver/dashboard" class="active"> Dashboard</a>
+    <a href="/caregiver/reminders"> Reminders</a>
+    <a href="/caregiver/medication"> Medications</a>
+    <a href="/caregiver/memory"> Memory Board</a>
+    <a href="/caregiver/location"> Live Location</a>
+    <a href="/caregiver/profile"> Profile</a>
+    <a href="/auth/logout" class="logout-btn"> Logout</a>
 
-  <h2>Memory Board</h2>
+  </nav>
 
-  <% memories.forEach(memory => { %>
-    <div>
-      <h3><%= memory.title %></h3>
-      <p><%= memory.description %></p>
-    </div>
-  <% }) %>
+  <div class="support">
+    <p><strong>Need help?</strong><br>Our support team is here.</p>
+    <button class="primary-btn">Contact Support</button>
+  </div>
+</aside>
 
-  <a href="/caregiver/dashboard">Back</a>
+
+  <main class="main">
+
+ <div class="page-header">
+  <div>
+    <h1>Memory Board</h1>
+    <p>Important moments and people for the patient</p>
+  </div>
+</div>
+
+<form id="memoryForm" class="memory-form">
+  <input id="memoryTitle" placeholder="Memory title" required />
+  <textarea id="memoryDesc" placeholder="Description" required></textarea>
+  <button class="primary-btn">＋ Add Memory</button>
+</form>
+
+<section class="memory-grid" id="memoryGrid"></section>
+
+  </main>
+</div>
+
+<script src="/js/caregiverMemory.js"></script>
 </body>
 </html>

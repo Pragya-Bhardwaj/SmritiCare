@@ -4,15 +4,12 @@
   <title>Memory Board</title>
 </head>
 <body>
-  <h2>Memory Board</h2>
 
-  <% memories.forEach(memory => { %>
-    <div>
-      <h3><%= memory.title %></h3>
-      <p><%= memory.description %></p>
-    </div>
-  <% }) %>
+<h2>Memory Board</h2>
+<div id="memoryList"></div>
 
-  <a href="/patient/dashboard">Back</a>
+<a href="/patient/dashboard">Back</a>
+
+<script src="/js/memoryPatient.js"></script>
 </body>
 </html>

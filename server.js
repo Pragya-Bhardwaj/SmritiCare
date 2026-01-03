@@ -1,48 +1,59 @@
 require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
-const connectDB = require("./config/db");
+const mongoose = require("mongoose");
+const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
-
-const caregiverRoutes = require("./routes/caregiverRoutes");
-const patientRoutes = require("./routes/patientRoutes");
+const pairingRoutes = require("./routes/pairingRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
 
-
+const patientRoutes = require("./routes/patientRoutes");
+const caregiverRoutes = require("./routes/caregiverRoutes");
 
 const app = express();
-connectDB();
 
-// Middleware
+/* ================= DATABASE ================= */
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB error:", err));
+
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "smriticasecret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false
   })
 );
 
+/* ================= STATIC FILES ================= */
+app.use(express.static(path.join(__dirname, "public")));
+
+/* ================= VIEW FILES ================= */
+app.use("/views", express.static(path.join(__dirname, "views")));
+
+/* ================= ROUTES ================= */
 app.use("/auth", authRoutes);
-app.use("/caregiver", caregiverRoutes);
+app.use("/pair", pairingRoutes);
+
+
 app.use("/patient", patientRoutes);
-app.use(memoryRoutes);
+app.use("/caregiver", caregiverRoutes);
 
+app.use("/memory", memoryRoutes);
 
-
-// Static files
-app.use(express.static("public"));
-
-// Test route
+/* ================= FALLBACK ================= */
 app.get("/", (req, res) => {
-  res.send("SmritiCare Server Running");
+  res.redirect("/auth/login");
 });
 
-// Server start
-const PORT = process.env.PORT || 5000;
+/* ================= START SERVER ================= */
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

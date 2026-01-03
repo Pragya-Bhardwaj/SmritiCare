@@ -1,46 +1,30 @@
 const Memory = require("../models/Memory");
-const CarePair = require("../models/CarePair");
 
-// Caregiver adds memory
+
 exports.addMemory = async (req, res) => {
-  try {
-    const caregiverId = req.session.user.id;
+  console.log("SESSION USER:", req.session.user);
 
-    const pair = await CarePair.findOne({ caregiverId });
-    if (!pair) return res.status(400).send("No patient linked");
+  if (!req.session.user.patientId) return res.json({ error: "Not linked" });
 
-    await Memory.create({
-      patientId: pair.patientId,
-      title: req.body.title,
-      description: req.body.description,
-    });
+  const memory = await Memory.create({
+    caregiverId: req.session.user.id,
+    patientId: req.session.user.patientId,
+    title: req.body.title,
+    description: req.body.description
+  });
 
-    res.redirect("/caregiver/memory");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Unable to add memory");
-  }
+  res.json(memory);
 };
 
-// View memory board (caregiver & patient)
-exports.viewMemories = async (req, res) => {
-  try {
-    let patientId;
+exports.getMemories = async (req, res) => {
+  const role = req.session.user.role;
+  const id = req.session.user.id;
 
-    if (req.session.user.role === "caregiver") {
-      const pair = await CarePair.findOne({
-        caregiverId: req.session.user.id,
-      });
-      patientId = pair.patientId;
-    } else {
-      patientId = req.session.user.id;
-    }
+  const memories = role === "caregiver"
+    ? await Memory.find({ caregiverId: id })
+    : await Memory.find({ patientId: id });
 
-    const memories = await Memory.find({ patientId });
-
-    res.render("memory", { memories });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Unable to fetch memories");
-  }
+  res.json(memories);
 };
+
+

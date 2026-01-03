@@ -2,18 +2,83 @@
 <html>
 <head>
   <title>Caregiver Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/caregiver.css">
 </head>
+
 <body>
-  <h1>Caregiver Dashboard</h1>
+<div class="app">
 
-  <ul>
-    <li>Patient Profile</li>
-    <li>Memory Board (Coming Soon)</li>
-    <li>Reminders (Coming Soon)</li>
-    <li>Medication (Coming Soon)</li>
-    <li>Live Location (Coming Soon)</li>
-  </ul>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+  <h2 class="logo">SmritiCare</h2>
 
-  <a href="/auth/logout">Logout</a>
+  <nav>
+    <a href="/caregiver/dashboard" class="active"> Dashboard</a>
+    <a href="/caregiver/reminders"> Reminders</a>
+    <a href="/caregiver/medication"> Medications</a>
+    <a href="/caregiver/memory"> Memory Board</a>
+    <a href="/caregiver/location"> Live Location</a>
+    <a href="/caregiver/profile"> Profile</a>
+    <a href="/auth/logout" class="logout-btn"> Logout</a>
+
+  </nav>
+
+  <div class="support">
+    <p><strong>Need help?</strong><br>Our support team is here.</p>
+    <button class="primary-btn">Contact Support</button>
+  </div>
+</aside>
+
+
+  <main class="main">
+
+    <header class="topbar">
+      <div class="user">
+        <div>
+          <strong>Caregiver</strong>
+          <p>Primary Caregiver</p>
+          </div>
+    </header>
+
+    <section class="welcome">
+      <div>
+        <p class="small">Welcome back</p>
+        <h1>You are doing a wonderful job.</h1>
+        <p class="sub">🍃 One step at a time.</p>
+      </div>
+      <div class="heart"></div>
+    </section>
+
+    <h2 class="section-title">Self-Care Tips for You 🌿</h2>
+
+<section class="selfcare-grid">
+  <div class="card selfcare">
+    <h3>🧘 Take a Breather</h3>
+    <p>Pause for 2 minutes. Deep breathing helps reduce stress and improves focus.</p>
+  </div>
+
+  <div class="card selfcare">
+    <h3>💧 Stay Hydrated</h3>
+    <p>Drinking enough water keeps your energy levels steady throughout the day.</p>
+  </div>
+
+  <div class="card selfcare">
+    <h3>😴 Rest is Care</h3>
+    <p>Getting proper sleep is essential. Caring for yourself helps you care better.</p>
+  </div>
+
+  <div class="card selfcare">
+    <h3>🤝 Ask for Help</h3>
+    <p>You don’t have to do everything alone. Reaching out is a strength.</p>
+  </div>
+</section>
+
+
+  </main>
+</div>
+
+<script src="/js/caregiverDashboard.js"></script>
 </body>
 </html>
