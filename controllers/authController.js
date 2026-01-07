@@ -3,6 +3,24 @@ const User = require("../models/User");
 const PatientProfile = require("../models/PatientProfile");
 const CaregiverProfile = require("../models/CaregiverProfile");
 const InviteCode = require("../models/InviteCode");
+const nodemailer = require("nodemailer");
+
+/* ================= VERIFY OTP ================= */
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+async function sendOTP(email, otp) {
+  await transporter.sendMail({
+    to: email,
+    subject: "SmritiCare OTP Verification",
+    html: `<h3>Your OTP: <b>${otp}</b></h3>`
+  });
+}
 
 /* ================= SIGNUP ================= */
 exports.signup = async (req, res) => {
@@ -58,16 +76,21 @@ exports.signup = async (req, res) => {
   }
 };
 
+
 /* ================= LOGIN ================= */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+   const user = await User.findOne({ email });
+if (!user) return res.send("Invalid credentials");
 
-    const user = await User.findOne({ email });
-    if (!user) return res.send("Invalid credentials");
+/* ✅ ADD THIS CHECK HERE */
+if (!user.isEmailVerified) {
+  return res.send("Please verify your email via OTP first");
+}
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.send("Invalid credentials");
+const isMatch = await bcrypt.compare(password, user.password);
+if (!isMatch) return res.send("Invalid credentials");
+
 
     req.session.user = {
       id: user._id,
@@ -87,6 +110,8 @@ exports.login = async (req, res) => {
   }
 };
 
+
+
 /* ================= LOGOUT ================= */
 exports.logout = (req, res) => {
   req.session.destroy(() => {
@@ -94,3 +119,32 @@ exports.logout = (req, res) => {
   });
 };
 
+exports.verifyOTP = async (req, res) => {
+  const { otp } = req.body;
+
+  const user = await User.findById(req.session.tempUser);
+  if (!user) return res.send("Session expired");
+
+  if (
+    user.otp.code !== otp ||
+    user.otp.expiresAt < Date.now()
+  ) {
+    return res.send("Invalid or expired OTP");
+  }
+
+  user.isEmailVerified = true;
+  user.otp = null;
+  await user.save();
+
+  req.session.user = {
+    id: user._id,
+    role: user.role,
+    linked: false
+  };
+
+  if (user.role === "patient") {
+    return res.redirect("/patient/invite");
+  }
+
+  res.redirect("/caregiver/link");
+};

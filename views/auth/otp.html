@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OTP Verification</title>
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 class="auth-title">Verify OTP</h2>
+    <p class="auth-subtitle">Check your email</p>
+
+    <form action="/auth/verify-otp" method="POST">
+      <input name="otp" placeholder="Enter 6-digit OTP" required>
+      <button class="auth-btn">Verify</button>
+    </form>
+
+    <p id="msg"></p>
+  </div>
+</div>
+
+</body>
+</html>

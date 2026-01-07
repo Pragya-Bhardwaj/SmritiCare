@@ -2,19 +2,22 @@
 <html>
 <head>
   <title>Signup</title>
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
-  <link rel="stylesheet" href="/css/auth.css">
 
 <div class="auth-wrapper">
   <div class="auth-card">
     <h2 class="auth-title">Create Account</h2>
     <p class="auth-subtitle">Signup to get started</p>
 
-    <form action="/auth/signup" method="POST">
+    <form action="/auth/signup" method="POST" onsubmit="return validateSignup()">
       <input name="name" placeholder="Full Name" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <input name="password" type="password" placeholder="Password" required>
+
+      <input id="email" name="email" type="email" placeholder="Email" required>
+
+      <input id="password" name="password" type="password" placeholder="Password" required>
+      <small id="strength"></small>
 
       <select name="role" required>
         <option value="">Select Role</option>
@@ -31,6 +34,45 @@
     </div>
   </div>
 </div>
+
+<script>
+const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
+
+function validateSignup() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const domain = email.split("@")[1];
+  if (!allowedDomains.includes(domain)) {
+    alert("Only Gmail, Yahoo, Outlook allowed");
+    return false;
+  }
+
+  if (checkStrength(password) !== "Strong") {
+    alert("Password not strong enough");
+    return false;
+  }
+
+  return true;
+}
+
+function checkStrength(pwd) {
+  let s = 0;
+  if (pwd.length >= 8) s++;
+  if (/[A-Z]/.test(pwd)) s++;
+  if (/[0-9]/.test(pwd)) s++;
+  if (/[@$!%*?&]/.test(pwd)) s++;
+
+  const txt = document.getElementById("strength");
+  if (s <= 1) { txt.innerText = "Weak"; return "Weak"; }
+  if (s === 2) { txt.innerText = "Medium"; return "Medium"; }
+  txt.innerText = "Strong"; return "Strong";
+}
+
+document.getElementById("password").addEventListener("input", e => {
+  checkStrength(e.target.value);
+});
+</script>
 
 </body>
 </html>

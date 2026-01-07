@@ -13,7 +13,13 @@
     <p class="auth-subtitle">Enter the invite code shared by patient</p>
 
     <input id="code" placeholder="PAT-XXXX">
-    <button class="auth-btn" onclick="link()">Link Patient</button>
+<button class="auth-btn" onclick="link()">Link Patient</button>
+
+<p id="msg"></p>
+
+<button id="dashBtn" class="auth-btn" disabled onclick="location.href='/caregiver/dashboard'">
+  Go to Dashboard
+</button>
 
     <p id="msg" class="auth-subtitle"></p>
   </div>
