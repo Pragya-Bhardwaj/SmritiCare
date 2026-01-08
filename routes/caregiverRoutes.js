@@ -75,24 +75,7 @@ router.get("/dashboard", (req, res) => {
 });
 
 
-router.post("/link", async (req, res) => {
-  const { code } = req.body;
 
-  const invite = await InviteCode.findOne({ code });
-  if (!invite) {
-    return res.json({ success: false, error: "Invalid invite code" });
-  }
-
-  invite.linked = true;
-  await invite.save();
-
-  await User.findByIdAndUpdate(invite.patientId, { linked: true });
-  await User.findByIdAndUpdate(req.session.user.id, { linked: true });
-
-  req.session.user.linked = true;
-
-  res.json({ success: true });
-});
 
 
 module.exports = router;

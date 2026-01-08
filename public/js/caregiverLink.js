@@ -18,9 +18,10 @@ async function link() {
    const res = await fetch("/caregiver/link", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  credentials: "include", // 🔥 THIS LINE FIXES IT
-  body: JSON.stringify({ code: codeInput.value.trim() })
+  credentials: "same-origin",   // 👈 THIS IS REQUIRED
+  body: JSON.stringify({ code })
 });
+
 
 
     const data = await res.json();
