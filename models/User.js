@@ -35,7 +35,8 @@ const userSchema = new mongoose.Schema({
   linked: {
     type: Boolean,
     default: false
-  },
+  }, 
+
 
   linkedUser: {
     type: mongoose.Schema.Types.ObjectId,

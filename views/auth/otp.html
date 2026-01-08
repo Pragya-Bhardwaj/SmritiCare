@@ -12,30 +12,23 @@
     <p class="auth-subtitle">Check your email</p>
     <p class="otp-info">OTP valid for 5 minutes</p>
 
-    <form id="otpForm">
-      <input id="otp" placeholder="Enter 6-digit OTP" required>
-      <p class="error" id="otpError"></p>
+    <form onsubmit="verifyOTP(event)">
+  <input id="otp" placeholder="Enter 6-digit OTP" required>
+  <p class="error" id="otpError"></p>
 
-      <button class="auth-btn" type="submit">Verify</button>
-    </form>
+  <button class="auth-btn">Verify</button>
+  <button type="button" class="auth-btn" onclick="resendOTP()">Resend OTP</button>
 
-    <button class="link-btn" onclick="resendOTP()">Resend OTP</button>
-    <p class="success" id="resendMsg"></p>
-  </div>
-</div>
+  <p class="waiting-text">OTP valid for 5 minutes</p>
+</form>
 
 <script>
-document.getElementById("otpForm").addEventListener("submit", async (e) => {
+async function verifyOTP(e) {
   e.preventDefault();
 
   const otp = document.getElementById("otp").value.trim();
   const err = document.getElementById("otpError");
   err.innerText = "";
-
-  if (!/^\d{6}$/.test(otp)) {
-    err.innerText = "Enter valid 6-digit OTP";
-    return;
-  }
 
   const res = await fetch("/auth/verify-otp", {
     method: "POST",
@@ -43,27 +36,23 @@ document.getElementById("otpForm").addEventListener("submit", async (e) => {
     body: JSON.stringify({ otp })
   });
 
-  const text = await res.text();
-
-  if (text.includes("Invalid")) {
-    err.innerText = "Invalid OTP";
-  } else {
-    window.location.href = text;
-  }
-});
-
-async function resendOTP() {
-  const msg = document.getElementById("resendMsg");
-  msg.innerText = "";
-
-  const res = await fetch("/auth/resend-otp", { method: "POST" });
   const data = await res.json();
 
-  if (data.success) {
-    msg.innerText = "OTP resent successfully";
+  if (!res.ok) {
+    err.innerText = data.error;
+    return;
   }
+
+  window.location.href = data.redirect;
+}
+
+async function resendOTP() {
+  await fetch("/auth/resend-otp", { method: "POST" });
+  alert("OTP resent to your email");
 }
 </script>
+
+
 
 </body>
 </html>

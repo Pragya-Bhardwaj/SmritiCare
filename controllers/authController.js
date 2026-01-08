@@ -77,45 +77,41 @@ exports.signup = async (req, res) => {
 
 /* ================= VERIFY OTP ================= */
 exports.verifyOTP = async (req, res) => {
-  try {
-    const { otp } = req.body;
+  const { otp } = req.body;
+  const user = await User.findById(req.session.tempUser);
 
-    const user = await User.findById(req.session.tempUser);
-    if (!user) return res.send("Session expired. Please signup again.");
-
-    if (
-      !user.otp ||
-      user.otp.code !== otp ||
-      user.otp.expiresAt < Date.now()
-    ) {
-      return res.send("Invalid");
-    }
-
-    user.isEmailVerified = true;
-    user.otp = null;
-    await user.save();
-
-    req.session.user = {
-      id: user._id,
-      role: user.role,
-      linked: false
-    };
-
-    delete req.session.tempUser;
-
-    if (user.role === "patient") {
-      return res.redirect("/patient/welcome");
-    }
-
-    res.redirect("/caregiver/link");
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("OTP verification failed");
-    
-
+  if (!user) {
+    return res.status(400).json({ error: "Session expired" });
   }
+
+  if (
+    !user.otp ||
+    user.otp.code !== otp ||
+    user.otp.expiresAt < Date.now()
+  ) {
+    return res.status(400).json({ error: "Invalid or expired OTP" });
+  }
+
+  user.isEmailVerified = true;
+  user.otp = null;
+  await user.save();
+
+  req.session.user = {
+    id: user._id,
+    role: user.role,
+    linked: false
+  };
+
+  delete req.session.tempUser;
+
+  return res.json({
+    redirect:
+      user.role === "patient"
+        ? "/patient/welcome"
+        : "/caregiver/link"
+  });
 };
+
 
 /* ================= LOGIN ================= */
 exports.login = async (req, res) => {
@@ -159,24 +155,19 @@ exports.logout = (req, res) => {
 };
 /* ================= RESEND OTP ================= */
 exports.resendOTP = async (req, res) => {
-  try {
-    const user = await User.findById(req.session.tempUser);
-    if (!user) return res.json({ success: false });
+  const user = await User.findById(req.session.tempUser);
+  if (!user) return res.status(400).json({ error: "Session expired" });
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = Math.floor(100000 + Math.random() * 900000);
 
-    user.otp = {
-      code: otp,
-      expiresAt: Date.now() + 5 * 60 * 1000
-    };
-    await user.save();
+  user.otp = {
+    code: otp,
+    expiresAt: Date.now() + 5 * 60 * 1000
+  };
+  await user.save();
 
-    await sendOTP(user.email, otp);
+  await sendOTP(user.email, otp);
 
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error(err);
-    res.json({ success: false });
-  }
+  res.json({ success: true });
 };
+
