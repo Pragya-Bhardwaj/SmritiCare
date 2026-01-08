@@ -11,6 +11,9 @@ const memoryRoutes = require("./routes/memoryRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
 
+const MongoStore = require("connect-mongo");
+
+
 const app = express();
 
 /* ================= DATABASE ================= */
@@ -31,6 +34,19 @@ app.use(
   })
 );
 
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "smriticasecret",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions"
+    })
+  })
+);
+
 /* ================= STATIC FILES ================= */
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -40,6 +56,7 @@ app.use("/views", express.static(path.join(__dirname, "views")));
 /* ================= ROUTES ================= */
 app.use("/auth", authRoutes);
 app.use("/pair", pairingRoutes);
+
 
 
 app.use("/patient", patientRoutes);
