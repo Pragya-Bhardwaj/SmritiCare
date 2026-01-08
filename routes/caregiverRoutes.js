@@ -48,14 +48,14 @@ router.post("/link", async (req, res) => {
     caregiver.linkedUser = patient._id;
     await caregiver.save();
 
-    // Update session
+    // Update caregiver session
     req.session.user.linked = true;
 
     return res.json({ success: true });
 
   } catch (err) {
     console.error(err);
-    res.json({ success: false, error: "Linking failed" });
+    return res.json({ success: false, error: "Linking failed" });
   }
 });
 
