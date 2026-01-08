@@ -2,6 +2,7 @@ async function link() {
   const codeInput = document.getElementById("code");
   const msg = document.getElementById("msg");
   const dashBtn = document.getElementById("dashBtn");
+  const linkBtn = document.getElementById("linkBtn");
 
   msg.innerText = "";
   msg.style.color = "red";
@@ -11,22 +12,31 @@ async function link() {
     return;
   }
 
-  const res = await fetch("/caregiver/link", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: codeInput.value.trim() })
-  });
+  linkBtn.disabled = true;
 
-  const data = await res.json();
+  try {
+    const res = await fetch("/caregiver/link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: codeInput.value.trim() })
+    });
 
-  if (!data.success) {
-    msg.innerText = data.error || "Invalid invite code";
-    return;
+    const data = await res.json();
+
+    if (!data.success) {
+      msg.innerText = data.error || "Invalid invite code";
+      linkBtn.disabled = false;
+      return;
+    }
+
+    msg.style.color = "green";
+    msg.innerText = "Linked successfully!";
+
+    dashBtn.disabled = false;
+    dashBtn.classList.remove("disabled-btn");
+
+  } catch (err) {
+    msg.innerText = "Something went wrong. Try again.";
+    linkBtn.disabled = false;
   }
-
-  msg.style.color = "green";
-  msg.innerText = "Linked successfully!";
-
-  dashBtn.disabled = false;
-  dashBtn.classList.remove("disabled-btn");
 }

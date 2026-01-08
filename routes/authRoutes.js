@@ -15,6 +15,8 @@ router.get("/verify-otp", (req, res) => {
 });
 
 router.post("/verify-otp", authController.verifyOTP);
+router.post("/resend-otp", authController.resendOTP);
+
 
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);

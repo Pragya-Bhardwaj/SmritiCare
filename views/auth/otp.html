@@ -10,26 +10,58 @@
   <div class="auth-card">
     <h2 class="auth-title">Verify OTP</h2>
     <p class="auth-subtitle">Check your email</p>
+    <p class="otp-info">OTP valid for 5 minutes</p>
 
-    <form action="/auth/verify-otp" method="POST" onsubmit="return validateOTP()">
-      <input id="otp" name="otp" placeholder="Enter 6-digit OTP" required>
+    <form id="otpForm">
+      <input id="otp" placeholder="Enter 6-digit OTP" required>
       <p class="error" id="otpError"></p>
-      <button class="auth-btn">Verify</button>
+
+      <button class="auth-btn" type="submit">Verify</button>
     </form>
+
+    <button class="link-btn" onclick="resendOTP()">Resend OTP</button>
+    <p class="success" id="resendMsg"></p>
   </div>
 </div>
 
 <script>
-function validateOTP() {
+document.getElementById("otpForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
   const otp = document.getElementById("otp").value.trim();
   const err = document.getElementById("otpError");
   err.innerText = "";
 
   if (!/^\d{6}$/.test(otp)) {
     err.innerText = "Enter valid 6-digit OTP";
-    return false;
+    return;
   }
-  return true;
+
+  const res = await fetch("/auth/verify-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ otp })
+  });
+
+  const text = await res.text();
+
+  if (text.includes("Invalid")) {
+    err.innerText = "Invalid OTP";
+  } else {
+    window.location.href = text;
+  }
+});
+
+async function resendOTP() {
+  const msg = document.getElementById("resendMsg");
+  msg.innerText = "";
+
+  const res = await fetch("/auth/resend-otp", { method: "POST" });
+  const data = await res.json();
+
+  if (data.success) {
+    msg.innerText = "OTP resent successfully";
+  }
 }
 </script>
 

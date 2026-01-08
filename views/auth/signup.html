@@ -39,40 +39,60 @@
 const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
 
 function validateSignup() {
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+  const strengthText = document.getElementById("strength");
+
+  strengthText.innerText = "";
 
   const domain = email.split("@")[1];
   if (!allowedDomains.includes(domain)) {
-    alert("Only Gmail, Yahoo, Outlook allowed");
+    strengthText.innerText = "Invalid email domain";
+    strengthText.className = "strength weak";
     return false;
   }
 
   if (checkStrength(password) !== "Strong") {
-    alert("Password not strong enough");
     return false;
   }
 
   return true;
 }
 
+
 function checkStrength(pwd) {
   let s = 0;
-  if (pwd.length >= 8) s++;
+
+  if (pwd.length >= 6) s++;          // reduced from 8
   if (/[A-Z]/.test(pwd)) s++;
   if (/[0-9]/.test(pwd)) s++;
   if (/[@$!%*?&]/.test(pwd)) s++;
 
   const txt = document.getElementById("strength");
-  if (s <= 1) { txt.innerText = "Weak"; return "Weak"; }
-  if (s === 2) { txt.innerText = "Medium"; return "Medium"; }
-  txt.innerText = "Strong"; return "Strong";
+
+  if (s <= 1) {
+    txt.innerText = "Weak";
+    txt.className = "strength weak";
+    return "Weak";
+  }
+
+  if (s === 2) {
+    txt.innerText = "Medium";
+    txt.className = "strength weak"; // still red
+    return "Medium";
+  }
+
+  txt.innerText = "Strong";
+  txt.className = "strength strong"; // green
+  return "Strong";
 }
+
 
 document.getElementById("password").addEventListener("input", e => {
   checkStrength(e.target.value);
 });
 </script>
+
 
 </body>
 </html>

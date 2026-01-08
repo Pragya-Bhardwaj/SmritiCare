@@ -88,7 +88,7 @@ exports.verifyOTP = async (req, res) => {
       user.otp.code !== otp ||
       user.otp.expiresAt < Date.now()
     ) {
-      return res.send("Invalid or expired OTP");
+      return res.send("Invalid");
     }
 
     user.isEmailVerified = true;
@@ -112,6 +112,8 @@ exports.verifyOTP = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("OTP verification failed");
+    
+
   }
 };
 
@@ -154,4 +156,27 @@ exports.logout = (req, res) => {
   req.session.destroy(() => {
     res.redirect("/auth/login");
   });
+};
+/* ================= RESEND OTP ================= */
+exports.resendOTP = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.tempUser);
+    if (!user) return res.json({ success: false });
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    user.otp = {
+      code: otp,
+      expiresAt: Date.now() + 5 * 60 * 1000
+    };
+    await user.save();
+
+    await sendOTP(user.email, otp);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
 };
