@@ -49,7 +49,6 @@ router.get("/dashboard", (req, res) => {
     return res.redirect("/auth/login");
   }
 
-  // 🔒 BLOCK DASHBOARD UNTIL CAREGIVER LINKS
   if (!req.session.user.linked) {
     return res.redirect("/patient/welcome");
   }
@@ -58,5 +57,6 @@ router.get("/dashboard", (req, res) => {
     path.join(__dirname, "../views/patient/dashboard.html")
   );
 });
+
 
 module.exports = router;

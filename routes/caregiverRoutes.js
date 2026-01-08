@@ -65,7 +65,6 @@ router.get("/dashboard", (req, res) => {
     return res.redirect("/auth/login");
   }
 
-  // 🔒 BLOCK DASHBOARD UNTIL LINKED
   if (!req.session.user.linked) {
     return res.redirect("/caregiver/link");
   }
@@ -74,6 +73,7 @@ router.get("/dashboard", (req, res) => {
     path.join(__dirname, "../views/caregiver/dashboard.html")
   );
 });
+
 
 router.post("/link", async (req, res) => {
   const { code } = req.body;

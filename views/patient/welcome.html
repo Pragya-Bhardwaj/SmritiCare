@@ -21,7 +21,7 @@
       id="dashboardBtn"
       class="auth-btn disabled-btn"
       disabled
-      onclick="location.href='/patient/dashboard'"
+      onclick="goPatientDashboard()"
     >
       Go to Dashboard
     </button>
@@ -29,29 +29,46 @@
 </div>
 
 <script>
-async function loadInviteCode() {
-  const res = await fetch("/patient/invite-code");
-  const data = await res.json();
-  document.getElementById("inviteCode").innerText = data.code || "----";
+function goPatientDashboard() {
+  window.location.href = "/patient/dashboard";
 }
 
-async function checkLinkStatus() {
-  const res = await fetch("/patient/link-status");
-  const data = await res.json();
-
-  if (data.linked) {
-    const btn = document.getElementById("dashboardBtn");
-    btn.disabled = false;
-    btn.classList.remove("disabled-btn");
-    document.getElementById("statusText").innerText =
-      "Caregiver linked successfully!";
+async function loadInviteCode() {
+  try {
+    const res = await fetch("/patient/invite-code");
+    const data = await res.json();
+    document.getElementById("inviteCode").innerText = data.code || "----";
+  } catch (err) {
+    console.error("Failed to load invite code");
   }
 }
 
+let poller = null;
+
+async function checkLinkStatus() {
+  try {
+    const res = await fetch("/patient/link-status");
+    const data = await res.json();
+
+    if (data.linked) {
+      const btn = document.getElementById("dashboardBtn");
+      btn.disabled = false;
+      btn.classList.remove("disabled-btn");
+
+      document.getElementById("statusText").innerText =
+        "Caregiver linked successfully!";
+
+      clearInterval(poller); // 🛑 stop polling once linked
+    }
+  } catch (err) {
+    console.error("Link status check failed");
+  }
+}
+
+// INIT
 loadInviteCode();
-setInterval(checkLinkStatus, 5000);
+poller = setInterval(checkLinkStatus, 3000);
 </script>
 
 </body>
 </html>
-
