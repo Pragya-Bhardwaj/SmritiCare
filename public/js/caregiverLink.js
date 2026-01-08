@@ -15,11 +15,13 @@ async function link() {
   linkBtn.disabled = true;
 
   try {
-    const res = await fetch("/caregiver/link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: codeInput.value.trim() })
-    });
+   const res = await fetch("/caregiver/link", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include", // 🔥 THIS LINE FIXES IT
+  body: JSON.stringify({ code: codeInput.value.trim() })
+});
+
 
     const data = await res.json();
 
