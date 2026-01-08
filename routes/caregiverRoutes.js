@@ -48,14 +48,14 @@ router.post("/link", async (req, res) => {
     caregiver.linkedUser = patient._id;
     await caregiver.save();
 
-    // Update session
+    // Update caregiver session
     req.session.user.linked = true;
 
     return res.json({ success: true });
 
   } catch (err) {
     console.error(err);
-    res.json({ success: false, error: "Linking failed" });
+    return res.json({ success: false, error: "Linking failed" });
   }
 });
 
@@ -65,7 +65,6 @@ router.get("/dashboard", (req, res) => {
     return res.redirect("/auth/login");
   }
 
-  // 🔒 BLOCK DASHBOARD UNTIL LINKED
   if (!req.session.user.linked) {
     return res.redirect("/caregiver/link");
   }
@@ -74,25 +73,5 @@ router.get("/dashboard", (req, res) => {
     path.join(__dirname, "../views/caregiver/dashboard.html")
   );
 });
-
-router.post("/link", async (req, res) => {
-  const { code } = req.body;
-
-  const invite = await InviteCode.findOne({ code });
-  if (!invite) {
-    return res.json({ success: false, error: "Invalid invite code" });
-  }
-
-  invite.linked = true;
-  await invite.save();
-
-  await User.findByIdAndUpdate(invite.patientId, { linked: true });
-  await User.findByIdAndUpdate(req.session.user.id, { linked: true });
-
-  req.session.user.linked = true;
-
-  res.json({ success: true });
-});
-
 
 module.exports = router;
