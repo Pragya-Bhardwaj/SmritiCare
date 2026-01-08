@@ -11,14 +11,27 @@
     <h2 class="auth-title">Verify OTP</h2>
     <p class="auth-subtitle">Check your email</p>
 
-    <form action="/auth/verify-otp" method="POST">
-      <input name="otp" placeholder="Enter 6-digit OTP" required>
+    <form action="/auth/verify-otp" method="POST" onsubmit="return validateOTP()">
+      <input id="otp" name="otp" placeholder="Enter 6-digit OTP" required>
+      <p class="error" id="otpError"></p>
       <button class="auth-btn">Verify</button>
     </form>
-
-    <p id="msg"></p>
   </div>
 </div>
+
+<script>
+function validateOTP() {
+  const otp = document.getElementById("otp").value.trim();
+  const err = document.getElementById("otpError");
+  err.innerText = "";
+
+  if (!/^\d{6}$/.test(otp)) {
+    err.innerText = "Enter valid 6-digit OTP";
+    return false;
+  }
+  return true;
+}
+</script>
 
 </body>
 </html>

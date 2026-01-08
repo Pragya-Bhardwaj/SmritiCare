@@ -2,18 +2,23 @@
 <html>
 <head>
   <title>Login</title>
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
-  <link rel="stylesheet" href="/css/auth.css">
 
 <div class="auth-wrapper">
   <div class="auth-card">
     <h2 class="auth-title">Welcome Back</h2>
     <p class="auth-subtitle">Login to continue</p>
 
-    <form action="/auth/login" method="POST">
-      <input name="email" type="email" placeholder="Email" required>
-      <input name="password" type="password" placeholder="Password" required>
+    <form action="/auth/login" method="POST" onsubmit="return validateLogin()">
+
+      <input id="email" name="email" type="email" placeholder="Email" required>
+      <p class="error" id="emailError"></p>
+
+      <input id="password" name="password" type="password" placeholder="Password" required>
+      <p class="error" id="passwordError"></p>
+
       <button class="auth-btn">Login</button>
     </form>
 
@@ -24,5 +29,30 @@
   </div>
 </div>
 
+<script>
+function validateLogin() {
+  let valid = true;
+
+  document.getElementById("emailError").innerText = "";
+  document.getElementById("passwordError").innerText = "";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email) {
+    document.getElementById("emailError").innerText = "Email is required";
+    valid = false;
+  }
+
+  if (!password) {
+    document.getElementById("passwordError").innerText = "Password is required";
+    valid = false;
+  }
+
+  return valid;
+}
+</script>
+
 </body>
 </html>
+

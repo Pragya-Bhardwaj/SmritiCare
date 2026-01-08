@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Invite Caregiver</title>
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
-  <link rel="stylesheet" href="/css/auth.css">
 
 <div class="auth-wrapper">
   <div class="auth-card">
     <h2 class="auth-title">Welcome!</h2>
     <p class="auth-subtitle">Share this invite code with your caregiver</p>
 
-    <div class="invite-code" id="code">----</div>
+    <div class="invite-code" id="inviteCode">----</div>
 
-    <form action="/patient/dashboard">
-      <button class="auth-btn">Go to Dashboard</button>
-    </form>
+    <p class="waiting-text" id="statusText">
+      Waiting for caregiver to link
+    </p>
+
+    <button
+      id="dashboardBtn"
+      class="auth-btn disabled-btn"
+      disabled
+      onclick="location.href='/patient/dashboard'"
+    >
+      Go to Dashboard
+    </button>
   </div>
 </div>
 
-<script src="/js/patientWelcome.js"></script>
+<script>
+async function loadInviteCode() {
+  const res = await fetch("/patient/invite-code");
+  const data = await res.json();
+  document.getElementById("inviteCode").innerText = data.code || "----";
+}
+
+async function checkLinkStatus() {
+  const res = await fetch("/patient/link-status");
+  const data = await res.json();
+
+  if (data.linked) {
+    const btn = document.getElementById("dashboardBtn");
+    btn.disabled = false;
+    btn.classList.remove("disabled-btn");
+    document.getElementById("statusText").innerText =
+      "Caregiver linked successfully!";
+  }
+}
+
+loadInviteCode();
+setInterval(checkLinkStatus, 5000);
+</script>
 
 </body>
 </html>
+

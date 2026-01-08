@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const InviteCode = require("../models/InviteCode");
+const User = require("../models/User");
 
-router.get("/welcome", (req, res) => {
+/* ================= WELCOME / INVITE PAGE ================= */
+router.get("/welcome", async (req, res) => {
   if (!req.session.user || req.session.user.role !== "patient") {
     return res.redirect("/auth/login");
   }
@@ -12,9 +15,43 @@ router.get("/welcome", (req, res) => {
   );
 });
 
+/* ================= FETCH INVITE CODE ================= */
+router.get("/invite-code", async (req, res) => {
+  if (!req.session.user || req.session.user.role !== "patient") {
+    return res.json({ code: null });
+  }
+
+  const invite = await InviteCode.findOne({
+    patientId: req.session.user.id
+  });
+
+  res.json({ code: invite?.code || null });
+});
+
+/* ================= LINK STATUS (POLLING) ================= */
+router.get("/link-status", async (req, res) => {
+  if (!req.session.user || req.session.user.role !== "patient") {
+    return res.json({ linked: false });
+  }
+
+  const user = await User.findById(req.session.user.id);
+  if (!user) return res.json({ linked: false });
+
+  // Keep session in sync
+  req.session.user.linked = user.linked;
+
+  res.json({ linked: user.linked });
+});
+
+/* ================= DASHBOARD ================= */
 router.get("/dashboard", (req, res) => {
   if (!req.session.user || req.session.user.role !== "patient") {
     return res.redirect("/auth/login");
+  }
+
+  // 🔒 BLOCK DASHBOARD UNTIL CAREGIVER LINKS
+  if (!req.session.user.linked) {
+    return res.redirect("/patient/welcome");
   }
 
   res.sendFile(
