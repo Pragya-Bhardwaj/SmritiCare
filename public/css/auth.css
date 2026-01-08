@@ -128,3 +128,20 @@
     padding: 24px;
   }
 }
+
+.disabled-btn {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.waiting-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+}

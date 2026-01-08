@@ -2,10 +2,9 @@
 <html>
 <head>
   <title>Link Patient</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
- <link rel="stylesheet" href="/css/auth.css">
 
 <div class="auth-wrapper">
   <div class="auth-card">
@@ -13,15 +12,19 @@
     <p class="auth-subtitle">Enter the invite code shared by patient</p>
 
     <input id="code" placeholder="PAT-XXXX">
-<button class="auth-btn" onclick="link()">Link Patient</button>
 
-<p id="msg"></p>
+    <p class="error" id="msg"></p>
 
-<button id="dashBtn" class="auth-btn" disabled onclick="location.href='/caregiver/dashboard'">
-  Go to Dashboard
-</button>
+    <button class="auth-btn" onclick="link()">Link Patient</button>
 
-    <p id="msg" class="auth-subtitle"></p>
+    <button
+      id="dashBtn"
+      class="auth-btn disabled-btn"
+      disabled
+      onclick="location.href='/caregiver/dashboard'"
+    >
+      Go to Dashboard
+    </button>
   </div>
 </div>
 
