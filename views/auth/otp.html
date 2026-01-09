@@ -10,49 +10,87 @@
   <div class="auth-card">
     <h2 class="auth-title">Verify OTP</h2>
     <p class="auth-subtitle">Check your email</p>
-    <p class="otp-info">OTP valid for 5 minutes</p>
+
+    <p class="waiting-text" id="timerText">
+      OTP valid for <span id="timer">05:00</span>
+    </p>
 
     <form onsubmit="verifyOTP(event)">
-  <input id="otp" placeholder="Enter 6-digit OTP" required>
-  <p class="error" id="otpError"></p>
+      <input id="otp" placeholder="Enter 6-digit OTP" required>
+      <p class="error" id="otpError"></p>
 
-  <button class="auth-btn">Verify</button>
-  <button type="button" class="auth-btn" onclick="resendOTP()">Resend OTP</button>
-
-  <p class="waiting-text">OTP valid for 5 minutes</p>
-</form>
+      <button class="auth-btn" id="verifyBtn">Verify</button>
+      <button type="button" class="auth-btn" id="resendBtn" onclick="resendOTP()">
+        Resend OTP
+      </button>
+    </form>
+  </div>
+</div>
 
 <script>
+/* ================= TIMER ================= */
+let timeLeft = 300; // 5 minutes
+const timerEl = document.getElementById("timer");
+
+const countdown = setInterval(() => {
+  const min = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+  const sec = String(timeLeft % 60).padStart(2, "0");
+  timerEl.innerText = `${min}:${sec}`;
+
+  if (timeLeft-- <= 0) {
+    clearInterval(countdown);
+    document.getElementById("timerText").innerText =
+      "OTP expired. Please resend OTP.";
+  }
+}, 1000);
+
+/* ================= VERIFY OTP ================= */
 async function verifyOTP(e) {
   e.preventDefault();
 
   const otp = document.getElementById("otp").value.trim();
   const err = document.getElementById("otpError");
+  const btn = document.getElementById("verifyBtn");
+
   err.innerText = "";
+  btn.disabled = true;
 
   const res = await fetch("/auth/verify-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ otp })
   });
 
   const data = await res.json();
 
   if (!res.ok) {
-    err.innerText = data.error;
+    err.innerText = data.error || "Invalid OTP";
+    btn.disabled = false;
     return;
   }
 
   window.location.href = data.redirect;
 }
 
+/* ================= RESEND OTP ================= */
 async function resendOTP() {
-  await fetch("/auth/resend-otp", { method: "POST" });
-  alert("OTP resent to your email");
+  const btn = document.getElementById("resendBtn");
+  btn.disabled = true;
+
+  const res = await fetch("/auth/resend-otp", {
+    method: "POST",
+    credentials: "include"
+  });
+
+  const data = await res.json();
+
+  alert(data.success ? "OTP resent successfully" : "Failed to resend OTP");
+
+  timeLeft = 300;
+  btn.disabled = false;
 }
 </script>
-
-
 
 </body>
 </html>

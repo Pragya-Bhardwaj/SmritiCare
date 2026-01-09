@@ -4,9 +4,20 @@ const path = require("path");
 const InviteCode = require("../models/InviteCode");
 const User = require("../models/User");
 
-/* ================= LINK PAGE ================= */
-router.get("/link", (req, res) => {
+/* ================= AUTH MIDDLEWARE ================= */
+function requireCaregiver(req, res, next) {
   if (!req.session.user || req.session.user.role !== "caregiver") {
+    return res.redirect("/auth/login");
+  }
+  next();
+}
+
+/* ================= LINK PAGE ================= */
+router.get("/link", requireCaregiver, async (req, res) => {
+  const caregiver = await User.findById(req.session.user.id);
+
+  // 🔒 Block if email not verified
+  if (!caregiver || !caregiver.isEmailVerified) {
     return res.redirect("/auth/login");
   }
 
@@ -16,13 +27,17 @@ router.get("/link", (req, res) => {
 });
 
 /* ================= LINK ACTION ================= */
-router.post("/link", async (req, res) => {
+router.post("/link", requireCaregiver, async (req, res) => {
   try {
-    if (!req.session.user || req.session.user.role !== "caregiver") {
+    const caregiver = await User.findById(req.session.user.id);
+    if (!caregiver || !caregiver.isEmailVerified) {
       return res.json({ success: false, error: "Unauthorized" });
     }
 
     const { code } = req.body;
+    if (!code) {
+      return res.json({ success: false, error: "Invite code required" });
+    }
 
     const invite = await InviteCode.findOne({ code });
     if (!invite || invite.linked) {
@@ -30,42 +45,44 @@ router.post("/link", async (req, res) => {
     }
 
     const patient = await User.findById(invite.patientId);
-    const caregiver = await User.findById(req.session.user.id);
-
     if (!patient || patient.role !== "patient") {
       return res.json({ success: false, error: "Patient not found" });
     }
 
-    // 🔗 LINK BOTH SIDES
+    // 🔗 LINK BOTH SIDES (ATOMIC STYLE)
     invite.linked = true;
-    await invite.save();
-
     patient.linked = true;
     patient.linkedUser = caregiver._id;
-    await patient.save();
-
     caregiver.linked = true;
     caregiver.linkedUser = patient._id;
-    await caregiver.save();
 
-    // Update caregiver session
+    await Promise.all([
+      invite.save(),
+      patient.save(),
+      caregiver.save()
+    ]);
+
+    // 🔄 Sync session
     req.session.user.linked = true;
-
-    return res.json({ success: true });
+    req.session.save(() => {
+      res.json({ success: true });
+    });
 
   } catch (err) {
     console.error(err);
-    return res.json({ success: false, error: "Linking failed" });
+    res.json({ success: false, error: "Linking failed" });
   }
 });
 
 /* ================= DASHBOARD ================= */
-router.get("/dashboard", (req, res) => {
-  if (!req.session.user || req.session.user.role !== "caregiver") {
+router.get("/dashboard", requireCaregiver, async (req, res) => {
+  const caregiver = await User.findById(req.session.user.id);
+
+  if (!caregiver || !caregiver.isEmailVerified) {
     return res.redirect("/auth/login");
   }
 
-  if (!req.session.user.linked) {
+  if (!caregiver.linked) {
     return res.redirect("/caregiver/link");
   }
 
@@ -73,9 +90,5 @@ router.get("/dashboard", (req, res) => {
     path.join(__dirname, "../views/caregiver/dashboard.html")
   );
 });
-
-
-
-
 
 module.exports = router;

@@ -25,15 +25,16 @@ async function sendOTP(email, otp) {
 /* ================= SIGNUP ================= */
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
+    email = email.toLowerCase().trim();
 
     const existing = await User.findOne({ email });
-    if (existing) return res.send("User already exists");
+    if (existing) {
+      return res.status(400).json({ error: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 🔐 Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
 
     const user = await User.create({
       name,
@@ -47,7 +48,6 @@ exports.signup = async (req, res) => {
       }
     });
 
-    // Role-based setup
     if (role === "patient") {
       await PatientProfile.create({ userId: user._id });
 
@@ -61,73 +61,38 @@ exports.signup = async (req, res) => {
       await CaregiverProfile.create({ userId: user._id });
     }
 
-    // 📩 Send OTP
     await sendOTP(email, otp);
 
-    // Temporary session for OTP verification
     req.session.tempUser = user._id;
 
-    return res.redirect("/auth/verify-otp");
-
+    return res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Signup error");
+    res.status(500).json({ error: "Signup failed" });
   }
 };
 
 /* ================= VERIFY OTP ================= */
 exports.verifyOTP = async (req, res) => {
-  const { otp } = req.body;
-  const user = await User.findById(req.session.tempUser);
-
-  if (!user) {
-    return res.status(400).json({ error: "Session expired" });
-  }
-
-  if (
-    !user.otp ||
-    user.otp.code !== otp ||
-    user.otp.expiresAt < Date.now()
-  ) {
-    return res.status(400).json({ error: "Invalid or expired OTP" });
-  }
-
-  user.isEmailVerified = true;
-  user.otp = null;
-  await user.save();
-
-  req.session.user = {
-    id: user._id,
-    role: user.role,
-    linked: false
-  };
-
-  delete req.session.tempUser;
-
-  return res.json({
-    redirect:
-      user.role === "patient"
-        ? "/patient/welcome"
-        : "/caregiver/link"
-  });
-};
-
-
-/* ================= LOGIN ================= */
-exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { otp } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.send("Invalid credentials");
-
-    // 🔒 BLOCK LOGIN UNTIL EMAIL VERIFIED
-    if (!user.isEmailVerified) {
-      return res.send("Please verify your email via OTP first");
+    const user = await User.findById(req.session.tempUser);
+    if (!user) {
+      return res.status(400).json({ error: "Session expired" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.send("Invalid credentials");
+    if (
+      !user.otp ||
+      user.otp.code !== String(otp) ||
+      user.otp.expiresAt < Date.now()
+    ) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    user.isEmailVerified = true;
+    user.otp = null;
+    await user.save();
 
     req.session.user = {
       id: user._id,
@@ -135,39 +100,91 @@ exports.login = async (req, res) => {
       linked: user.linked
     };
 
-    if (user.role === "patient") {
-      return res.redirect("/patient/dashboard");
-    }
+    delete req.session.tempUser;
 
-    res.redirect("/caregiver/dashboard");
-
+    return res.json({
+      redirect:
+        user.role === "patient"
+          ? "/patient/welcome"
+          : "/caregiver/link"
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Login error");
+    res.status(500).json({ error: "OTP verification failed" });
+  }
+};
+
+/* ================= LOGIN ================= */
+exports.login = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+    email = email.toLowerCase().trim();
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        error: "Please verify your email via OTP first"
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    req.session.user = {
+      id: user._id,
+      role: user.role,
+      linked: user.linked
+    };
+
+    return res.json({
+      redirect:
+        user.role === "patient"
+          ? "/patient/dashboard"
+          : "/caregiver/dashboard"
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
 /* ================= LOGOUT ================= */
 exports.logout = (req, res) => {
-  req.session.destroy(() => {
+  req.session.regenerate(err => {
+    if (err) {
+      console.error("Session regenerate error:", err);
+    }
     res.redirect("/auth/login");
   });
 };
+
 /* ================= RESEND OTP ================= */
 exports.resendOTP = async (req, res) => {
-  const user = await User.findById(req.session.tempUser);
-  if (!user) return res.status(400).json({ error: "Session expired" });
+  try {
+    const user = await User.findById(req.session.tempUser);
+    if (!user) {
+      return res.status(400).json({ error: "Session expired" });
+    }
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
 
-  user.otp = {
-    code: otp,
-    expiresAt: Date.now() + 5 * 60 * 1000
-  };
-  await user.save();
+    user.otp = {
+      code: otp,
+      expiresAt: Date.now() + 5 * 60 * 1000
+    };
+    await user.save();
 
-  await sendOTP(user.email, otp);
+    await sendOTP(user.email, otp);
 
-  res.json({ success: true });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to resend OTP" });
+  }
 };
-

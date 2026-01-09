@@ -3,6 +3,7 @@ async function link() {
   const msg = document.getElementById("msg");
   const dashBtn = document.getElementById("dashBtn");
   const linkBtn = document.getElementById("linkBtn");
+  const code = codeInput.value.trim();
 
   msg.innerText = "";
   msg.style.color = "red";
@@ -18,7 +19,7 @@ async function link() {
    const res = await fetch("/caregiver/link", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  credentials: "same-origin",   // 👈 THIS IS REQUIRED
+  credentials: "same-origin",
   body: JSON.stringify({ code })
 });
 

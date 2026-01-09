@@ -11,15 +11,14 @@
     <h2 class="auth-title">Welcome Back</h2>
     <p class="auth-subtitle">Login to continue</p>
 
-    <form action="/auth/login" method="POST" onsubmit="return validateLogin()">
-
-      <input id="email" name="email" type="email" placeholder="Email" required>
+    <form onsubmit="login(event)">
+      <input id="email" type="email" placeholder="Email" required>
       <p class="error" id="emailError"></p>
 
-      <input id="password" name="password" type="password" placeholder="Password" required>
+      <input id="password" type="password" placeholder="Password" required>
       <p class="error" id="passwordError"></p>
 
-      <button class="auth-btn">Login</button>
+      <button class="auth-btn" id="loginBtn">Login</button>
     </form>
 
     <div class="auth-link">
@@ -30,29 +29,48 @@
 </div>
 
 <script>
-function validateLogin() {
-  let valid = true;
-
-  document.getElementById("emailError").innerText = "";
-  document.getElementById("passwordError").innerText = "";
+async function login(e) {
+  e.preventDefault();
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+  const emailError = document.getElementById("emailError");
+  const passwordError = document.getElementById("passwordError");
+  const btn = document.getElementById("loginBtn");
+
+  emailError.innerText = "";
+  passwordError.innerText = "";
 
   if (!email) {
-    document.getElementById("emailError").innerText = "Email is required";
-    valid = false;
+    emailError.innerText = "Email is required";
+    return;
   }
 
   if (!password) {
-    document.getElementById("passwordError").innerText = "Password is required";
-    valid = false;
+    passwordError.innerText = "Password is required";
+    return;
   }
 
-  return valid;
+  btn.disabled = true;
+
+  const res = await fetch("/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    passwordError.innerText = data.error;
+    btn.disabled = false;
+    return;
+  }
+
+  window.location.href = data.redirect;
 }
 </script>
 
 </body>
 </html>
-

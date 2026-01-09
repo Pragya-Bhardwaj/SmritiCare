@@ -11,21 +11,23 @@
     <h2 class="auth-title">Create Account</h2>
     <p class="auth-subtitle">Signup to get started</p>
 
-    <form action="/auth/signup" method="POST" onsubmit="return validateSignup()">
-      <input name="name" placeholder="Full Name" required>
+    <form onsubmit="signup(event)">
+      <input id="name" placeholder="Full Name" required>
 
-      <input id="email" name="email" type="email" placeholder="Email" required>
+      <input id="email" type="email" placeholder="Email" required>
 
-      <input id="password" name="password" type="password" placeholder="Password" required>
+      <input id="password" type="password" placeholder="Password" required>
       <small id="strength"></small>
 
-      <select name="role" required>
+      <select id="role" required>
         <option value="">Select Role</option>
         <option value="caregiver">Caregiver</option>
         <option value="patient">Patient</option>
       </select>
 
-      <button class="auth-btn">Signup</button>
+      <p class="error" id="error"></p>
+
+      <button class="auth-btn" id="signupBtn">Signup</button>
     </form>
 
     <div class="auth-link">
@@ -38,32 +40,53 @@
 <script>
 const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
 
-function validateSignup() {
+async function signup(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  const strengthText = document.getElementById("strength");
+  const role = document.getElementById("role").value;
+  const error = document.getElementById("error");
+  const btn = document.getElementById("signupBtn");
 
-  strengthText.innerText = "";
+  error.innerText = "";
 
-  const domain = email.split("@")[1];
-  if (!allowedDomains.includes(domain)) {
-    strengthText.innerText = "Invalid email domain";
-    strengthText.className = "strength weak";
-    return false;
+  if (!allowedDomains.includes(email.split("@")[1])) {
+    error.innerText = "Invalid email domain";
+    return;
   }
 
   if (checkStrength(password) !== "Strong") {
-    return false;
+    error.innerText = "Password not strong enough";
+    return;
   }
 
-  return true;
+  btn.disabled = true;
+
+  const res = await fetch("/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ name, email, password, role })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    error.innerText = data.error;
+    btn.disabled = false;
+    return;
+  }
+
+  window.location.href = "/auth/verify-otp";
 }
 
+/* ================= PASSWORD STRENGTH ================= */
 
 function checkStrength(pwd) {
   let s = 0;
-
-  if (pwd.length >= 6) s++;          // reduced from 8
+  if (pwd.length >= 6) s++;
   if (/[A-Z]/.test(pwd)) s++;
   if (/[0-9]/.test(pwd)) s++;
   if (/[@$!%*?&]/.test(pwd)) s++;
@@ -78,21 +101,19 @@ function checkStrength(pwd) {
 
   if (s === 2) {
     txt.innerText = "Medium";
-    txt.className = "strength weak"; // still red
+    txt.className = "strength weak";
     return "Medium";
   }
 
   txt.innerText = "Strong";
-  txt.className = "strength strong"; // green
+  txt.className = "strength strong";
   return "Strong";
 }
-
 
 document.getElementById("password").addEventListener("input", e => {
   checkStrength(e.target.value);
 });
 </script>
-
 
 </body>
 </html>

@@ -3,16 +3,13 @@ const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const path = require("path");
+const MongoStore = require("connect-mongo");
 
 const authRoutes = require("./routes/authRoutes");
 const pairingRoutes = require("./routes/pairingRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
-
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
-
-const MongoStore = require("connect-mongo");
-
 
 const app = express();
 
@@ -22,46 +19,37 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error("MongoDB error:", err));
 
-/* ================= MIDDLEWARE ================= */
+/* ================= BODY PARSERS ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/* ================= SESSION (SINGLE SOURCE OF TRUTH) ================= */
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "smriticasecret",
-    resave: false,
-    saveUninitialized: false
-  })
-);
-
-
-app.use(
-  session({
+    name: "smriticare.sid",
     secret: process.env.SESSION_SECRET || "smriticasecret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions"
-    })
+    }),
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 // 1 day
+    }
   })
 );
 
 /* ================= STATIC FILES ================= */
 app.use(express.static(path.join(__dirname, "public")));
-
-/* ================= VIEW FILES ================= */
 app.use("/views", express.static(path.join(__dirname, "views")));
 
 /* ================= ROUTES ================= */
 app.use("/auth", authRoutes);
 app.use("/pair", pairingRoutes);
-
-
-
 app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
-
 app.use("/memory", memoryRoutes);
 
 /* ================= FALLBACK ================= */

@@ -7,8 +7,8 @@ const inviteCodeSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
-  used: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+  linked: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("InviteCode", inviteCodeSchema);
