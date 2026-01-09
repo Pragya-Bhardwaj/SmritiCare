@@ -1,31 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Reminders</title>
+  <meta charset="UTF-8">
+  <title>SmritiCare – Reminders</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/caregiver.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
+
 <div class="app">
 
   <!-- Sidebar -->
-  <!-- COPY SIDEBAR HERE -->
+  <aside class="sidebar">
+    <h2 class="logo">SmritiCare</h2>
+    <nav>
+      <a href="index.html"> Dashboard</a>
+      <a href="reminders.html" class="active"> Reminders</a>
+      <a href="medication.html"> Medications</a>
+      <a href="memoryboard.html"> Memory Board</a>
+      <a href="livelocation.html"> Live Location</a>
+      <a href="profile.html"> Profile</a>
+    </nav>
+  </aside>
 
+  <!-- Main -->
   <main class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="user">
+        <div>
+          <strong>Sarah Kumar</strong>
+          <p>Caregiver</p>
+        </div>
+        <img src="https://i.pravatar.cc/40">
+      </div>
+    </header>
+
+    <!-- Page Header -->
     <div class="page-header">
       <div>
         <h1>Reminders</h1>
-        <p>Daily care reminders</p>
+        <p>Manage daily reminders for Ramesh</p>
       </div>
-      <button class="primary-btn" onclick="addReminder()">＋ Add Reminder</button>
+      <button class="primary-btn" onclick="addReminder()">＋ Add New Reminder</button>
     </div>
 
-    <div class="reminder-list" id="reminderList"></div>
+    <!-- Filters -->
+    <div class="filters">
+      <span class="filter active" onclick="filterReminders('all')">All</span>
+      <span class="filter" onclick="filterReminders('medicine')">💊 Medicine</span>
+      <span class="filter" onclick="filterReminders('meal')">🍽 Meal</span>
+      <span class="filter" onclick="filterReminders('appointment')">🧑‍⚕ Appointment</span>
+      <span class="filter" onclick="filterReminders('hygiene')">🚿 Hygiene</span>
+    </div>
+
+    <!-- Reminder List -->
+    <div class="reminder-list">
+
+      <!-- Trial Reminder 1 -->
+      <div class="reminder-card" data-type="medicine">
+        <div class="left">
+          <span class="icon">💊</span>
+          <div>
+            <h3>Morning Medicine</h3>
+            <p>⏰ 9:00 AM • Daily</p>
+          </div>
+        </div>
+        <div class="right">
+          <span class="status done" onclick="toggleStatus(this)">Done</span>
+          <button class="icon-btn" onclick="editItem('reminder','demo')">✏️</button>
+          <button class="icon-btn" onclick="this.closest('.reminder-card').remove()">🗑️</button>
+        </div>
+      </div>
+
+      <!-- Trial Reminder 2 -->
+      <div class="reminder-card" data-type="meal">
+        <div class="left">
+          <span class="icon">🍽</span>
+          <div>
+            <h3>Breakfast</h3>
+            <p>⏰ 9:30 AM • Daily</p>
+          </div>
+        </div>
+        <div class="right">
+          <span class="status done" onclick="toggleStatus(this)">Done</span>
+          <button class="icon-btn" onclick="editItem('reminder','demo')">✏️</button>
+          <button class="icon-btn" onclick="this.closest('.reminder-card').remove()">🗑️</button>
+        </div>
+      </div>
+
+      <!-- Trial Reminder 3 -->
+      <div class="reminder-card" data-type="medicine">
+        <div class="left">
+          <span class="icon">💊</span>
+          <div>
+            <h3>Blood Pressure Check</h3>
+            <p>⏰ 11:00 AM • Daily</p>
+          </div>
+        </div>
+        <div class="right">
+          <span class="status pending" onclick="toggleStatus(this)">Pending</span>
+          <button class="icon-btn" onclick="editItem('reminder','demo')">✏️</button>
+          <button class="icon-btn" onclick="this.closest('.reminder-card').remove()">🗑️</button>
+        </div>
+      </div>
+
+      <!-- Trial Reminder 4 -->
+      <div class="reminder-card" data-type="appointment">
+        <div class="left">
+          <span class="icon">🧑‍⚕</span>
+          <div>
+            <h3>Doctor Visit</h3>
+            <p>⏰ 2:00 PM • Weekly</p>
+          </div>
+        </div>
+        <div class="right">
+          <span class="status pending" onclick="toggleStatus(this)">Pending</span>
+          <button class="icon-btn" onclick="editItem('reminder','demo')">✏️</button>
+          <button class="icon-btn" onclick="this.closest('.reminder-card').remove()">🗑️</button>
+        </div>
+      </div>
+
+    </div>
+
   </main>
 </div>
 
-<script src="/js/caregiverReminders.js"></script>
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>

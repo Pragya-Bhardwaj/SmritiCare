@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmritiCare – Caregiver Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">SmritiCare</h2>
+
+    <nav>
+        <a href="index.html"  class="active"> Dashboard</a>
+        <a href="reminders.html" class="nav-link"> Reminders</a>
+        <a href="medication.html" class="nav-link"> Medications</a>
+        <a href="memoryboard.html" class="nav-link"> Memory Board</a>
+        <a href="livelocation.html" class="nav-link"> Live Location</a>
+        <a href="profile.html" class="nav-link"> Profile</a>
+    </nav>
+
+    <div class="support">
+      <p><strong>Need help?</strong><br>Our support team is here for you.</p>
+      <button>Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+
+      <div class="user">
+        <div>
+          <strong>Sarah Kumar</strong>
+          <p>Caregiver</p>
+        </div>
+        <img src="https://i.pravatar.cc/40" alt="avatar">
+      </div>
+    </header>
+
+    <!-- Welcome Card -->
+    <section class="welcome">
+      <div>
+        <p class="small">Welcome back</p>
+        <h1>You're doing a wonderful job caring for Ramesh.</h1>
+        <p class="sub">🍃 Breathe. One step at a time.</p>
+      </div>
+      <div class="heart">💙</div>
+    </section>
+
+    <!-- Summary -->
+    <h2 class="section-title">Today's Summary</h2>
+    <section class="summary">
+      <div class="card">
+        <p>Completed Today</p>
+        <h3>2</h3>
+      </div>
+      <div class="card">
+        <p>Pending Tasks</p>
+        <h3>3</h3>
+      </div>
+      <div class="card">
+        <p>Medicines Due</p>
+        <h3>1</h3>
+      </div>
+      <div class="card">
+        <p>Last Location</p>
+        <h3>Home</h3>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <h2 class="section-title">Quick Actions</h2>
+    <section class="actions">
+      <div class="action">💊<br>Add Reminder</div>
+      <div class="action">📷<br>Add Memory</div>
+      <div class="action">📞<br>Emergency Call</div>
+      <div class="action">📍<br>Check Location</div>
+    </section>
+
+    
+  </main>
+</div>
+<script src="script.js"></script>
+
+
+
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <h3 id="modal-title">Title</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

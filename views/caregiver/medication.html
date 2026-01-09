@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SmritiCare – Medications</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="logo">SmritiCare</h2>
+
+      <nav>
+        <a href="index.html"> Dashboard</a>
+        <a href="reminders.html"> Reminders</a>
+        <a href="medication.html" class="active"> Medications</a>
+        <a href="memoryboard.html"> Memory Board</a>
+        <a href="livelocation.html"> Live Location</a>
+        <a href="profile.html"> Profile</a>
+      </nav>
+
+      <div class="support">
+        <p><strong>Need help?</strong><br>Our support team is here for you.</p>
+        <button>Contact Support</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="user">
+          <div>
+            <strong>Sarah Kumar</strong>
+            <p>Caregiver</p>
+          </div>
+          <img src="https://i.pravatar.cc/40" alt="avatar">
+        </div>
+      </header>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>Medications</h1>
+          <p>Track and manage all medications for Ramesh</p>
+        </div>
+
+        <button class="primary-btn" onclick="addMedication()">
+          ＋ Add Medication
+        </button>
+      </div>
+
+      <!-- Medication Table -->
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Dose</th>
+              <th>Time</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td><strong>Aricept (Donepezil)</strong></td>
+              <td><span class="pill">10mg</span></td>
+              <td>9:00 AM</td>
+              <td>Take with breakfast</td>
+              <td>
+                <button class="icon-btn" onclick="editItem()">✏️</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Namenda (Memantine)</strong></td>
+              <td><span class="pill">20mg</span></td>
+              <td>9:00 PM</td>
+              <td>Take before bed</td>
+              <td>
+                <button class="icon-btn" onclick="editItem()">✏️</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Blood Pressure Medicine</strong></td>
+              <td><span class="pill">5mg</span></td>
+              <td>11:00 AM</td>
+              <td>Check BP before taking</td>
+              <td>
+                <button class="icon-btn" onclick="editItem()">✏️</button>
+              </td>
+            </tr>
+
+            <tr class="highlight">
+              <td><strong>Vitamin D3</strong></td>
+              <td><span class="pill">1000 IU</span></td>
+              <td>9:00 AM</td>
+              <td>With breakfast</td>
+              <td>
+                <button class="icon-btn" onclick="editItem()">✏️</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Omega-3 Fish Oil</strong></td>
+              <td><span class="pill">1000mg</span></td>
+              <td>1:00 PM</td>
+              <td>After lunch</td>
+              <td>
+                <button class="icon-btn" onclick="editItem()">✏️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+
+
+
+  <!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <h3 id="modal-title">Title</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
