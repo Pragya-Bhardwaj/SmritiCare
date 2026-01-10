@@ -247,3 +247,19 @@
   margin-bottom: 28px;
   letter-spacing: 0.3px;
 }
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  width: 300px;
+}

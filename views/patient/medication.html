@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Medications</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/patient.css">
+
+  <style>
+    .med-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .med-header h1 {
+      margin: 0;
+    }
+
+    .med-header p {
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .add-btn {
+      background: #3b82f6;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .med-table {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .med-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .med-table thead {
+      background: #f9fafb;
+    }
+
+    .med-table th,
+    .med-table td {
+      padding: 16px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .med-table th {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .med-table tbody tr {
+      border-top: 1px solid #eee;
+    }
+
+    .dose-badge {
+      background: #e0ecff;
+      color: #2563eb;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-block;
+    }
+
+    .edit-icon {
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .help-box {
+      margin-top: 30px;
+      background: #f3f4ff;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .help-box h4 {
+      margin: 0 0 5px;
+    }
+
+    .support-btn {
+      margin-top: 10px;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">SmritiCare</div>
+
+    <a href="/patient/dashboard">Dashboard</a>
+    <a href="/patient/reminders">Reminders</a>
+    <a href="/patient/medication" class="active">Medications</a>
+    <a href="/patient/memory">Memory Board</a>
+    <a href="#">Live Location</a>
+    <a href="/patient/profile">Profile</a>
+
+    <div class="help-box">
+      <h4>Need help?</h4>
+      <p>Our support team is here for you.</p>
+      <button class="support-btn">Contact Support</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <strong>Patient</strong>
+    </header>
+
+    <!-- HEADER -->
+    <div class="med-header">
+      <div>
+        <h1>Medications</h1>
+        <p>Track and manage all medications for Ramesh</p>
+      </div>
+      <button class="add-btn">+ Add Medication</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="med-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Dose</th>
+            <th>Time</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><strong>Aricept (Donepezil)</strong></td>
+            <td><span class="dose-badge">10mg</span></td>
+            <td>9:00 AM</td>
+            <td>Take with breakfast</td>
+            <td class="edit-icon">✏️</td>
+          </tr>
+
+          <tr>
+            <td><strong>Namenda (Memantine)</strong></td>
+            <td><span class="dose-badge">20mg</span></td>
+            <td>9:00 PM</td>
+            <td>Take before bed</td>
+            <td class="edit-icon">✏️</td>
+          </tr>
+
+          <tr>
+            <td><strong>Blood Pressure Medicine</strong></td>
+            <td><span class="dose-badge">5mg</span></td>
+            <td>11:00 AM</td>
+            <td>Check BP before taking</td>
+            <td class="edit-icon">✏️</td>
+          </tr>
+
+          <tr style="background:#faf7ff">
+            <td><strong>Vitamin D3</strong></td>
+            <td><span class="dose-badge">1000 IU</span></td>
+            <td>9:00 AM</td>
+            <td>With breakfast</td>
+            <td class="edit-icon">✏️</td>
+          </tr>
+
+          <tr>
+            <td><strong>Omega-3 Fish Oil</strong></td>
+            <td><span class="dose-badge">1000mg</span></td>
+            <td>1:00 PM</td>
+            <td>After lunch</td>
+            <td class="edit-icon">✏️</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+<script src="/js/patientApp.js"></script>
+
+</body>
+</html>

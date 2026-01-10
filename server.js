@@ -13,6 +13,8 @@ const caregiverRoutes = require("./routes/caregiverRoutes");
 
 const app = express();
 
+
+
 /* ================= DATABASE ================= */
 mongoose
   .connect(process.env.MONGO_URI)
@@ -51,6 +53,8 @@ app.use("/pair", pairingRoutes);
 app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
+app.use("/api/patient", require("./routes/patientApiRoutes"));
+
 
 /* ================= FALLBACK ================= */
 app.get("/", (req, res) => {
