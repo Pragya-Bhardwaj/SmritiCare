@@ -16,7 +16,7 @@ function requirePatient(req, res, next) {
 async function requireLinked(req, res, next) {
   try {
     const user = await User.findById(req.session.user.id);
-    
+
     if (!user || !user.isEmailVerified) {
       return res.redirect("/auth/login");
     }
@@ -41,7 +41,9 @@ router.get("/welcome", requirePatient, async (req, res) => {
       return res.redirect("/auth/login");
     }
 
-    res.sendFile(path.join(__dirname, "../views/patient/welcome.html"));
+    res.sendFile(
+      path.join(__dirname, "../views/patient/welcome.html")
+    );
   } catch (err) {
     console.error("Patient welcome error:", err);
     res.redirect("/auth/login");
@@ -52,7 +54,8 @@ router.get("/welcome", requirePatient, async (req, res) => {
 router.get("/invite-code", requirePatient, async (req, res) => {
   try {
     const invite = await InviteCode.findOne({
-      patientId: req.session.user.id
+      patientId: req.session.user.id,
+      used: false
     });
 
     res.json({ code: invite ? invite.code : null });
@@ -68,6 +71,7 @@ router.get("/link-status", requirePatient, async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.json({ linked: false });
 
+    // 🔄 Sync session with DB
     req.session.user.linked = user.linked;
     req.session.save(() => {
       res.json({ linked: user.linked });
@@ -80,32 +84,44 @@ router.get("/link-status", requirePatient, async (req, res) => {
 
 /* ================= DASHBOARD ================= */
 router.get("/dashboard", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/dashboard.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/dashboard.html")
+  );
 });
 
 /* ================= MEMORY BOARD ================= */
 router.get("/memory", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/memory.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/memory.html")
+  );
 });
 
 /* ================= REMINDERS ================= */
 router.get("/reminders", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/reminders.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/reminders.html")
+  );
 });
 
 /* ================= MEDICATION ================= */
 router.get("/medication", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/medication.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/medication.html")
+  );
 });
 
 /* ================= SELF CARE ================= */
 router.get("/selfcare", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/selfcare.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/selfcare.html")
+  );
 });
 
 /* ================= PROFILE ================= */
 router.get("/profile", requirePatient, requireLinked, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/patient/profile.html"));
+  res.sendFile(
+    path.join(__dirname, "../views/patient/profile.html")
+  );
 });
 
 module.exports = router;
