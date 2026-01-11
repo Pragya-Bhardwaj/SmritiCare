@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const MongoStore = require("connect-mongo");
 
+/* ================= ROUTES ================= */
 const authRoutes = require("./routes/authRoutes");
 const pairingRoutes = require("./routes/pairingRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
@@ -31,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     name: "smriticare.sid",
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "smriticasecret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -49,7 +50,7 @@ app.use(
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/views", express.static(path.join(__dirname, "views")));
 
-/* ================= ROUTES ================= */
+/* ================= ROUTE MOUNTS ================= */
 app.use("/auth", authRoutes);
 app.use("/pair", pairingRoutes);
 app.use("/patient", patientRoutes);
