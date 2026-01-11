@@ -19,4 +19,4 @@ function saveProfile() {
     document.getElementById("editEmail").value;
 
   closeProfileModal();
-}
+pus}
