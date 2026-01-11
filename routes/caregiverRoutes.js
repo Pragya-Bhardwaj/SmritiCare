@@ -53,43 +53,41 @@ router.get("/link", requireCaregiver, async (req, res) => {
 /* ================= LINK ACTION ================= */
 router.post("/link", requireCaregiver, async (req, res) => {
   try {
-    const caregiver = await User.findById(req.session.user.id);
-
-    if (!caregiver || !caregiver.isEmailVerified) {
-      return res.json({ success: false, error: "Unauthorized" });
-    }
-
     const { code } = req.body;
+
     if (!code) {
       return res.json({ success: false, error: "Invite code required" });
     }
 
-    const invite = await InviteCode.findOne({ code, used: false });
-    if (!invite) {
-      return res.json({ success: false, error: "Invalid or expired invite code" });
+    const invite = await InviteCode.findOne({ code });
+
+    if (!invite || invite.linked) {
+      return res.json({ success: false, error: "Invalid invite code" });
     }
 
+    const caregiver = await User.findById(req.session.user.id);
     const patient = await User.findById(invite.patientId);
-    if (!patient || patient.role !== "patient") {
-      return res.json({ success: false, error: "Patient not found" });
+
+    if (!caregiver || !patient || patient.role !== "patient") {
+      return res.json({ success: false, error: "User not found" });
     }
 
-    /* 🔗 LINK BOTH USERS */
+    // 🔗 LINK BOTH SIDES
+    invite.linked = true;
+
     caregiver.linked = true;
-    caregiver.linkedPatientId = patient._id;
+    caregiver.linkedUser = patient._id;
 
     patient.linked = true;
-    patient.linkedCaregiverId = caregiver._id;
-
-    invite.used = true;
+    patient.linkedUser = caregiver._id;
 
     await Promise.all([
+      invite.save(),
       caregiver.save(),
-      patient.save(),
-      invite.save()
+      patient.save()
     ]);
 
-    /* 🔄 Update session */
+    // 🔄 Sync session
     req.session.user.linked = true;
     req.session.save(() => {
       res.json({ success: true });
@@ -151,3 +149,4 @@ router.get("/profile", requireCaregiver, requireLinked, (req, res) => {
 });
 
 module.exports = router;
+

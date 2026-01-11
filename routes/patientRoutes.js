@@ -54,8 +54,7 @@ router.get("/welcome", requirePatient, async (req, res) => {
 router.get("/invite-code", requirePatient, async (req, res) => {
   try {
     const invite = await InviteCode.findOne({
-      patientId: req.session.user.id,
-      used: false
+      patientId: req.session.user.id
     });
 
     res.json({ code: invite ? invite.code : null });
@@ -71,7 +70,7 @@ router.get("/link-status", requirePatient, async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.json({ linked: false });
 
-    // 🔄 Sync session with DB
+    // 🔄 keep session in sync
     req.session.user.linked = user.linked;
     req.session.save(() => {
       res.json({ linked: user.linked });
@@ -125,3 +124,4 @@ router.get("/profile", requirePatient, requireLinked, (req, res) => {
 });
 
 module.exports = router;
+
