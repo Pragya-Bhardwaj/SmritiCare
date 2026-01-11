@@ -1,46 +1,43 @@
+/**
+ * patientApp.js
+ * ------------------------
+ * Handles ONLY sidebar navigation
+ * No CRUD, no modals, no dashboard logic
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ---------- MODAL ---------- */
-  function openModal(html) {
-    const modal = document.createElement("div");
-    modal.className = "modal";
-    modal.innerHTML = `
-      <div class="modal-box">
-        ${html}
-        <button class="close-btn">Close</button>
-      </div>`;
-    document.body.appendChild(modal);
+  const sidebarLinks = document.querySelectorAll(".sidebar a");
 
-    modal.querySelector(".close-btn").onclick = () => modal.remove();
-  }
+  if (!sidebarLinks.length) return;
 
-  /* ---------- ADD MEDICATION ---------- */
-  const addBtn = document.querySelector(".add-btn");
-  if (addBtn) {
-    addBtn.onclick = () => {
-      openModal(`
-        <h3>Add Medication</h3>
-        <input id="name" placeholder="Medicine">
-        <input id="dose" placeholder="Dose">
-        <input id="time" placeholder="Time">
-        <input id="notes" placeholder="Notes">
-        <button id="saveMed">Save</button>
-      `);
+  const currentPath = window.location.pathname;
 
-      document.getElementById("saveMed").onclick = async () => {
-        await fetch("/api/patient/medications", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: name.value,
-            dose: dose.value,
-            time: time.value,
-            notes: notes.value
-          })
-        });
-        location.reload();
-      };
-    };
-  }
+  sidebarLinks.forEach(link => {
+    const href = link.getAttribute("href");
+
+    // Highlight active page
+    if (href === currentPath) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+
+    // Safe navigation on click
+    link.addEventListener("click", (e) => {
+      if (!href || href === "#") {
+        e.preventDefault();
+        return;
+      }
+
+      // Prevent reload if already on same page
+      if (href === currentPath) {
+        e.preventDefault();
+        return;
+      }
+
+      window.location.href = href;
+    });
+  });
 
 });
