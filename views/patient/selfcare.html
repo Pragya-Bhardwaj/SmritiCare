@@ -5,18 +5,19 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-<body>
 
+<body>
 <div class="dashboard">
 
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/reminders">Reminders</a>
-    <a href="/patient/medication">Medications</a>
     <a href="/patient/memory">Memory Board</a>
+    <a href="/patient/reminders">Reminders</a>
+    <a href="/patient/medication">Medication</a>
     <a href="/patient/selfcare" class="active">Self Care</a>
     <a href="/patient/profile">Profile</a>
+    <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
   <main class="main">
@@ -25,16 +26,14 @@
     <h1>Self Care</h1>
     <p class="sub">Daily wellness tips</p>
 
-    <div class="card">
-      <p>🌞 Take a short walk</p>
-      <p>💧 Drink enough water</p>
-      <p>🎵 Listen to calming music</p>
-      <p>😴 Get enough rest</p>
-    </div>
+    <div class="card">🌞 Take a morning walk</div>
+    <div class="card">💧 Drink enough water</div>
+    <div class="card">🎵 Listen to calming music</div>
+    <div class="card">😴 Get proper sleep</div>
+
   </main>
-
 </div>
-<script src="/js/patientApp.js"></script>
 
+<script src="/js/patientApp.js"></script>
 </body>
 </html>

@@ -5,17 +5,19 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-<body>
 
+<body>
 <div class="dashboard">
 
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/reminders">Reminders</a>
-    <a href="/patient/medication">Medications</a>
     <a href="/patient/memory">Memory Board</a>
+    <a href="/patient/reminders">Reminders</a>
+    <a href="/patient/medication">Medication</a>
+    <a href="/patient/selfcare">Self Care</a>
     <a href="/patient/profile" class="active">Profile</a>
+    <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
   <main class="main">
@@ -23,15 +25,14 @@
 
     <h1>Profile</h1>
 
-    <div class="card">
-      <p><strong>Name:</strong> Ramesh</p>
-      <p><strong>Role:</strong> Patient</p>
-      <p><strong>Email:</strong> ramesh@example.com</p>
-    </div>
+    <div class="card"><strong>Name:</strong> Ramesh Kumar</div>
+    <div class="card"><strong>Age:</strong> 72</div>
+    <div class="card"><strong>Caregiver:</strong> Sarah Kumar</div>
+    <div class="card"><strong>Contact:</strong> +91 98765 43210</div>
+
   </main>
-
 </div>
-<script src="/js/patientApp.js"></script>
 
+<script src="/js/patientApp.js"></script>
 </body>
 </html>

@@ -12,126 +12,77 @@ function requirePatient(req, res, next) {
   next();
 }
 
-/* ================= PATIENT READY CHECK ================= */
-async function ensurePatientReady(req, res, next) {
-  const user = await User.findById(req.session.user.id);
-
-  if (!user || !user.isEmailVerified) {
-    return res.redirect("/auth/login");
-  }
-
-  // Block access until caregiver is linked
-  if (!user.linked) {
-    return res.redirect("/patient/welcome");
-  }
-
-  next();
-}
-
 /* ================= WELCOME / INVITE PAGE ================= */
 router.get("/welcome", requirePatient, async (req, res) => {
-  const user = await User.findById(req.session.user.id);
+  try {
+    const user = await User.findById(req.session.user.id);
 
-  if (!user || !user.isEmailVerified) {
-    return res.redirect("/auth/login");
+    // 🔒 Block if email not verified
+    if (!user || !user.isEmailVerified) {
+      return res.redirect("/auth/login");
+    }
+
+    res.sendFile(
+      path.join(__dirname, "../views/patient/welcome.html")
+    );
+  } catch (err) {
+    console.error("Patient welcome error:", err);
+    res.redirect("/auth/login");
   }
-
-  res.sendFile(
-    path.join(__dirname, "../views/patient/welcome.html")
-  );
 });
 
 /* ================= FETCH INVITE CODE ================= */
 router.get("/invite-code", requirePatient, async (req, res) => {
-  const invite = await InviteCode.findOne({
-    patientId: req.session.user.id
-  });
+  try {
+    const invite = await InviteCode.findOne({
+      patientId: req.session.user.id
+    });
 
-  res.json({ code: invite ? invite.code : null });
+    res.json({ code: invite ? invite.code : null });
+  } catch (err) {
+    console.error("Invite code fetch error:", err);
+    res.status(500).json({ code: null });
+  }
 });
 
 /* ================= LINK STATUS (POLLING) ================= */
 router.get("/link-status", requirePatient, async (req, res) => {
-  const user = await User.findById(req.session.user.id);
-  if (!user) return res.json({ linked: false });
+  try {
+    const user = await User.findById(req.session.user.id);
+    if (!user) return res.json({ linked: false });
 
-  // Keep session synced with DB
-  req.session.user.linked = user.linked;
-  req.session.save(() => {
-    res.json({ linked: user.linked });
-  });
+    // 🔄 Sync session with DB
+    req.session.user.linked = user.linked;
+    req.session.save(() => {
+      res.json({ linked: user.linked });
+    });
+  } catch (err) {
+    console.error("Link status error:", err);
+    res.json({ linked: false });
+  }
 });
 
 /* ================= DASHBOARD ================= */
-router.get(
-  "/dashboard",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
+router.get("/dashboard", requirePatient, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.user.id);
+
+    if (!user || !user.isEmailVerified) {
+      return res.redirect("/auth/login");
+    }
+
+    // 🔒 Block dashboard until caregiver links
+    if (!user.linked) {
+      return res.redirect("/patient/welcome");
+    }
+
     res.sendFile(
       path.join(__dirname, "../views/patient/dashboard.html")
     );
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    res.redirect("/auth/login");
   }
-);
-
-/* ================= MEMORY BOARD ================= */
-router.get(
-  "/memory",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../views/patient/memory.html")
-    );
-  }
-);
-
-/* ================= REMINDERS ================= */
-router.get(
-  "/reminders",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../views/patient/reminders.html")
-    );
-  }
-);
-
-/* ================= MEDICATION ================= */
-router.get(
-  "/medication",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../views/patient/medication.html")
-    );
-  }
-);
-
-/* ================= SELF CARE ================= */
-router.get(
-  "/selfcare",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../views/patient/selfcare.html")
-    );
-  }
-);
-
-/* ================= PROFILE ================= */
-router.get(
-  "/profile",
-  requirePatient,
-  ensurePatientReady,
-  (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../views/patient/profile.html")
-    );
-  }
-);
+});
 
 module.exports = router;

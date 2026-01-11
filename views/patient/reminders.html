@@ -1,39 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Reminders</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-<body>
 
+<body>
 <div class="dashboard">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/reminders" class="active">Reminders</a>
-    <a href="/patient/medication">Medications</a>
     <a href="/patient/memory">Memory Board</a>
-    <a href="#">Live Location</a>
+    <a href="/patient/reminders" class="active">Reminders</a>
+    <a href="/patient/medication">Medication</a>
+    <a href="/patient/selfcare">Self Care</a>
     <a href="/patient/profile">Profile</a>
+    <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
-    <header class="topbar"><strong>Patient</strong></header>
+    <header class="topbar">
+      <strong>Patient</strong>
+    </header>
 
     <h1>Reminders</h1>
-    <p class="sub">Your daily reminders</p>
+    <p class="sub">Manage daily reminders for Ramesh</p>
 
-    <div class="card">
-      <p>🕘 Take morning medication</p>
-      <p>🧘 Light stretching</p>
-      <p>📞 Call caregiver</p>
-    </div>
+    <div class="card">💊 Morning Medicine — 9:00 AM</div>
+    <div class="card">🍽 Breakfast — 9:30 AM</div>
+    <div class="card">🩺 Blood Pressure Check — 11:00 AM</div>
+    <div class="card">👨‍⚕️ Doctor Visit — Weekly</div>
+
   </main>
-
 </div>
-<script src="/js/patientApp.js"></script>
 
+<script src="/js/patientApp.js"></script>
 </body>
 </html>

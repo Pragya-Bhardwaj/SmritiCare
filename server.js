@@ -10,36 +10,38 @@ const pairingRoutes = require("./routes/pairingRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
+const patientApiRoutes = require("./routes/patientApiRoutes");
 
 const app = express();
-
-
 
 /* ================= DATABASE ================= */
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB error:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 /* ================= BODY PARSERS ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= SESSION (SINGLE SOURCE OF TRUTH) ================= */
+/* ================= SESSION CONFIG ================= */
 app.use(
   session({
     name: "smriticare.sid",
-    secret: process.env.SESSION_SECRET || "smriticasecret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
-      collectionName: "sessions"
+      collectionName: "sessions",
     }),
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 // 1 day
-    }
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
   })
 );
 
@@ -53,10 +55,9 @@ app.use("/pair", pairingRoutes);
 app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
-app.use("/api/patient", require("./routes/patientApiRoutes"));
+app.use("/api/patient", patientApiRoutes);
 
-
-/* ================= FALLBACK ================= */
+/* ================= ROOT ================= */
 app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
@@ -64,5 +65,5 @@ app.get("/", (req, res) => {
 /* ================= START SERVER ================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
