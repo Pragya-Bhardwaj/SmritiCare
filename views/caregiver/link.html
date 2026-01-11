@@ -1,28 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Link Patient</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link with Patient - SmritiCare</title>
   <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
 
 <div class="auth-wrapper">
   <div class="auth-card">
-    <h2 class="auth-title">Link Patient</h2>
-    <p class="auth-subtitle">Enter the invite code shared by patient</p>
+    <h2 class="auth-title">Link with Patient</h2>
+    <p class="auth-subtitle">Enter the invite code provided by your patient</p>
 
-    <input id="code" placeholder="PAT-XXXX">
+    <input 
+      type="text" 
+      id="code" 
+      class="auth-input" 
+      placeholder="Enter 6-digit code"
+      maxlength="6"
+    />
 
-    <p class="error" id="msg"></p>
+    <p id="msg" class="error-msg"></p>
 
-    <button id="linkBtn" class="auth-btn" onclick="link()">Link Patient</button>
+    <button 
+      id="linkBtn" 
+      class="auth-btn" 
+      onclick="link()"
+    >
+      Link Account
+    </button>
 
-
-    <button
-      id="dashBtn"
-      class="auth-btn disabled-btn"
+    <button 
+      id="dashBtn" 
+      class="auth-btn disabled-btn" 
       disabled
-      onclick="location.href='/caregiver/dashboard'"
+      onclick="goToDashboard()"
     >
       Go to Dashboard
     </button>
@@ -30,6 +43,5 @@
 </div>
 
 <script src="/js/caregiverLink.js"></script>
-
 </body>
 </html>

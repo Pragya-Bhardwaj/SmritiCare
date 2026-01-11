@@ -5,6 +5,7 @@
 .app {
   display: flex;
   min-height: 100vh;
+  background: #f5f7fa;
 }
 
 /* ============================= */
@@ -21,34 +22,46 @@
 }
 
 .logo {
-  color: var(--primary);
+  color: #6ea8fe;
   margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .sidebar nav a {
   display: block;
   padding: 14px 18px;
-  margin-bottom: 10px;
   border-radius: 12px;
   color: #64748b;
   font-weight: 500;
   text-decoration: none;
+  transition: all 0.3s;
+}
+
+.sidebar nav a:hover {
+  background: #f1f5f9;
+  color: #334155;
 }
 
 .sidebar nav a.active {
-  background: var(--primary);
+  background: #6ea8fe;
   color: #ffffff;
 }
 
-.support {
-  background: #f4f0ff;
-  padding: 16px;
-  border-radius: 16px;
-}
-
-.support button {
-  margin-top: 10px;
-  width: 100%;
+.logout-btn {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #b91c1c;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* ============================= */
@@ -58,6 +71,7 @@
 .main {
   flex: 1;
   padding: 30px;
+  overflow-y: auto;
 }
 
 /* ============================= */
@@ -68,6 +82,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .user {
@@ -88,11 +103,27 @@
   margin-top: 25px;
   background: linear-gradient(90deg, #6ea8fe, #c4a7f5);
   color: #fff;
-  padding: 30px;
+  padding: 40px;
   border-radius: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 30px;
+}
+
+.welcome h1 {
+  margin: 10px 0;
+  font-size: 32px;
+}
+
+.welcome .small {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.welcome .sub {
+  opacity: 0.9;
+  margin-top: 10px;
 }
 
 .heart {
@@ -101,13 +132,34 @@
 }
 
 /* ============================= */
-/* SUMMARY */
+/* SECTION TITLE */
 /* ============================= */
 
-.summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+.section-title {
+  color: #1e293b;
+  font-size: 24px;
+  margin: 30px 0 20px 0;
+}
+
+/* ============================= */
+/* PAGE HEADER */
+/* ============================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.page-header .small {
+  color: #64748b;
+  font-size: 14px;
 }
 
 /* ============================= */
@@ -115,41 +167,229 @@
 /* ============================= */
 
 .card {
-  background: var(--card-bg);
+  background: white;
   padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
 }
 
 /* ============================= */
-/* QUICK ACTIONS */
+/* SELF CARE GRID */
+/* ============================= */
+
+.selfcare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.selfcare h3 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+}
+
+.selfcare p {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================= */
+/* CARD LIST */
+/* ============================= */
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reminder-card,
+.medication-card,
+.memory-card,
+.selfcare-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.small {
+  color: #64748b;
+  font-size: 14px;
+  margin: 4px 0 0 0;
+}
+
+.time {
+  color: #6b7280;
+}
+
+.desc {
+  color: #6b7280;
+}
+
+/* ============================= */
+/* STATUS BADGES */
+/* ============================= */
+
+.status {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.done {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
+.primary-btn {
+  background: #6ea8fe;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.primary-btn:hover {
+  background: #5a8fd8;
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  color: #4b5563;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.secondary-btn:hover {
+  background: #d1d5db;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 8px;
+  transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ============================= */
+/* ACTIONS GROUP */
 /* ============================= */
 
 .actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.action {
+/* ============================= */
+/* MODALS */
+/* ============================= */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
   background: white;
-  padding: 25px;
+  padding: 30px;
   border-radius: 20px;
-  text-align: center;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-box h3 {
+  margin: 0 0 20px 0;
+  color: #1e293b;
+}
+
+.modal-box input,
+.modal-box textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.modal-box input:focus,
+.modal-box textarea:focus {
+  outline: none;
+  border-color: #6ea8fe;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  flex: 1;
 }
 
 /* ============================= */
-/* MEMORY BOARD */
+/* PROFILE CARD */
 /* ============================= */
 
-.memory-grid {
-  margin-top: 30px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+.profile-card p {
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+}
+
+.profile-card p:last-child {
+  border-bottom: none;
 }
 
 /* ============================= */
@@ -157,8 +397,7 @@
 /* ============================= */
 
 @media (max-width: 1024px) {
-  .summary,
-  .actions {
+  .selfcare-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -172,57 +411,32 @@
     width: 100%;
     flex-direction: row;
     overflow-x: auto;
+    padding: 15px;
   }
 
   .sidebar nav {
-    display: flex;
+    flex-direction: row;
     gap: 10px;
   }
 
   .sidebar nav a {
     white-space: nowrap;
   }
-}
-/* ============================= */
-/* SELF CARE TIPS */
-/* ============================= */
 
-.selfcare-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
+  .selfcare-grid {
+    grid-template-columns: 1fr;
+  }
 
-.selfcare h3 {
-  margin-bottom: 8px;
-}
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 
-.selfcare p {
-  color: var(--text-muted);
-  font-size: 15px;
-  line-height: 1.5;
-}
-.logout-btn {
-  margin-top: 20px;
-  padding: 14px;
-  border-radius: 12px;
-  background: #fee2e2;
-  color: #b91c1c;
-  text-align: center;
-  font-weight: 500;
-}
-.memory-form {
-  margin: 20px 0;
-  display: grid;
-  gap: 12px;
-  max-width: 520px;
-}
-
-.memory-form input,
-.memory-form textarea {
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  font-size: 15px;
+  .reminder-card,
+  .medication-card,
+  .memory-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Live Location</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Location - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
 </head>
 <body>
 
 <div class="app">
+
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2 class="logo">SmritiCare</h2>
+
     <nav>
       <a href="/caregiver/dashboard">Dashboard</a>
+      <a href="/caregiver/reminders">Reminders</a>
+      <a href="/caregiver/medication">Medications</a>
+      <a href="/caregiver/memory">Memory Board</a>
+      <a href="/caregiver/selfcare">Self Care</a>
       <a href="/caregiver/location" class="active">Live Location</a>
+      <a href="/caregiver/profile">Profile</a>
       <a href="/auth/logout" class="logout-btn">Logout</a>
     </nav>
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
+
     <h1>Live Location</h1>
+    <p class="small">Track patient location in real-time</p>
 
-    <div class="card">
-      📍 Patient last seen near <strong>Central Park</strong><br>
-      <span class="small">Updated 5 minutes ago</span>
-    </div>
-  </main>
-</div>
-
-</body>
-</html>
+    <div class="card" style="margin-top: 20px;">
+      <h3>📍 Current Location</h3>
+      <p>Patient last seen near <strong>Central Park</strong></p>
+      <p class="small" style=

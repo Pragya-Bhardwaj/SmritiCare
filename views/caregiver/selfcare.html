@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Caregiver • Self Care</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- EXISTING CSS -->
+  <title>Self Care - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
 </head>
-
 <body>
+
 <div class="app">
 
   <!-- SIDEBAR -->
@@ -78,34 +77,3 @@
 </div>
 
 <!-- ADD / EDIT MODAL -->
-<div class="modal hidden" id="selfcareModal">
-  <div class="modal-box">
-    <h3 id="modalTitle">Add Tip</h3>
-
-    <input type="text" id="tipTitle" placeholder="Title">
-    <input type="text" id="tipDesc" placeholder="Short description">
-
-    <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeSelfcareModal()">Cancel</button>
-      <button class="primary-btn" onclick="saveTip()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE MODAL -->
-<div class="modal hidden" id="deleteModal">
-  <div class="modal-box">
-    <h3>Delete Tip?</h3>
-    <p class="small">This cannot be undone.</p>
-
-    <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
-      <button class="primary-btn" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- JS -->
-<script src="/js/caregiverSelfcare.js"></script>
-</body>
-</html>
