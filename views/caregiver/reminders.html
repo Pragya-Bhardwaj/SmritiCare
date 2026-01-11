@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Caregiver • Memory Board</title>
+  <title>Caregiver • Reminders</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- EXISTING CSS -->
@@ -12,15 +12,15 @@
 <body>
 <div class="app">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (UNCHANGED) -->
   <aside class="sidebar">
     <h2 class="logo">SmritiCare</h2>
 
     <nav>
       <a href="/caregiver/dashboard">Dashboard</a>
-      <a href="/caregiver/reminders">Reminders</a>
+      <a href="/caregiver/reminders" class="active">Reminders</a>
       <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/memory" class="active">Memory Board</a>
+      <a href="/caregiver/memory">Memory Board</a>
       <a href="/caregiver/location">Live Location</a>
       <a href="/caregiver/profile">Profile</a>
       <a href="/auth/logout" class="logout-btn">Logout</a>
@@ -32,21 +32,23 @@
 
     <div class="page-header">
       <div>
-        <h1>Memory Board</h1>
-        <p class="small">Important people and moments</p>
+        <h1>Reminders</h1>
+        <p class="small">Daily tasks you help the patient remember</p>
       </div>
 
-      <button class="primary-btn" onclick="openAddModal()">＋ Add Memory</button>
+      <button class="primary-btn" onclick="openAddModal()">＋ Add Reminder</button>
     </div>
 
-    <!-- SAMPLE MEMORY DATA -->
-    <section class="card-list" id="memoryList">
+    <!-- SAMPLE DATA -->
+    <section class="card-list" id="reminderList">
 
-      <div class="card memory-card">
+      <div class="card reminder-card">
         <div>
-          <strong class="title">Wedding Day</strong>
-          <p class="small desc">Married to Anita on 12 June 1985</p>
+          <strong class="title">Morning Walk</strong>
+          <p class="small time">07:00 AM</p>
         </div>
+
+        <span class="status done">Done</span>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -54,11 +56,13 @@
         </div>
       </div>
 
-      <div class="card memory-card">
+      <div class="card reminder-card">
         <div>
-          <strong class="title">Son - Rahul</strong>
-          <p class="small desc">Lives in Bangalore, works as an engineer</p>
+          <strong class="title">Breakfast</strong>
+          <p class="small time">09:00 AM</p>
         </div>
+
+        <span class="status pending">Pending</span>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -66,11 +70,13 @@
         </div>
       </div>
 
-      <div class="card memory-card">
+      <div class="card reminder-card">
         <div>
-          <strong class="title">Favourite Place</strong>
-          <p class="small desc">Evening walks in Lodhi Garden</p>
+          <strong class="title">Evening Medicine</strong>
+          <p class="small time">08:00 PM</p>
         </div>
+
+        <span class="status pending">Pending</span>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -83,25 +89,25 @@
 </div>
 
 <!-- ADD / EDIT MODAL -->
-<div class="modal hidden" id="memoryModal">
+<div class="modal hidden" id="reminderModal">
   <div class="modal-box">
-    <h3 id="modalTitle">Add Memory</h3>
+    <h3 id="modalTitle">Add Reminder</h3>
 
-    <input type="text" id="memoryTitle" placeholder="Title">
-    <input type="text" id="memoryDesc" placeholder="Short description">
+    <input type="text" id="reminderTitle" placeholder="Reminder title">
+    <input type="time" id="reminderTime">
 
     <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeMemoryModal()">Cancel</button>
-      <button class="primary-btn" onclick="saveMemory()">Save</button>
+      <button class="secondary-btn" onclick="closeReminderModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveReminder()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- DELETE CONFIRMATION MODAL -->
 <div class="modal hidden" id="deleteModal">
   <div class="modal-box">
-    <h3>Delete Memory?</h3>
-    <p class="small">This cannot be undone.</p>
+    <h3>Delete Reminder?</h3>
+    <p class="small">This action cannot be undone.</p>
 
     <div class="modal-actions">
       <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
@@ -111,6 +117,6 @@
 </div>
 
 <!-- JS -->
-<script src="/js/caregiverMemory.js"></script>
+<script src="/js/caregiverReminders.js"></script>
 </body>
 </html>

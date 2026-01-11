@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Caregiver • Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- EXISTING CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/caregiver.css">
+</head>
+
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2 class="logo">SmritiCare</h2>
+
+    <nav>
+      <a href="/caregiver/dashboard">Dashboard</a>
+      <a href="/caregiver/reminders">Reminders</a>
+      <a href="/caregiver/medication">Medications</a>
+      <a href="/caregiver/memory">Memory Board</a>
+      <a href="/caregiver/selfcare">Self Care</a>
+      <a href="/caregiver/location">Live Location</a>
+      <a href="/caregiver/profile" class="active">Profile</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <h1>My Profile</h1>
+        <p class="small">Your caregiver information</p>
+      </div>
+
+      <button class="primary-btn" onclick="openEditModal()">Edit Profile</button>
+    </div>
+
+    <!-- PROFILE CARD -->
+    <div class="card profile-card">
+      <p><strong>Name:</strong> <span id="cgName">Anita Sharma</span></p>
+      <p><strong>Email:</strong> <span id="cgEmail">anita.caregiver@email.com</span></p>
+      <p><strong>Role:</strong> Primary Caregiver</p>
+      <p><strong>Linked Patient:</strong> Yes</p>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal hidden" id="profileModal">
+  <div class="modal-box">
+    <h3>Edit Profile</h3>
+
+    <input type="text" id="editName" placeholder="Full Name">
+    <input type="email" id="editEmail" placeholder="Email">
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeProfileModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="/js/caregiverProfile.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Caregiver • Memory Board</title>
+  <title>Caregiver • Self Care</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- EXISTING CSS -->
@@ -20,7 +20,8 @@
       <a href="/caregiver/dashboard">Dashboard</a>
       <a href="/caregiver/reminders">Reminders</a>
       <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/memory" class="active">Memory Board</a>
+      <a href="/caregiver/memory">Memory Board</a>
+      <a href="/caregiver/selfcare" class="active">Self Care</a>
       <a href="/caregiver/location">Live Location</a>
       <a href="/caregiver/profile">Profile</a>
       <a href="/auth/logout" class="logout-btn">Logout</a>
@@ -32,21 +33,19 @@
 
     <div class="page-header">
       <div>
-        <h1>Memory Board</h1>
-        <p class="small">Important people and moments</p>
+        <h1>Self Care</h1>
+        <p class="small">Because your well-being matters too</p>
       </div>
 
-      <button class="primary-btn" onclick="openAddModal()">＋ Add Memory</button>
+      <button class="primary-btn" onclick="openAddModal()">＋ Add Tip</button>
     </div>
 
-    <!-- SAMPLE MEMORY DATA -->
-    <section class="card-list" id="memoryList">
+    <!-- SAMPLE DATA -->
+    <section class="card-list" id="selfcareList">
 
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Wedding Day</strong>
-          <p class="small desc">Married to Anita on 12 June 1985</p>
-        </div>
+      <div class="card selfcare-card">
+        <strong class="title">🧘 Take a Breather</strong>
+        <p class="small desc">Pause for 2 minutes and take deep breaths.</p>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -54,11 +53,9 @@
         </div>
       </div>
 
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Son - Rahul</strong>
-          <p class="small desc">Lives in Bangalore, works as an engineer</p>
-        </div>
+      <div class="card selfcare-card">
+        <strong class="title">💧 Stay Hydrated</strong>
+        <p class="small desc">Drink water regularly to stay energized.</p>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -66,11 +63,9 @@
         </div>
       </div>
 
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Favourite Place</strong>
-          <p class="small desc">Evening walks in Lodhi Garden</p>
-        </div>
+      <div class="card selfcare-card">
+        <strong class="title">😴 Rest is Care</strong>
+        <p class="small desc">Adequate sleep helps you care better.</p>
 
         <div class="actions">
           <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
@@ -83,16 +78,16 @@
 </div>
 
 <!-- ADD / EDIT MODAL -->
-<div class="modal hidden" id="memoryModal">
+<div class="modal hidden" id="selfcareModal">
   <div class="modal-box">
-    <h3 id="modalTitle">Add Memory</h3>
+    <h3 id="modalTitle">Add Tip</h3>
 
-    <input type="text" id="memoryTitle" placeholder="Title">
-    <input type="text" id="memoryDesc" placeholder="Short description">
+    <input type="text" id="tipTitle" placeholder="Title">
+    <input type="text" id="tipDesc" placeholder="Short description">
 
     <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeMemoryModal()">Cancel</button>
-      <button class="primary-btn" onclick="saveMemory()">Save</button>
+      <button class="secondary-btn" onclick="closeSelfcareModal()">Cancel</button>
+      <button class="primary-btn" onclick="saveTip()">Save</button>
     </div>
   </div>
 </div>
@@ -100,7 +95,7 @@
 <!-- DELETE MODAL -->
 <div class="modal hidden" id="deleteModal">
   <div class="modal-box">
-    <h3>Delete Memory?</h3>
+    <h3>Delete Tip?</h3>
     <p class="small">This cannot be undone.</p>
 
     <div class="modal-actions">
@@ -111,6 +106,6 @@
 </div>
 
 <!-- JS -->
-<script src="/js/caregiverMemory.js"></script>
+<script src="/js/caregiverSelfcare.js"></script>
 </body>
 </html>
