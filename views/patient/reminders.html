@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Reminders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reminders - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-
 <body>
+
 <div class="dashboard">
 
   <!-- SIDEBAR -->
@@ -22,8 +23,9 @@
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <main class="main">
+    
     <header class="topbar">
       <strong>Patient</strong>
     </header>
@@ -31,12 +33,54 @@
     <h1>Reminders</h1>
     <p class="sub">Manage daily reminders for Ramesh</p>
 
-    <div class="card">💊 Morning Medicine — 9:00 AM</div>
-    <div class="card">🍽 Breakfast — 9:30 AM</div>
-    <div class="card">🩺 Blood Pressure Check — 11:00 AM</div>
-    <div class="card">👨‍⚕️ Doctor Visit — Weekly</div>
+    <div class="filter-tabs">
+      <button class="tab active">All</button>
+      <button class="tab">💊 Medicine</button>
+      <button class="tab">🍽 Meal</button>
+      <button class="tab">👨‍⚕️ Appointment</button>
+      <button class="tab">🧼 Hygiene</button>
+    </div>
+
+    <div class="reminders-list">
+      <div class="card reminder-card">
+        <div class="reminder-icon">💊</div>
+        <div class="reminder-content">
+          <h3>Morning Medicine</h3>
+          <p>🕐 9:00 AM • Daily</p>
+        </div>
+        <span class="badge badge-pending">Pending</span>
+      </div>
+
+      <div class="card reminder-card">
+        <div class="reminder-icon">🍽</div>
+        <div class="reminder-content">
+          <h3>Breakfast</h3>
+          <p>🕐 9:30 AM • Daily</p>
+        </div>
+        <span class="badge badge-done">Done</span>
+      </div>
+
+      <div class="card reminder-card">
+        <div class="reminder-icon">💊</div>
+        <div class="reminder-content">
+          <h3>Blood Pressure Check</h3>
+          <p>🕐 11:00 AM • Daily</p>
+        </div>
+        <span class="badge badge-pending">Pending</span>
+      </div>
+
+      <div class="card reminder-card">
+        <div class="reminder-icon">👨‍⚕️</div>
+        <div class="reminder-content">
+          <h3>Doctor Visit</h3>
+          <p>🕐 2:00 PM • Weekly</p>
+        </div>
+        <span class="badge badge-pending">Pending</span>
+      </div>
+    </div>
 
   </main>
+
 </div>
 
 <script src="/js/patientApp.js"></script>

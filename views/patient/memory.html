@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Memory Board</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Board - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-
 <body>
+
 <div class="dashboard">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
@@ -20,16 +23,32 @@
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="main">
-    <header class="topbar"><strong>Patient</strong></header>
+    
+    <header class="topbar">
+      <strong>Patient</strong>
+    </header>
 
     <h1>Memory Board</h1>
-    <p class="sub">Important people and places</p>
+    <p class="sub">Important people, places, and moments for Ramesh</p>
 
-    <div class="card">👩 Daughter — Priya</div>
-    <div class="card">🏠 Home — Living Room</div>
+    <div class="dashboard-grid">
+      <div class="card">
+        <h3>👩 Daughter Priya</h3>
+        <p>This is your daughter Priya. She visits every Sunday and loves cooking your favourite dishes.</p>
+        <button class="btn btn-secondary">Play Voice</button>
+      </div>
+
+      <div class="card">
+        <h3>🏠 Home - Living Room</h3>
+        <p>This is your living room. The green chair is your favourite reading spot.</p>
+        <button class="btn btn-secondary">Play Voice</button>
+      </div>
+    </div>
 
   </main>
+
 </div>
 
 <script src="/js/patientApp.js"></script>

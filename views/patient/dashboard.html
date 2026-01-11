@@ -1,87 +1,86 @@
-<link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="/css/patient.css">
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard - SmritiCare</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/patient.css">
+</head>
+<body>
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-  <div class="sidebar-logo">SmritiCare</div>
-
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard" class="active">Dashboard</a>
-    <a href="/patient/memory" >Memory Board</a>
+    <a href="/patient/memory">Memory Board</a>
     <a href="/patient/reminders">Reminders</a>
     <a href="/patient/medication">Medication</a>
     <a href="/patient/selfcare">Self Care</a>
     <a href="/patient/profile">Profile</a>
     <a href="/auth/logout" class="logout-btn">Logout</a>
-  
-
-  <a href="/auth/logout" class="logout-btn"> Logout</a>
-</aside>
-
+  </aside>
 
   <!-- MAIN CONTENT -->
-  
+  <main class="main">
 
-<main class="main">
-
-  <!-- TOPBAR (MATCH CAREGIVER) -->
-  <header class="topbar">
-    <div class="user">
-      <div>
-        <strong>Patient</strong>
-        <p>SmritiCare User</p>
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="user">
+        <div>
+          <strong>Patient</strong>
+          <p>SmritiCare User</p>
+        </div>
       </div>
+    </header>
+
+    <!-- WELCOME CARD -->
+    <section class="welcome">
+      <div>
+        <p class="small">Welcome back</p>
+        <h1>We're here to help you today.</h1>
+        <p class="sub">💙 Take things one step at a time.</p>
+      </div>
+      <div class="heart">🌼</div>
+    </section>
+
+    <h2 class="section-title">Your Care Overview</h2>
+
+    <!-- DASHBOARD GRID -->
+    <div class="dashboard-grid">
+
+      <div class="card">
+        <h3>Memory Board</h3>
+        <p>View important people and moments.</p>
+        <a href="/patient/memory" class="btn btn-primary">Open</a>
+      </div>
+
+      <div class="card">
+        <h3>Reminders</h3>
+        <p>See your daily reminders.</p>
+        <a href="/patient/reminders" class="btn btn-primary">Open</a>
+      </div>
+
+      <div class="card">
+        <h3>Medication</h3>
+        <p>Check your medicines.</p>
+        <a href="/patient/medication" class="btn btn-primary">Open</a>
+      </div>
+
+      <div class="card">
+        <h3>Self Care</h3>
+        <p>Simple daily wellness tips.</p>
+        <a href="/patient/selfcare" class="btn btn-primary">Open</a>
+      </div>
+
     </div>
-  </header>
 
-  <!-- WELCOME CARD -->
-  <section class="welcome">
-    <div>
-      <p class="small">Welcome back</p>
-      <h1>We’re here to help you today.</h1>
-      <p class="sub">💙 Take things one step at a time.</p>
-    </div>
-    <div class="heart">🌼</div>
-  </section>
-
-  <h2 class="section-title">Your Care Overview</h2>
-
-  <!-- DASHBOARD GRID -->
-  <div class="dashboard-grid">
-
-    <div class="card">
-      <h3>Memory Board</h3>
-      <p>View important people and moments.</p>
-      <a href="/patient/memory" class="btn btn-primary">Open</a>
-    </div>
-
-    <div class="card">
-      <h3>Reminders</h3>
-      <p>See your daily reminders.</p>
-      <button class="btn btn-secondary">Coming Soon</button>
-    </div>
-
-    <div class="card">
-      <h3>Medication</h3>
-      <p>Check your medicines.</p>
-      <button class="btn btn-secondary">Coming Soon</button>
-    </div>
-
-    <div class="card">
-      <h3>Self Care</h3>
-      <p>Simple daily wellness tips.</p>
-      <button class="btn btn-secondary">Coming Soon</button>
-    </div>
-
-  </div>
-  <script src="/js/patientApp.js"></script>
-
-</main>
-
- 
+  </main>
 
 </div>
+
+<script src="/js/patientApp.js"></script>
+</body>
+</html>

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Profile</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-
 <body>
+
 <div class="dashboard">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
@@ -20,17 +23,82 @@
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="main">
-    <header class="topbar"><strong>Patient</strong></header>
+    
+    <header class="topbar">
+      <strong>Patient</strong>
+    </header>
 
     <h1>Profile</h1>
+    <p class="sub">Manage patient and caregiver information</p>
 
-    <div class="card"><strong>Name:</strong> Ramesh Kumar</div>
-    <div class="card"><strong>Age:</strong> 72</div>
-    <div class="card"><strong>Caregiver:</strong> Sarah Kumar</div>
-    <div class="card"><strong>Contact:</strong> +91 98765 43210</div>
+    <div class="profile-grid">
+      <!-- Patient Info Card -->
+      <div class="card profile-card">
+        <div class="card-header">
+          <h3>💙 Patient Information</h3>
+        </div>
+        
+        <div class="profile-avatar">
+          <div class="avatar-circle">R</div>
+        </div>
+
+        <div class="profile-details">
+          <h2>Ramesh Kumar</h2>
+          <p class="role-badge">Patient</p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Age</span>
+            <span class="value">72 years</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Medical ID</span>
+            <span class="value">MED-2024-7842</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Blood Type</span>
+            <span class="value">A+</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caregiver Info Card -->
+      <div class="card profile-card">
+        <div class="card-header">
+          <h3>👤 Caregiver Information</h3>
+        </div>
+        
+        <div class="profile-avatar">
+          <div class="avatar-circle">S</div>
+        </div>
+
+        <div class="profile-details">
+          <h2>Sarah Kumar</h2>
+          <p class="role-badge caregiver">Primary Caregiver</p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Relation</span>
+            <span class="value">Daughter-in-law</span>
+          </div>
+          <div class="info-item">
+            <span class="label">📞 Phone</span>
+            <span class="value">+91 98765 43210</span>
+          </div>
+          <div class="info-item">
+            <span class="label">📧 Email</span>
+            <span class="value">sarah.kumar@email.com</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
+
 </div>
 
 <script src="/js/patientApp.js"></script>

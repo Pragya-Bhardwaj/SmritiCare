@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Medications</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medications - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-
 <body>
+
 <div class="dashboard">
 
   <!-- SIDEBAR -->
@@ -22,22 +23,62 @@
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <main class="main">
+    
     <header class="topbar">
       <strong>Patient</strong>
     </header>
 
     <h1>Medications</h1>
-    <p class="sub">Track and manage all medications</p>
+    <p class="sub">Track and manage all medications for Ramesh</p>
 
-    <div class="card">Aricept (Donepezil) — 10mg — 9:00 AM</div>
-    <div class="card">Namenda (Memantine) — 20mg — 9:00 PM</div>
-    <div class="card">Blood Pressure Medicine — 5mg — 11:00 AM</div>
-    <div class="card">Vitamin D3 — 1000 IU</div>
-    <div class="card">Omega-3 Fish Oil — 1000mg</div>
+    <div class="medication-table">
+      <div class="table-header">
+        <div class="col">Medicine</div>
+        <div class="col">Dose</div>
+        <div class="col">Time</div>
+        <div class="col">Notes</div>
+      </div>
+
+      <div class="table-row">
+        <div class="col"><strong>Aricept (Donepezil)</strong></div>
+        <div class="col"><span class="badge badge-blue">10mg</span></div>
+        <div class="col">9:00 AM</div>
+        <div class="col">Take with breakfast</div>
+      </div>
+
+      <div class="table-row">
+        <div class="col"><strong>Namenda (Memantine)</strong></div>
+        <div class="col"><span class="badge badge-blue">20mg</span></div>
+        <div class="col">9:00 PM</div>
+        <div class="col">Take before bed</div>
+      </div>
+
+      <div class="table-row">
+        <div class="col"><strong>Blood Pressure Medicine</strong></div>
+        <div class="col"><span class="badge badge-blue">5mg</span></div>
+        <div class="col">11:00 AM</div>
+        <div class="col">Check BP before taking</div>
+      </div>
+
+      <div class="table-row">
+        <div class="col"><strong>Vitamin D3</strong></div>
+        <div class="col"><span class="badge badge-blue">1000 IU</span></div>
+        <div class="col">9:00 AM</div>
+        <div class="col">With breakfast</div>
+      </div>
+
+      <div class="table-row">
+        <div class="col"><strong>Omega-3 Fish Oil</strong></div>
+        <div class="col"><span class="badge badge-blue">1000mg</span></div>
+        <div class="col">1:00 PM</div>
+        <div class="col">After lunch</div>
+      </div>
+    </div>
 
   </main>
+
 </div>
 
 <script src="/js/patientApp.js"></script>

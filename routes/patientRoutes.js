@@ -12,19 +12,36 @@ function requirePatient(req, res, next) {
   next();
 }
 
+/* ================= CHECK IF LINKED ================= */
+async function requireLinked(req, res, next) {
+  try {
+    const user = await User.findById(req.session.user.id);
+    
+    if (!user || !user.isEmailVerified) {
+      return res.redirect("/auth/login");
+    }
+
+    if (!user.linked) {
+      return res.redirect("/patient/welcome");
+    }
+
+    next();
+  } catch (err) {
+    console.error("Link check error:", err);
+    res.redirect("/auth/login");
+  }
+}
+
 /* ================= WELCOME / INVITE PAGE ================= */
 router.get("/welcome", requirePatient, async (req, res) => {
   try {
     const user = await User.findById(req.session.user.id);
 
-    // 🔒 Block if email not verified
     if (!user || !user.isEmailVerified) {
       return res.redirect("/auth/login");
     }
 
-    res.sendFile(
-      path.join(__dirname, "../views/patient/welcome.html")
-    );
+    res.sendFile(path.join(__dirname, "../views/patient/welcome.html"));
   } catch (err) {
     console.error("Patient welcome error:", err);
     res.redirect("/auth/login");
@@ -51,7 +68,6 @@ router.get("/link-status", requirePatient, async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.json({ linked: false });
 
-    // 🔄 Sync session with DB
     req.session.user.linked = user.linked;
     req.session.save(() => {
       res.json({ linked: user.linked });
@@ -63,26 +79,33 @@ router.get("/link-status", requirePatient, async (req, res) => {
 });
 
 /* ================= DASHBOARD ================= */
-router.get("/dashboard", requirePatient, async (req, res) => {
-  try {
-    const user = await User.findById(req.session.user.id);
+router.get("/dashboard", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/dashboard.html"));
+});
 
-    if (!user || !user.isEmailVerified) {
-      return res.redirect("/auth/login");
-    }
+/* ================= MEMORY BOARD ================= */
+router.get("/memory", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/memory.html"));
+});
 
-    // 🔒 Block dashboard until caregiver links
-    if (!user.linked) {
-      return res.redirect("/patient/welcome");
-    }
+/* ================= REMINDERS ================= */
+router.get("/reminders", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/reminders.html"));
+});
 
-    res.sendFile(
-      path.join(__dirname, "../views/patient/dashboard.html")
-    );
-  } catch (err) {
-    console.error("Dashboard error:", err);
-    res.redirect("/auth/login");
-  }
+/* ================= MEDICATION ================= */
+router.get("/medication", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/medication.html"));
+});
+
+/* ================= SELF CARE ================= */
+router.get("/selfcare", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/selfcare.html"));
+});
+
+/* ================= PROFILE ================= */
+router.get("/profile", requirePatient, requireLinked, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/patient/profile.html"));
 });
 
 module.exports = router;

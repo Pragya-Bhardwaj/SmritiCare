@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Self Care</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self Care - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
 </head>
-
 <body>
+
 <div class="dashboard">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
     <a href="/patient/dashboard">Dashboard</a>
@@ -20,18 +23,56 @@
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="main">
-    <header class="topbar"><strong>Patient</strong></header>
+    
+    <header class="topbar">
+      <strong>Patient</strong>
+    </header>
 
     <h1>Self Care</h1>
-    <p class="sub">Daily wellness tips</p>
+    <p class="sub">Simple daily wellness tips</p>
 
-    <div class="card">🌞 Take a morning walk</div>
-    <div class="card">💧 Drink enough water</div>
-    <div class="card">🎵 Listen to calming music</div>
-    <div class="card">😴 Get proper sleep</div>
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="icon-large">🌞</div>
+        <h3>Morning Walk</h3>
+        <p>Take a morning walk in fresh air</p>
+      </div>
+
+      <div class="card">
+        <div class="icon-large">💧</div>
+        <h3>Stay Hydrated</h3>
+        <p>Drink enough water throughout the day</p>
+      </div>
+
+      <div class="card">
+        <div class="icon-large">🎵</div>
+        <h3>Listen to Music</h3>
+        <p>Enjoy calming music for relaxation</p>
+      </div>
+
+      <div class="card">
+        <div class="icon-large">😴</div>
+        <h3>Good Sleep</h3>
+        <p>Get proper rest and sleep schedule</p>
+      </div>
+
+      <div class="card">
+        <div class="icon-large">🧘</div>
+        <h3>Light Exercise</h3>
+        <p>Gentle stretching and movement</p>
+      </div>
+
+      <div class="card">
+        <div class="icon-large">📖</div>
+        <h3>Reading Time</h3>
+        <p>Spend time reading favorite books</p>
+      </div>
+    </div>
 
   </main>
+
 </div>
 
 <script src="/js/patientApp.js"></script>
