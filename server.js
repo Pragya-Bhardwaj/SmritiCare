@@ -12,6 +12,7 @@ const memoryRoutes = require("./routes/memoryRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
 const patientApiRoutes = require("./routes/patientApiRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
 app.use("/api/patient", patientApiRoutes);
+app.use("/api/profile", profileRoutes);
 
 /* ================= ROOT ================= */
 app.get("/", (req, res) => {
