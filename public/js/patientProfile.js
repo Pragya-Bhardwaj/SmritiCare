@@ -1,4 +1,4 @@
-// public/js/caregiverProfile.js
+// public/js/patientProfile.js
 
 let currentProfileData = null;
 
@@ -32,7 +32,15 @@ async function loadProfile() {
       document.getElementById("phone").value = profile.phone || "";
       document.getElementById("gender").value = profile.gender || "";
       document.getElementById("dateOfBirth").value = profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : "";
-      document.getElementById("relationToPatient").value = profile.relationToPatient || "";
+      document.getElementById("bloodGroup").value = profile.bloodGroup || "";
+      document.getElementById("medicalCondition").value = profile.medicalCondition || "";
+
+      // Emergency contact
+      if (profile.emergencyContact) {
+        document.getElementById("emergencyName").value = profile.emergencyContact.name || "";
+        document.getElementById("emergencyPhone").value = profile.emergencyContact.phone || "";
+        document.getElementById("emergencyRelation").value = profile.emergencyContact.relation || "";
+      }
 
       // Address
       if (profile.address) {
@@ -50,9 +58,9 @@ async function loadProfile() {
       }
     }
 
-    // Load patient details if linked
+    // Load caregiver details if linked
     if (data.linkedUser && data.linkedProfile) {
-      displayPatientDetails(data.linkedUser, data.linkedProfile);
+      displayCaregiverDetails(data.linkedUser, data.linkedProfile);
     }
 
   } catch (err) {
@@ -61,11 +69,9 @@ async function loadProfile() {
   }
 }
 
-/* ================= DISPLAY PATIENT DETAILS ================= */
-function displayPatientDetails(linkedUser, linkedProfile) {
-  const container = document.getElementById("patientDetails");
-
-  const age = linkedProfile.dateOfBirth ? calculateAge(linkedProfile.dateOfBirth) : "Not provided";
+/* ================= DISPLAY CAREGIVER DETAILS ================= */
+function displayCaregiverDetails(linkedUser, linkedProfile) {
+  const container = document.getElementById("caregiverDetails");
 
   container.innerHTML = `
     <div class="info-row">
@@ -85,38 +91,10 @@ function displayPatientDetails(linkedUser, linkedProfile) {
       <span class="info-value">${linkedProfile.gender || "Not provided"}</span>
     </div>
     <div class="info-row">
-      <span class="info-label">Age</span>
-      <span class="info-value">${age}</span>
+      <span class="info-label">Relation</span>
+      <span class="info-value">${linkedProfile.relationToPatient || "Not provided"}</span>
     </div>
-    <div class="info-row">
-      <span class="info-label">Blood Group</span>
-      <span class="info-value">${linkedProfile.bloodGroup || "Not provided"}</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">Medical Condition</span>
-      <span class="info-value">${linkedProfile.medicalCondition || "Not provided"}</span>
-    </div>
-    ${linkedProfile.emergencyContact && linkedProfile.emergencyContact.name ? `
-      <div class="info-row">
-        <span class="info-label">Emergency Contact</span>
-        <span class="info-value">${linkedProfile.emergencyContact.name} (${linkedProfile.emergencyContact.phone || "N/A"})</span>
-      </div>
-    ` : ''}
   `;
-}
-
-/* ================= CALCULATE AGE ================= */
-function calculateAge(dateOfBirth) {
-  const dob = new Date(dateOfBirth);
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  
-  return age + " years";
 }
 
 /* ================= SAVE PROFILE ================= */
@@ -127,7 +105,13 @@ document.getElementById("profileForm").addEventListener("submit", async (e) => {
     phone: document.getElementById("phone").value.trim(),
     gender: document.getElementById("gender").value,
     dateOfBirth: document.getElementById("dateOfBirth").value,
-    relationToPatient: document.getElementById("relationToPatient").value.trim(),
+    bloodGroup: document.getElementById("bloodGroup").value,
+    medicalCondition: document.getElementById("medicalCondition").value.trim(),
+    emergencyContact: {
+      name: document.getElementById("emergencyName").value.trim(),
+      phone: document.getElementById("emergencyPhone").value.trim(),
+      relation: document.getElementById("emergencyRelation").value.trim()
+    },
     address: {
       street: document.getElementById("street").value.trim(),
       city: document.getElementById("city").value.trim(),

@@ -1,14 +1,12 @@
+// models/CaregiverProfile.js
 const mongoose = require("mongoose");
 
 const caregiverProfileSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "User",
-    required: true 
-  },
-  relation: {
-    type: String,
-    trim: true
+    required: true,
+    unique: true
   },
   phone: {
     type: String,
@@ -16,11 +14,42 @@ const caregiverProfileSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["Male", "Female", "Other", "Prefer not to say", null],
-    default: null
+    enum: ["Male", "Female", "Other", ""],
+    default: ""
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  relationToPatient: {
+    type: String,
+    trim: true
+  },
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    pincode: String
+  },
+  profileImage: {
+    type: String, // URL or base64
+    default: ""
+  },
+  isProfileComplete: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
+
+// Method to check if profile is complete
+caregiverProfileSchema.methods.checkProfileComplete = function() {
+  this.isProfileComplete = !!(
+    this.phone &&
+    this.gender &&
+    this.relationToPatient
+  );
+  return this.isProfileComplete;
+};
 
 module.exports = mongoose.model("CaregiverProfile", caregiverProfileSchema);

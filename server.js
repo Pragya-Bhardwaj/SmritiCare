@@ -58,7 +58,7 @@ app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
 app.use("/api/patient", patientApiRoutes);
-app.use("/api/profile", profileRoutes);
+app.use(profileRoutes);
 
 /* ================= ROOT ================= */
 app.get("/", (req, res) => {

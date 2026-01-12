@@ -1,56 +1,56 @@
+// controllers/profileController.js
 const User = require("../models/User");
 const PatientProfile = require("../models/PatientProfile");
 const CaregiverProfile = require("../models/CaregiverProfile");
 
-/* ================= GET PROFILE ================= */
+/* ================= GET PROFILE DATA ================= */
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const user = await User.findById(userId).select("-password -otp");
+    const role = req.session.user.role;
 
+    const user = await User.findById(userId).populate('linkedUser');
+    
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    let profile;
-    if (user.role === "patient") {
+    let profile, linkedProfile, linkedUser;
+
+    if (role === "patient") {
       profile = await PatientProfile.findOne({ userId });
+      
+      if (user.linkedUser) {
+        linkedUser = await User.findById(user.linkedUser);
+        linkedProfile = await CaregiverProfile.findOne({ userId: user.linkedUser });
+      }
     } else {
       profile = await CaregiverProfile.findOne({ userId });
-    }
-
-    // Get linked user details if exists
-    let linkedUserData = null;
-    if (user.linked && user.linkedUser) {
-      const linkedUser = await User.findById(user.linkedUser).select("-password -otp");
       
-      if (linkedUser) {
-        let linkedProfile;
-        if (linkedUser.role === "patient") {
-          linkedProfile = await PatientProfile.findOne({ userId: linkedUser._id });
-        } else {
-          linkedProfile = await CaregiverProfile.findOne({ userId: linkedUser._id });
-        }
-
-        linkedUserData = {
-          name: linkedUser.name,
-          email: linkedUser.email,
-          role: linkedUser.role,
-          profile: linkedProfile || {}
-        };
+      if (user.linkedUser) {
+        linkedUser = await User.findById(user.linkedUser);
+        linkedProfile = await PatientProfile.findOne({ userId: user.linkedUser });
       }
     }
 
     res.json({
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
         linked: user.linked
       },
       profile: profile || {},
-      linkedUser: linkedUserData
+      linkedUser: linkedUser ? {
+        id: linkedUser._id,
+        name: linkedUser.name,
+        email: linkedUser.email,
+        role: linkedUser.role
+      } : null,
+      linkedProfile: linkedProfile || null
     });
+
   } catch (err) {
     console.error("Get profile error:", err);
     res.status(500).json({ error: "Failed to fetch profile" });
@@ -61,106 +61,73 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { name, phone, gender, age, condition, relation } = req.body;
+    const role = req.session.user.role;
+    const updateData = req.body;
 
-    // Update user name
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    // Remove sensitive fields
+    delete updateData.userId;
+    delete updateData._id;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
 
-    if (name && name.trim()) {
-      user.name = name.trim();
-      await user.save();
-    }
-
-    // Update role-specific profile
     let profile;
-    if (user.role === "patient") {
-      profile = await PatientProfile.findOne({ userId });
-      
-      if (!profile) {
-        profile = await PatientProfile.create({
-          userId,
-          age: age || null,
-          condition: condition || null,
-          phone: phone || null,
-          gender: gender || null
-        });
-      } else {
-        if (age) profile.age = age;
-        if (condition) profile.condition = condition;
-        if (phone) profile.phone = phone;
-        if (gender) profile.gender = gender;
-        await profile.save();
-      }
+
+    if (role === "patient") {
+      profile = await PatientProfile.findOneAndUpdate(
+        { userId },
+        { $set: updateData },
+        { new: true, upsert: true }
+      );
+      profile.checkProfileComplete();
+      await profile.save();
     } else {
-      profile = await CaregiverProfile.findOne({ userId });
-      
-      if (!profile) {
-        profile = await CaregiverProfile.create({
-          userId,
-          relation: relation || null,
-          phone: phone || null,
-          gender: gender || null
-        });
-      } else {
-        if (relation) profile.relation = relation;
-        if (phone) profile.phone = phone;
-        if (gender) profile.gender = gender;
-        await profile.save();
-      }
+      profile = await CaregiverProfile.findOneAndUpdate(
+        { userId },
+        { $set: updateData },
+        { new: true, upsert: true }
+      );
+      profile.checkProfileComplete();
+      await profile.save();
     }
 
     res.json({
       success: true,
+      profile,
       message: "Profile updated successfully"
     });
+
   } catch (err) {
     console.error("Update profile error:", err);
     res.status(500).json({ error: "Failed to update profile" });
   }
 };
 
-/* ================= CHECK PROFILE COMPLETION ================= */
-exports.checkProfileCompletion = async (req, res) => {
+/* ================= CHECK PROFILE STATUS ================= */
+exports.getProfileStatus = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const role = req.session.user.role;
 
     let profile;
-    let isComplete = false;
 
-    if (user.role === "patient") {
+    if (role === "patient") {
       profile = await PatientProfile.findOne({ userId });
-      
-      if (profile) {
-        isComplete = !!(
-          profile.phone &&
-          profile.gender &&
-          profile.age &&
-          profile.condition
-        );
-      }
     } else {
       profile = await CaregiverProfile.findOne({ userId });
-      
-      if (profile) {
-        isComplete = !!(
-          profile.phone &&
-          profile.gender &&
-          profile.relation
-        );
-      }
     }
 
-    res.json({ isComplete });
+    const isComplete = profile ? profile.isProfileComplete : false;
+
+    res.json({
+      isProfileComplete: isComplete,
+      profileExists: !!profile
+    });
+
   } catch (err) {
-    console.error("Check profile completion error:", err);
-    res.status(500).json({ error: "Failed to check profile status" });
+    console.error("Profile status error:", err);
+    res.status(500).json({ 
+      isProfileComplete: false,
+      profileExists: false 
+    });
   }
 };

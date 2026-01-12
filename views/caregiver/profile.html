@@ -6,6 +6,7 @@
   <title>Profile - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
+  <link rel="stylesheet" href="/css/profile.css">
 </head>
 <body>
 
@@ -22,22 +23,124 @@
       <a href="/caregiver/memory">Memory Board</a>
       <a href="/caregiver/selfcare">Self Care</a>
       <a href="/caregiver/location">Live Location</a>
-      <a href="/caregiver/profile" class="active">Profile</a>
+      <a href="/caregiver/profile" class="active" id="profileLink">
+        <span>Profile</span>
+        <span id="profileBadge" style="display:none; color: #ef4444; font-size: 18px; margin-left: 8px;">●</span>
+      </a>
       <a href="/auth/logout" class="logout-btn">Logout</a>
     </nav>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <main class="main">
 
-    <div class="page-header">
-      <div>
-        <h1>My Profile</h1>
-        <p class="small">Your caregiver information</p>
+    <div class="profile-container">
+      
+      <!-- PROFILE HEADER -->
+      <div class="profile-header">
+        <div class="avatar-upload">
+          <div class="avatar-circle" id="avatarPreview">
+            <span id="avatarInitial"></span>
+            <img id="avatarImage" style="display:none;">
+          </div>
+          <label class="avatar-edit-btn" for="profileImageInput">📷</label>
+          <input type="file" id="profileImageInput" accept="image/*">
+        </div>
+        <h1 id="userName">Loading...</h1>
+        <p id="userEmail" style="color: #64748b;"></p>
       </div>
 
-      <button class="primary-btn" onclick="openEditModal()">Edit Profile</button>
+      <!-- MY PROFILE SECTION -->
+      <div class="profile-section">
+        <h2>👤 Caregiver Details</h2>
+        
+        <form id="profileForm">
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" required readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" required readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+            </div>
+
+            <div class="form-group">
+              <label for="gender">Gender *</label>
+              <select id="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input type="date" id="dateOfBirth">
+            </div>
+
+            <div class="form-group">
+              <label for="relationToPatient">Relation to Patient *</label>
+              <input type="text" id="relationToPatient" placeholder="e.g., Daughter, Son, Spouse" required>
+            </div>
+
+            <div class="form-group full-width">
+              <h3 style="margin: 16px 0 8px 0; color: #334155; font-size: 16px;">Address</h3>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="street">Street Address</label>
+              <input type="text" id="street" placeholder="Street Address">
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" placeholder="City">
+            </div>
+
+            <div class="form-group">
+              <label for="state">State</label>
+              <input type="text" id="state" placeholder="State">
+            </div>
+
+            <div class="form-group">
+              <label for="pincode">Pincode</label>
+              <input type="text" id="pincode" placeholder="Pincode">
+            </div>
+
+          </div>
+
+          <div class="btn-container">
+            <button type="button" class="secondary-btn" onclick="window.location.reload()">Cancel</button>
+            <button type="submit" class="primary-btn">Save Profile</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- PATIENT DETAILS SECTION -->
+      <div class="profile-section linked-profile">
+        <h2>👨‍⚕️ Your Patient's Details</h2>
+        <div id="patientDetails">
+          <div class="no-linked-user">
+            <p>No patient linked yet</p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- PROFILE CARD -->
-    <div
+  </main>
+</div>
+
+<script src="/js/caregiverDashboard.js"></script>
+<script src="/js/caregiverProfile.js"></script>
+</body>
+</html>
