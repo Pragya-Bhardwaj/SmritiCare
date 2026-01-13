@@ -25,6 +25,12 @@ async function requireLinked(req, res, next) {
       return res.redirect("/caregiver/link");
     }
 
+    // ✅ CRITICAL FIX: Ensure patientId is in session
+    if (!req.session.user.patientId && user.linkedUser) {
+      req.session.user.patientId = user.linkedUser;
+      await req.session.save();
+    }
+
     next();
   } catch (err) {
     console.error("Link check error:", err);
@@ -41,6 +47,15 @@ router.get("/link", requireCaregiver, async (req, res) => {
       return res.redirect("/auth/login");
     }
 
+    // If already linked, redirect to dashboard
+    if (caregiver.linked && caregiver.linkedUser) {
+      // Sync session
+      req.session.user.linked = true;
+      req.session.user.patientId = caregiver.linkedUser;
+      await req.session.save();
+      return res.redirect("/caregiver/dashboard");
+    }
+
     res.sendFile(
       path.join(__dirname, "../views/caregiver/link.html")
     );
@@ -55,25 +70,78 @@ router.post("/link", requireCaregiver, async (req, res) => {
   try {
     const { code } = req.body;
 
-    if (!code) {
-      return res.json({ success: false, error: "Invite code required" });
+    // Validate input
+    if (!code || code.trim() === "") {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Invite code is required" 
+      });
     }
 
-    const invite = await InviteCode.findOne({ code });
+    // Find invite code
+    const invite = await InviteCode.findOne({ code: code.trim() });
 
-    if (!invite || invite.linked) {
-      return res.json({ success: false, error: "Invalid invite code" });
+    if (!invite) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Invalid invite code" 
+      });
     }
 
+    // Check if already used
+    if (invite.used) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "This invite code has already been used" 
+      });
+    }
+
+    // Check if expired
+    if (invite.expiresAt && invite.expiresAt < Date.now()) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "This invite code has expired" 
+      });
+    }
+
+    // Get caregiver and patient
     const caregiver = await User.findById(req.session.user.id);
     const patient = await User.findById(invite.patientId);
 
-    if (!caregiver || !patient || patient.role !== "patient") {
-      return res.json({ success: false, error: "User not found" });
+    // Validate users
+    if (!caregiver) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Caregiver not found" 
+      });
+    }
+
+    if (!patient || patient.role !== "patient") {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Patient not found" 
+      });
+    }
+
+    // Check if caregiver is already linked
+    if (caregiver.linked && caregiver.linkedUser) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "You are already linked to a patient" 
+      });
+    }
+
+    // Check if patient is already linked
+    if (patient.linked && patient.linkedUser) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "This patient is already linked to another caregiver" 
+      });
     }
 
     // 🔗 LINK BOTH SIDES
-    invite.linked = true;
+    invite.used = true;
+    invite.usedBy = caregiver._id;
 
     caregiver.linked = true;
     caregiver.linkedUser = patient._id;
@@ -81,21 +149,42 @@ router.post("/link", requireCaregiver, async (req, res) => {
     patient.linked = true;
     patient.linkedUser = caregiver._id;
 
+    // Save all changes
     await Promise.all([
       invite.save(),
       caregiver.save(),
       patient.save()
     ]);
 
-    // 🔄 Sync session
+    // ✅ CRITICAL FIX: Store patientId in session
     req.session.user.linked = true;
-    req.session.save(() => {
-      res.json({ success: true });
+    req.session.user.patientId = patient._id.toString();
+
+    // Save session and respond
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ 
+          success: false, 
+          error: "Failed to save session" 
+        });
+      }
+
+      console.log("✅ Link successful. Session:", req.session.user);
+
+      res.json({ 
+        success: true,
+        message: "Successfully linked to patient",
+        patientName: patient.name
+      });
     });
 
   } catch (err) {
     console.error("Link error:", err);
-    res.json({ success: false, error: "Linking failed" });
+    res.status(500).json({ 
+      success: false, 
+      error: "Linking failed. Please try again." 
+    });
   }
 });
 
@@ -149,4 +238,3 @@ router.get("/profile", requireCaregiver, requireLinked, (req, res) => {
 });
 
 module.exports = router;
-

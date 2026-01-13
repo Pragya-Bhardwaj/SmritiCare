@@ -11,64 +11,34 @@
     <h2 class="auth-title">Welcome!</h2>
     <p class="auth-subtitle">Share this invite code with your caregiver</p>
 
-    <div class="invite-code" id="inviteCode">----</div>
+    <div class="invite-code" id="inviteCode">Loading...</div>
 
     <p class="waiting-text" id="statusText">
       Waiting for caregiver to link
     </p>
 
-    <button
-      id="dashboardBtn"
-      class="auth-btn disabled-btn"
-      disabled
-      onclick="goPatientDashboard()"
-    >
-      Go to Dashboard
-    </button>
+    <div style="margin-top: 12px; display:flex; gap:10px; align-items:center; justify-content:center;">
+      <button
+        id="regenerateBtn"
+        class="auth-btn"
+        type="button"
+      >
+        Regenerate Code
+      </button>
+
+      <button
+        id="dashboardBtn"
+        class="auth-btn disabled-btn"
+        disabled
+        onclick="goPatientDashboard()"
+      >
+        Go to Dashboard
+      </button>
+    </div>
   </div>
 </div>
 
-<script>
-function goPatientDashboard() {
-  window.location.href = "/patient/dashboard";
-}
-
-async function loadInviteCode() {
-  try {
-    const res = await fetch("/patient/invite-code");
-    const data = await res.json();
-    document.getElementById("inviteCode").innerText = data.code || "----";
-  } catch (err) {
-    console.error("Failed to load invite code");
-  }
-}
-
-let poller = null;
-
-async function checkLinkStatus() {
-  try {
-    const res = await fetch("/patient/link-status");
-    const data = await res.json();
-
-    if (data.linked) {
-      const btn = document.getElementById("dashboardBtn");
-      btn.disabled = false;
-      btn.classList.remove("disabled-btn");
-
-      document.getElementById("statusText").innerText =
-        "Caregiver linked successfully!";
-
-      clearInterval(poller); // 🛑 stop polling once linked
-    }
-  } catch (err) {
-    console.error("Link status check failed");
-  }
-}
-
-// INIT
-loadInviteCode();
-poller = setInterval(checkLinkStatus, 3000);
-</script>
+<script src="/js/patientWelcome.js"></script>
 
 </body>
 </html>
