@@ -90,7 +90,7 @@ function createMemoryCard(memory) {
     .slice(0, 2);
 
   return `
-    <div class="memory-card" data-id="${memory._id}">
+    <div class="memory-item" data-id="${memory._id}">
       <div class="memory-image ${memory.imageUrl ? 'has-image' : ''}" 
            ${memory.imageUrl ? `style="background-image: url('${memory.imageUrl}')"` : ''}>
         ${!memory.imageUrl ? initials : ''}
