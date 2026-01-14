@@ -21,12 +21,8 @@ router.get("/memories", requirePatient, async (req, res) => {
 });
 
 router.post("/memories", requirePatient, async (req, res) => {
-  res.json(
-    await Memory.create({
-      patientId: req.session.user.id,
-      ...req.body
-    })
-  );
+  // Patients are not allowed to create memories; only caregivers can add memories for their linked patient
+  res.status(403).json({ error: 'Forbidden', message: 'Patients cannot create memories' });
 });
 
 module.exports = router;

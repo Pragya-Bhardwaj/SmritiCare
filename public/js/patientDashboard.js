@@ -45,7 +45,7 @@ async function loadPatientName() {
  */
 async function loadMemories() {
   try {
-    const res = await fetch("/api/memories", { 
+    const res = await fetch("/memory/api/memories", { 
       credentials: "include" 
     });
     
@@ -92,11 +92,7 @@ async function loadMemories() {
             ${memory.description ? `
               <p class="memory-description">${escapeHtml(memory.description)}</p>
             ` : ''}
-            ${memory.tags && memory.tags.length ? `
-              <div class="memory-tags">
-                ${memory.tags.map(tag => `<span class="memory-tag">${escapeHtml(tag)}</span>`).join('')}
-              </div>
-            ` : ''}
+
             ${memory.audioUrl ? `
               <div class="memory-audio">
                 <button class="audio-btn" onclick="event.stopPropagation(); playAudio('${memory.audioUrl}')">

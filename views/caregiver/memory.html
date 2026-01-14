@@ -6,6 +6,7 @@
   <title>Memory Board - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
+  <link rel="stylesheet" href="/css/memoryBoard.css">
 </head>
 <body>
 
@@ -33,51 +34,16 @@
     <div class="page-header">
       <div>
         <h1>Memory Board</h1>
-        <p class="small">Important people and moments</p>
+        <p class="small">Add and manage memories for your linked patient</p>
       </div>
 
       <button class="primary-btn" onclick="openAddModal()">＋ Add Memory</button>
     </div>
 
-    <!-- SAMPLE MEMORY DATA -->
-    <section class="card-list" id="memoryList">
-
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Wedding Day</strong>
-          <p class="small desc">Married to Anita on 12 June 1985</p>
-        </div>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
+    <section class="memory-board-section">
+      <div>
+        <div id="memoryGrid" class="memory-grid"></div>
       </div>
-
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Son - Rahul</strong>
-          <p class="small desc">Lives in Bangalore, works as an engineer</p>
-        </div>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
-      </div>
-
-      <div class="card memory-card">
-        <div>
-          <strong class="title">Favourite Place</strong>
-          <p class="small desc">Evening walks in Lodhi Garden</p>
-        </div>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
-      </div>
-
     </section>
   </main>
 </div>
@@ -87,13 +53,33 @@
   <div class="modal-box">
     <h3 id="modalTitle">Add Memory</h3>
 
-    <input type="text" id="memoryTitle" placeholder="Title">
-    <input type="text" id="memoryDesc" placeholder="Short description">
+    <form id="memoryForm" enctype="multipart/form-data">
+      <input type="hidden" id="memoryId">
+      <input type="text" id="memoryTitle" name="title" placeholder="Title" required>
+      <input type="text" id="memoryRelation" name="relation" placeholder="Relation (e.g., Daughter, Son)">
+      <input type="text" id="memoryDesc" name="description" placeholder="Short description">
+      <textarea id="memoryNotes" name="notes" placeholder="Notes or story" rows="3"></textarea>
 
-    <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeMemoryModal()">Cancel</button>
-      <button class="primary-btn" onclick="saveMemory()">Save</button>
-    </div>
+      <div class="file-row">
+        <label class="file-input-label">Image
+          <input type="file" id="memoryImage" name="image" accept="image/*">
+        </label>
+
+        <label class="file-input-label">Audio
+          <input type="file" id="memoryAudio" name="audio" accept="audio/*">
+        </label>
+      </div>
+
+      <div id="mediaPreview" class="media-preview">
+        <img id="previewImage" class="preview-image" src="" alt="" style="display:none; max-width:100%; border-radius:8px; margin-top:8px;" />
+        <audio id="previewAudio" controls style="display:none; width:100%; margin-top:8px;"></audio>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" onclick="closeMemoryModal()">Cancel</button>
+        <button type="submit" class="primary-btn">Save</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -105,12 +91,12 @@
 
     <div class="modal-actions">
       <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
-      <button class="primary-btn" onclick="confirmDelete()">Delete</button>
+      <button class="primary-btn" id="confirmDelete">Delete</button>
     </div>
   </div>
 </div>
 
 <script src="/js/profileStatusChecker.js"></script>
-<script src="/js/caregiverDashboard.js"></script>
+<script src="/js/memoryCaregiver.js"></script>
 </body>
 </html>

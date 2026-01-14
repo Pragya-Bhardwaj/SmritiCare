@@ -22,6 +22,19 @@ const memorySchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  relation: {
+    type: String,
+    trim: true
+  },
+  notes: {
+    type: String,
+    trim: true
+  },
+  category: {
+    type: String,
+    trim: true,
+    default: "Other"
+  },
   imageUrl: {
     type: String
   },

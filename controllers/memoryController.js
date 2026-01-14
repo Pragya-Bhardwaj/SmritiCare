@@ -32,8 +32,8 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    // Validate input
-    const { title, description, imageUrl, audioUrl, tags } = req.body;
+    // Accept text fields and files (multer handles files)
+    const { title, description, relation, notes, category, tags } = req.body;
 
     if (!title || title.trim() === "") {
       return res.status(400).json({ 
@@ -42,15 +42,38 @@ exports.addMemory = async (req, res) => {
       });
     }
 
+    // Handle uploaded files (if any)
+    let imagePath = req.body.imageUrl || undefined;
+    let audioPath = req.body.audioUrl || undefined;
+
+    if (req.files) {
+      if (req.files.image && req.files.image[0]) {
+        imagePath = `/uploads/memories/images/${req.files.image[0].filename}`;
+      }
+      if (req.files.audio && req.files.audio[0]) {
+        audioPath = `/uploads/memories/audio/${req.files.audio[0].filename}`;
+      }
+    }
+
+    // Normalize tags
+    let tagArray = [];
+    if (tags) {
+      if (Array.isArray(tags)) tagArray = tags;
+      else if (typeof tags === 'string') tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+    }
+
     // Create memory
     const memory = await Memory.create({
       caregiverId: req.session.user.id,
       patientId: req.session.user.patientId,
       title: title.trim(),
       description: description ? description.trim() : "",
-      imageUrl,
-      audioUrl,
-      tags: tags || []
+      relation: relation ? relation.trim() : undefined,
+      notes: notes ? notes.trim() : undefined,
+      category: category ? category.trim() : undefined,
+      imageUrl: imagePath,
+      audioUrl: audioPath,
+      tags: tagArray
     });
 
     // Populate references for response
@@ -73,11 +96,8 @@ exports.addMemory = async (req, res) => {
   }
 };
 
-/**
- * Get all memories for the logged-in user
- * Caregivers see memories they created
- * Patients see all memories created for them
- */
+
+// Update getMemories to support query filters
 exports.getMemories = async (req, res) => {
   try {
     // Validate session
@@ -89,23 +109,38 @@ exports.getMemories = async (req, res) => {
     }
 
     const { role, id, patientId } = req.session.user;
+    const { category, search } = req.query;
     let memories;
+
+    const buildFilter = (base) => {
+      const filter = { ...base };
+      if (category && category !== 'All') filter.category = category;
+      if (search) {
+        const q = new RegExp(search.trim(), 'i');
+        filter.$or = [
+          { title: q },
+          { description: q },
+          { notes: q },
+          { relation: q }
+        ];
+      }
+      return filter;
+    };
 
     if (role === "caregiver") {
       // Caregiver sees memories they created for their patient
       if (!patientId) {
         return res.json({ memories: [] }); // Not linked yet
       }
-      memories = await Memory.find({ 
-        caregiverId: id,
-        patientId: patientId 
-      })
+      const filter = buildFilter({ caregiverId: id, patientId });
+      memories = await Memory.find(filter)
         .populate("patientId", "name")
         .sort({ createdAt: -1 });
 
     } else if (role === "patient") {
       // Patient sees all memories created for them
-      memories = await Memory.find({ patientId: id })
+      const filter = buildFilter({ patientId: id });
+      memories = await Memory.find(filter)
         .populate("caregiverId", "name email")
         .sort({ createdAt: -1 });
 
@@ -131,14 +166,12 @@ exports.getMemories = async (req, res) => {
   }
 };
 
-/**
- * Update a memory
- * Only the caregiver who created it can update
- */
+
+// Update memory to accept files and new fields
 exports.updateMemory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, imageUrl, audioUrl, tags } = req.body;
+    const { title, description, relation, notes, category, tags } = req.body;
 
     // Validate session
     if (!req.session.user || req.session.user.role !== "caregiver") {
@@ -165,14 +198,38 @@ exports.updateMemory = async (req, res) => {
       });
     }
 
-    // Update fields
-    if (title) memory.title = title.trim();
-    if (description !== undefined) memory.description = description.trim();
-    if (imageUrl !== undefined) memory.imageUrl = imageUrl;
-    if (audioUrl !== undefined) memory.audioUrl = audioUrl;
-    if (tags) memory.tags = tags;
+    // Debug: log incoming update payload
+    console.log('Update payload:', { body: req.body, files: Object.keys(req.files || {}) });
+
+    // Handle uploaded files (replace only if provided)
+    if (req.files) {
+      if (req.files.image && req.files.image[0]) {
+        memory.imageUrl = `/uploads/memories/images/${req.files.image[0].filename}`;
+      }
+      if (req.files.audio && req.files.audio[0]) {
+        memory.audioUrl = `/uploads/memories/audio/${req.files.audio[0].filename}`;
+      }
+    }
+
+    // Update fields (update even if empty string provided)
+    if (Object.prototype.hasOwnProperty.call(req.body, 'title')) memory.title = title ? title.trim() : '';
+    if (Object.prototype.hasOwnProperty.call(req.body, 'description')) memory.description = description ? description.trim() : '';
+    if (Object.prototype.hasOwnProperty.call(req.body, 'relation')) memory.relation = relation ? relation.trim() : '';
+    if (Object.prototype.hasOwnProperty.call(req.body, 'notes')) memory.notes = notes ? notes.trim() : '';
+    if (Object.prototype.hasOwnProperty.call(req.body, 'category')) memory.category = category ? category.trim() : '';
+    if (Object.prototype.hasOwnProperty.call(req.body, 'tags')) {
+      if (Array.isArray(tags)) memory.tags = tags;
+      else if (typeof tags === 'string') memory.tags = tags.split(',').map(t => t.trim()).filter(Boolean);
+      else memory.tags = [];
+    }
 
     await memory.save();
+
+    // Populate references to return a consistent object to client
+    await memory.populate([
+      { path: "caregiverId", select: "name email" },
+      { path: "patientId", select: "name" }
+    ]);
 
     res.json({
       success: true,
@@ -188,10 +245,8 @@ exports.updateMemory = async (req, res) => {
   }
 };
 
-/**
- * Delete a memory
- * Only the caregiver who created it can delete
- */
+
+// Delete a memory
 exports.deleteMemory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -236,3 +291,4 @@ exports.deleteMemory = async (req, res) => {
     });
   }
 };
+
