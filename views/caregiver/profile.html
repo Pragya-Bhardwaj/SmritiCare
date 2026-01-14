@@ -18,14 +18,14 @@
 
     <nav>
       <a href="/caregiver/dashboard">Dashboard</a>
+      <a href="/caregiver/memory">Memory Board</a>
       <a href="/caregiver/reminders">Reminders</a>
       <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/memory">Memory Board</a>
-      <a href="/caregiver/selfcare">Self Care</a>
       <a href="/caregiver/location">Live Location</a>
-      <a href="/caregiver/profile" class="active" id="profileLink">
+      <a href="/caregiver/selfcare">Self Care</a>
+      <a href="/caregiver/profile" id="profileLink">
         <span>Profile</span>
-        <span id="profileBadge" style="display:none; color: #ef4444; font-size: 18px; margin-left: 8px;">●</span>
+        <span id="profileBadge" style="display:none; color: #dc2626; font-size: 18px; margin-left: 8px; animation: pulse 2s infinite;">●</span>
       </a>
       <a href="/auth/logout" class="logout-btn">Logout</a>
     </nav>
@@ -140,6 +140,7 @@
   </main>
 </div>
 
+<script src="/js/profileStatusChecker.js"></script>
 <script src="/js/caregiverDashboard.js"></script>
 <script src="/js/caregiverProfile.js"></script>
 </body>

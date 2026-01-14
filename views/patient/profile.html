@@ -24,7 +24,7 @@
     <a href="/patient/selfcare">Self Care</a>
     <a href="/patient/profile" class="active" id="profileLink">
       <span>Profile</span>
-      <span id="profileBadge" style="display:none; color: #ef4444; font-size: 18px; margin-left: 8px;">●</span>
+      <span id="profileBadge" style="display:none; color: #dc2626; font-size: 18px; margin-left: 8px; animation: pulse 2s infinite;">●</span>
     </a>
     <a href="/auth/logout" class="logout-btn">Logout</a>
   </aside>
@@ -32,10 +32,6 @@
   <!-- MAIN CONTENT -->
   <main class="main">
     
-    <header class="topbar">
-      <strong>Patient Profile</strong>
-    </header>
-
     <div class="profile-container">
       
       <!-- PROFILE HEADER -->
@@ -177,6 +173,7 @@
 
 </div>
 
+<script src="/js/profileStatusChecker.js"></script>
 <script src="/js/patientApp.js"></script>
 <script src="/js/patientProfile.js"></script>
 </body>

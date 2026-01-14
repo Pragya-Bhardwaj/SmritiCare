@@ -105,6 +105,22 @@ body {
   z-index: 1000;
 }
 
+/* ============================= */
+/* PROFILE COMPLETION BADGE */
+/* ============================= */
+
+.profile-badge,
+#profileBadge {
+  color: #dc2626; /* darker red */
+  font-size: 18px;
+  margin-left: 8px;
+  display: inline-block;
+  line-height: 1;
+
+}
+
+
+
 .hidden {
   display: none;
 }

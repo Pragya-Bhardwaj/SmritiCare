@@ -6,6 +6,9 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Load caregiver name into topbar
+  loadCaregiverName();
+
   const sidebarLinks = document.querySelectorAll(".sidebar nav a");
 
   if (!sidebarLinks.length) return;
@@ -40,3 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+async function loadCaregiverName() {
+  try {
+    const res = await fetch('/api/profile', { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.user && data.user.name) {
+      const el = document.getElementById('caregiverName');
+      if (el) el.textContent = data.user.name;
+
+      // Ensure strong title remains 'Caregiver'
+      const strongEl = document.querySelector('.user div strong');
+      if (strongEl) strongEl.textContent = 'Caregiver';
+    }
+  } catch (err) {
+    console.error('Failed to load caregiver name:', err);
+  }
+}
