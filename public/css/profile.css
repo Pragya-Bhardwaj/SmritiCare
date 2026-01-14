@@ -291,6 +291,24 @@
       font-family: inherit;
     }
 
+    /* Phone input split: country code + number */
+    .phone-inputs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .phone-inputs input#phoneCountryCode {
+      width: 110px;
+    }
+
+    .field-error {
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 6px;
+      min-height: 18px; /* reserve space */
+    }
+
     .btn-container {
       display: flex;
       gap: 12px;

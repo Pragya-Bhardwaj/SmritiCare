@@ -364,6 +364,35 @@
   transform: scale(1.1);
 }
 
+/* Edit/Delete action buttons */
+.edit-btn,
+.delete-btn {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.edit-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.edit-btn:hover {
+  background: #e5e7eb;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+}
+
 /* ============================= */
 /* ACTIONS GROUP */
 /* ============================= */
@@ -410,7 +439,8 @@
 }
 
 .modal-box input,
-.modal-box textarea {
+.modal-box textarea,
+.modal-box select {
   width: 100%;
   padding: 12px;
   border: 1px solid #e5e7eb;
@@ -421,9 +451,25 @@
 }
 
 .modal-box input:focus,
-.modal-box textarea:focus {
+.modal-box textarea:focus,
+.modal-box select:focus {
   outline: none;
   border-color: #667eea;
+}
+
+.time-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.time-select select {
+  padding: 8px 10px;
+  min-width: 64px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  font-size: 14px;
 }
 
 .modal-actions {

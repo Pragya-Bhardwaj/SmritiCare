@@ -45,42 +45,45 @@
       <div class="card medication-card">
         <div>
           <strong class="title">Paracetamol</strong>
-          <p class="small">500 mg • Morning</p>
+          <p class="small meta"><span class="dose">500 mg</span> • <span class="time" data-time="09:00">09:00 AM</span></p>
+          <p class="small notes">Take after breakfast</p>
         </div>
 
         <span class="status done">Taken</span>
 
         <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
+          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
+          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
         </div>
       </div>
 
       <div class="card medication-card">
         <div>
           <strong class="title">Vitamin D</strong>
-          <p class="small">1 capsule • Afternoon</p>
+          <p class="small meta"><span class="dose">1 capsule</span> • <span class="time" data-time="13:00">01:00 PM</span></p>
+          <p class="small notes">Weekly supplement</p>
         </div>
 
         <span class="status pending">Pending</span>
 
         <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
+          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
+          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
         </div>
       </div>
 
       <div class="card medication-card">
         <div>
           <strong class="title">Insulin</strong>
-          <p class="small">10 units • Night</p>
+          <p class="small meta"><span class="dose">10 units</span> • <span class="time" data-time="21:00">09:00 PM</span></p>
+          <p class="small notes">Store refrigerated</p>
         </div>
 
         <span class="status pending">Pending</span>
 
         <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
+          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
+          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
         </div>
       </div>
 
@@ -94,7 +97,38 @@
     <h3 id="modalTitle">Add Medication</h3>
 
     <input type="text" id="medName" placeholder="Medication name">
-    <input type="text" id="medDose" placeholder="Dosage & time (e.g. 500mg Morning)">
+
+    <div class="time-select">
+      <select id="medHour">
+        <option>01</option>
+        <option>02</option>
+        <option>03</option>
+        <option>04</option>
+        <option>05</option>
+        <option>06</option>
+        <option>07</option>
+        <option>08</option>
+        <option>09</option>
+        <option>10</option>
+        <option>11</option>
+        <option>12</option>
+      </select>
+
+      <select id="medMinute">
+        <option>00</option>
+        <option>15</option>
+        <option>30</option>
+        <option>45</option>
+      </select>
+
+      <select id="medAmPm">
+        <option>AM</option>
+        <option>PM</option>
+      </select>
+    </div>
+
+    <input type="text" id="medDose" placeholder="Dosage (e.g., 500 mg)">
+    <textarea id="medNotes" placeholder="Notes (optional)"></textarea>
 
     <div class="modal-actions">
       <button class="secondary-btn" onclick="closeMedModal()">Cancel</button>

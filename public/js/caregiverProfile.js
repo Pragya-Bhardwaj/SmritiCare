@@ -2,6 +2,49 @@
 
 let currentProfileData = null;
 
+function validatePhoneParts(countryCode, number) {
+  // Returns { valid: boolean, error: string|null }
+  if (!countryCode || typeof countryCode !== 'string' || countryCode.trim() === '') {
+    return { valid: false, error: 'Please include country code (e.g., +91).' };
+  }
+  const cc = countryCode.trim();
+  if (!cc.startsWith('+')) {
+    return { valid: false, error: 'Country code must start with + (e.g., +91).' };
+  }
+  const ccDigits = cc.replace(/[^\d]/g, '');
+  if (ccDigits.length < 1 || ccDigits.length > 3) {
+    return { valid: false, error: 'Country code should be 1 to 3 digits.' };
+  }
+
+  if (!number || typeof number !== 'string' || number.trim() === '') {
+    return { valid: false, error: 'Please enter a 10-digit phone number.' };
+  }
+  const num = number.replace(/[^\d]/g, '');
+  if (num.length !== 10) {
+    return { valid: false, error: 'Phone number must be exactly 10 digits.' };
+  }
+  if (/^0{10}$/.test(num)) {
+    return { valid: false, error: 'Phone number cannot be all zeros.' };
+  }
+
+  return { valid: true, error: null };
+}
+
+function parsePhoneToParts(phone) {
+  if (!phone || typeof phone !== 'string') return { country: '', number: '' };
+  const trimmed = phone.trim();
+  const compact = trimmed.replace(/[^\d+]/g, '');
+  const m = compact.match(/^\+?(\d{1,3})(\d{10})$/);
+  if (m) return { country: '+' + m[1], number: m[2] };
+  const parts = trimmed.split(/\s+/);
+  if (parts.length >= 2) {
+    const c = parts[0].startsWith('+') ? parts[0] : '+' + parts[0];
+    const n = parts[1].replace(/[^\d]/g, '');
+    return { country: c, number: n };
+  }
+  return { country: '', number: '' };
+}
+
 /* ================= LOAD PROFILE DATA ================= */
 async function loadProfile() {
   try {
@@ -29,7 +72,9 @@ async function loadProfile() {
     if (data.profile) {
       const profile = data.profile;
 
-      document.getElementById("phone").value = profile.phone || "";
+      const phoneParts = parsePhoneToParts(profile.phone || "");
+      document.getElementById("phoneCountryCode").value = phoneParts.country;
+      document.getElementById("phoneNumber").value = phoneParts.number;
       document.getElementById("gender").value = profile.gender || "";
       document.getElementById("dateOfBirth").value = profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : "";
       document.getElementById("relationToPatient").value = profile.relationToPatient || "";
@@ -123,8 +168,26 @@ function calculateAge(dateOfBirth) {
 document.getElementById("profileForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const cc = document.getElementById("phoneCountryCode").value.trim();
+  const num = document.getElementById("phoneNumber").value.trim();
+  const phoneErrorEl = document.getElementById("phoneError");
+
+  const validation = validatePhoneParts(cc, num);
+  if (!validation.valid) {
+    if (phoneErrorEl) phoneErrorEl.innerText = validation.error;
+    // focus the specific field
+    if (validation.error.toLowerCase().includes('country')) {
+      document.getElementById("phoneCountryCode").focus();
+    } else {
+      document.getElementById("phoneNumber").focus();
+    }
+    return;
+  } else {
+    if (phoneErrorEl) phoneErrorEl.innerText = '';
+  }
+
   const formData = {
-    phone: document.getElementById("phone").value.trim(),
+    phone: `${cc} ${num}`,
     gender: document.getElementById("gender").value,
     dateOfBirth: document.getElementById("dateOfBirth").value,
     relationToPatient: document.getElementById("relationToPatient").value.trim(),
@@ -223,4 +286,19 @@ async function checkProfileStatus() {
 document.addEventListener("DOMContentLoaded", () => {
   loadProfile();
   checkProfileStatus();
+
+  // Live validation for phone fields
+  const ccEl = document.getElementById("phoneCountryCode");
+  const numEl = document.getElementById("phoneNumber");
+  const phoneErrorEl = document.getElementById("phoneError");
+
+  if (ccEl && numEl && phoneErrorEl) {
+    const liveValidate = () => {
+      const v = validatePhoneParts(ccEl.value, numEl.value);
+      phoneErrorEl.innerText = v.valid ? '' : v.error;
+    };
+
+    ccEl.addEventListener('input', liveValidate);
+    numEl.addEventListener('input', liveValidate);
+  }
 });

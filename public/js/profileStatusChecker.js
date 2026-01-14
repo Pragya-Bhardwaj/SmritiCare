@@ -3,7 +3,7 @@
 
 (async function checkProfileCompletion() {
   try {
-    const res = await fetch("/api/profile/status");
+    const res = await fetch("/api/profile/status", { credentials: 'include' });
     if (!res.ok) {
       try { await res.json(); } catch(e) { /* non-json response - probably an HTML 404 */ }
       console.warn('Profile status endpoint not available or returned an error:', res.status);

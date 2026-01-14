@@ -31,47 +31,51 @@
 
     <div class="filter-tabs">
       <button class="tab active">All</button>
-      <button class="tab">💊 Medicine</button>
-      <button class="tab">🍽 Meal</button>
-      <button class="tab">👨‍⚕️ Appointment</button>
-      <button class="tab">🧼 Hygiene</button>
+      <button class="tab">Medicine</button>
+      <button class="tab">Meal</button>
+      <button class="tab">Appointment</button>
+      <button class="tab">Hygiene</button>
     </div>
 
     <div class="reminders-list">
-      <div class="card reminder-card">
-        <div class="reminder-icon">💊</div>
+      <div class="card reminder-card" data-status="pending">
         <div class="reminder-content">
           <h3>Morning Medicine</h3>
-          <p>🕐 9:00 AM • Daily</p>
+          <p>9:00 AM • Daily</p>
         </div>
-        <span class="badge badge-pending">Pending</span>
+        <div class="reminder-action">
+          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
+        </div>
       </div>
 
-      <div class="card reminder-card">
-        <div class="reminder-icon">🍽</div>
+      <div class="card reminder-card done" data-status="done">
         <div class="reminder-content">
           <h3>Breakfast</h3>
-          <p>🕐 9:30 AM • Daily</p>
+          <p>9:30 AM • Daily</p>
         </div>
-        <span class="badge badge-done">Done</span>
+        <div class="reminder-action">
+          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done" checked>
+        </div>
       </div>
 
-      <div class="card reminder-card">
-        <div class="reminder-icon">💊</div>
+      <div class="card reminder-card" data-status="pending">
         <div class="reminder-content">
           <h3>Blood Pressure Check</h3>
-          <p>🕐 11:00 AM • Daily</p>
+          <p>11:00 AM • Daily</p>
         </div>
-        <span class="badge badge-pending">Pending</span>
+        <div class="reminder-action">
+          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
+        </div>
       </div>
 
-      <div class="card reminder-card">
-        <div class="reminder-icon">👨‍⚕️</div>
+      <div class="card reminder-card" data-status="pending">
         <div class="reminder-content">
           <h3>Doctor Visit</h3>
-          <p>🕐 2:00 PM • Weekly</p>
+          <p>2:00 PM • Weekly</p>
         </div>
-        <span class="badge badge-pending">Pending</span>
+        <div class="reminder-action">
+          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
+        </div>
       </div>
     </div>
 
@@ -81,5 +85,6 @@
 
 <script src="/js/profileStatusChecker.js"></script>
 <script src="/js/patientApp.js"></script>
+<script src="/js/patientReminders.js"></script>
 </body>
 </html>

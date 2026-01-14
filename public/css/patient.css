@@ -235,6 +235,28 @@
   color: #1e40af;
 }
 
+/* Reminder checkbox action */
+.reminder-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reminder-action .reminder-toggle {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.reminder-card.done .reminder-content h3 {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.reminder-card.done .reminder-content p {
+  color: #9ca3af;
+}
+
 /* Medication Table */
 .medication-table {
   background: white;

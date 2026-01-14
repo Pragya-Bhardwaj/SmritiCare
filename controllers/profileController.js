@@ -9,9 +9,12 @@ exports.getProfile = async (req, res) => {
     const userId = req.session.user.id;
     const role = req.session.user.role;
 
+    console.log(`[profileController] getProfile request: userId=${userId}, role=${role}`);
+
     const user = await User.findById(userId).populate('linkedUser');
     
     if (!user) {
+      console.warn(`[profileController] getProfile: user not found: ${userId}`);
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -33,6 +36,8 @@ exports.getProfile = async (req, res) => {
       }
     }
 
+    console.log(`[profileController] returning profile for user ${userId}: profileFound=${!!profile}, linkedUser=${!!linkedUser}`);
+
     res.json({
       user: {
         id: user._id,
@@ -52,7 +57,7 @@ exports.getProfile = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Get profile error:", err);
+    console.error("Get profile error:", err.stack || err);
     res.status(500).json({ error: "Failed to fetch profile" });
   }
 };
