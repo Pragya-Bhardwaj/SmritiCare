@@ -1,11 +1,21 @@
+// models/SelfCareTip.js
 const mongoose = require("mongoose");
 
-const selfCareSchema = new mongoose.Schema({
-  patientId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+const selfCareTipSchema = new mongoose.Schema({
+  tipTitle: {
+    type: String,
+    required: true,
+    trim: true
   },
-  tip: String
+  tipDescription: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  
 });
 
-module.exports = mongoose.model("SelfCare", selfCareSchema);
+selfCareTipSchema.index({ category: 1 });
+selfCareTipSchema.index({ targetRole: 1 });
+
+module.exports = mongoose.model("SelfCareTip", selfCareTipSchema);
