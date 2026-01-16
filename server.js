@@ -7,12 +7,12 @@ const MongoStore = require("connect-mongo");
 
 const app = express();
 
-/* ================= DATABASE CONNECTION ================= */
+/* DATABASE CONNECTION */
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error("MongoDB connection error:", err));
 
-/* ================= MIDDLEWARE ================= */
+/* MIDDLEWARE */
 
 // Body parsers
 app.use(express.json({ limit: "10mb" }));
@@ -50,11 +50,11 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-/* ================= STATIC FILES ================= */
+/* STATIC FILES */
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/views", express.static(path.join(__dirname, "views")));
 
-/* ================= ROUTES ================= */
+/* ROUTES */
 const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
@@ -71,7 +71,7 @@ app.use("/api/patient", patientApiRoutes);
 app.use("/", profileRoutes);
 
 
-/* ================= ROOT ROUTE ================= */
+/* ROOT ROUTE */
 app.get("/", (req, res) => {
   if (req.session.user) {
     // Redirect logged-in users to their dashboard
@@ -83,7 +83,7 @@ app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
 
-/* ================= 404 HANDLER ================= */
+/* 404 HANDLER */
 app.use((req, res) => {
   res.status(404).send(`
     <h1>404 - Page Not Found</h1>
@@ -92,9 +92,9 @@ app.use((req, res) => {
   `);
 });
 
-/* ================= ERROR HANDLER ================= */
+/* ERROR HANDLER */
 app.use((err, req, res, next) => {
-  console.error("❌ Server error:", err);
+  console.error(" Server error:", err);
   res.status(500).send(`
     <h1>500 - Server Error</h1>
     <p>Something went wrong on our end.</p>
@@ -102,7 +102,7 @@ app.use((err, req, res, next) => {
   `);
 });
 
-/* ================= START SERVER ================= */
+/* START SERVER */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(` SmritiCare server running on http://localhost:${PORT}`);

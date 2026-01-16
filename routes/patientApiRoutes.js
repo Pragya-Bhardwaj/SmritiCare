@@ -15,7 +15,7 @@ function requirePatient(req, res, next) {
 
 
 
-/* ===== MEMORY ===== */
+/* MEMORY */
 router.get("/memories", requirePatient, async (req, res) => {
   res.json(await Memory.find({ patientId: req.session.user.id }));
 });

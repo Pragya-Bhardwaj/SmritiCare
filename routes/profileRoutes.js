@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const profileController = require("../controllers/profileController");
 
-/* ================= MIDDLEWARE ================= */
+/* MIDDLEWARE */
 function requireAuth(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: "Not authenticated" });
@@ -11,7 +11,7 @@ function requireAuth(req, res, next) {
   next();
 }
 
-/* ================= PROFILE API ROUTES ================= */
+/* PROFILE API ROUTES */
 
 // Get current user's profile
 router.get("/api/profile", requireAuth, profileController.getProfile);

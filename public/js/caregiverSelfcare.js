@@ -1,7 +1,7 @@
 let selectedCard = null;
 let isEdit = false;
 
-/* ================= OPEN ================= */
+/* OPEN */
 
 function openAddModal() {
   isEdit = false;
@@ -32,7 +32,7 @@ function openDeleteModal(btn) {
   document.getElementById("deleteModal").classList.remove("hidden");
 }
 
-/* ================= CLOSE ================= */
+/* CLOSE */
 
 function closeSelfcareModal() {
   document.getElementById("selfcareModal").classList.add("hidden");
@@ -42,7 +42,7 @@ function closeDeleteModal() {
   document.getElementById("deleteModal").classList.add("hidden");
 }
 
-/* ================= SAVE ================= */
+/* SAVE */
 
 function saveTip() {
   const title = document.getElementById("tipTitle").value.trim();
@@ -73,7 +73,7 @@ function saveTip() {
   closeSelfcareModal();
 }
 
-/* ================= DELETE ================= */
+/* DELETE */
 
 function confirmDelete() {
   if (selectedCard) selectedCard.remove();

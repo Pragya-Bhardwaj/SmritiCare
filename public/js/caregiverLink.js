@@ -1,13 +1,11 @@
 // Prevent multiple submissions
 let isSubmitting = false;
 
-/**
- * Handle the linking process when caregiver enters invite code
- */
+/* Handle the linking process when caregiver enters invite code */
 async function link() {
   // Prevent double-submission
   if (isSubmitting) {
-    console.log("⏳ Already submitting, please wait...");
+    console.log(" Already submitting, please wait...");
     return;
   }
 
@@ -43,7 +41,7 @@ async function link() {
   }
 
   try {
-    console.log("🔗 Attempting to link with code:", code);
+    console.log(" Attempting to link with code:", code);
 
     const res = await fetch("/caregiver/link", {
       method: "POST",
@@ -57,7 +55,7 @@ async function link() {
     // Check HTTP status
     if (!res.ok) {
       const errorText = await res.text();
-      console.error("❌ HTTP Error:", res.status, errorText);
+      console.error(" HTTP Error:", res.status, errorText);
       throw new Error(`Server error: ${res.status}`);
     }
 
@@ -67,7 +65,7 @@ async function link() {
       // Show error message
       msg.style.color = "red";
       msg.innerText = data.error || "Invalid invite code";
-      console.error("❌ Link failed:", data.error);
+      console.error(" Link failed:", data.error);
 
       // Re-enable button
       isSubmitting = false;
@@ -78,8 +76,8 @@ async function link() {
       return;
     }
 
-    // ✅ SUCCESS
-    console.log("✅ Successfully linked to patient");
+    // SUCCESS
+    console.log(" Successfully linked to patient");
 
     msg.style.color = "green";
     msg.innerText = data.message || "Linked successfully!";
@@ -92,14 +90,14 @@ async function link() {
 
     // Keep link button disabled
     if (linkBtn) {
-      linkBtn.innerText = "Linked ✓";
+      linkBtn.innerText = "Linked ";
     }
 
     // NOTE: No auto-redirect — user must click "Go to Dashboard" to navigate.
     // Intentionally not redirecting automatically to give control to the caregiver.
 
   } catch (err) {
-    console.error("❌ Link error:", err);
+    console.error(" Link error:", err);
     
     msg.style.color = "red";
     msg.innerText = "Something went wrong. Please try again.";

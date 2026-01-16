@@ -5,7 +5,7 @@ const CaregiverProfile = require("../models/CaregiverProfile");
 const InviteCode = require("../models/InviteCode");
 const nodemailer = require("nodemailer");
 
-/* ================= MAIL SETUP ================= */
+/* MAIL SETUP */
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -30,14 +30,14 @@ async function sendOTP(email, otp) {
         </div>
       `
     });
-    console.log(`✅ OTP sent to ${email}`);
+    console.log(` OTP sent to ${email}`);
   } catch (err) {
-    console.error("❌ Failed to send OTP email:", err);
+    console.error(" Failed to send OTP email:", err);
     throw new Error("Failed to send verification email");
   }
 }
 
-/* ================= INPUT VALIDATION ================= */
+/* INPUT VALIDATION */
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
@@ -52,7 +52,7 @@ function validatePassword(password) {
   return { valid: true };
 }
 
-/* ================= SIGNUP ================= */
+/* SIGNUP */
 exports.signup = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
@@ -103,7 +103,7 @@ exports.signup = async (req, res) => {
       }
     });
 
-    console.log(`✅ User created: ${email} (${role})`);
+    console.log(` User created: ${email} (${role})`);
 
     // Create role-specific profile
     if (role === "patient") {
@@ -125,10 +125,10 @@ exports.signup = async (req, res) => {
         expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 
-      console.log(`✅ Patient profile created with invite code: ${code}`);
+      console.log(` Patient profile created with invite code: ${code}`);
     } else {
       await CaregiverProfile.create({ userId: user._id });
-      console.log(`✅ Caregiver profile created`);
+      console.log(` Caregiver profile created`);
     }
 
     // Send OTP email
@@ -161,7 +161,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-/* ================= VERIFY OTP ================= */
+/* VERIFY OTP */
 exports.verifyOTP = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -207,7 +207,7 @@ exports.verifyOTP = async (req, res) => {
     user.otp = undefined;
     await user.save();
 
-    console.log(`✅ Email verified for ${user.email}`);
+    console.log(` Email verified for ${user.email}`);
 
     // Create actual session
     req.session.user = {
@@ -241,7 +241,7 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 exports.login = async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -273,7 +273,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    console.log(`✅ User logged in: ${email}`);
+    console.log(` User logged in: ${email}`);
 
     // Create session with patientId if caregiver is linked
     const sessionData = {
@@ -314,7 +314,7 @@ exports.login = async (req, res) => {
   }
 };
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 exports.logout = (req, res) => {
   const userEmail = req.session.user?.email;
 
@@ -324,13 +324,13 @@ exports.logout = (req, res) => {
       return res.status(500).send("Logout failed");
     }
 
-    console.log(`✅ User logged out: ${userEmail || 'unknown'}`);
+    console.log(` User logged out: ${userEmail || 'unknown'}`);
     res.clearCookie("smriticare.sid");
     res.redirect("/auth/login");
   });
 };
 
-/* ================= RESEND OTP ================= */
+/* RESEND OTP */
 exports.resendOTP = async (req, res) => {
   try {
     // Check temporary session
@@ -363,7 +363,7 @@ exports.resendOTP = async (req, res) => {
     // Send OTP
     try {
       await sendOTP(user.email, otp);
-      console.log(`✅ OTP resent to ${user.email}`);
+      console.log(` OTP resent to ${user.email}`);
     } catch (emailErr) {
       return res.status(500).json({ error: "Failed to send email. Please try again." });
     }

@@ -1,7 +1,7 @@
 let selectedCard = null;
 let isEdit = false;
 
-/* ================= OPEN MODALS ================= */
+/* OPEN MODALS */
 
 function openAddModal() {
   isEdit = false;
@@ -61,7 +61,7 @@ function openDeleteModal(btn) {
   document.getElementById("deleteModal").classList.remove("hidden");
 }
 
-/* ================= CLOSE MODALS ================= */
+/* CLOSE MODALS */
 
 function closeReminderModal() {
   document.getElementById("reminderModal").classList.add("hidden");
@@ -71,7 +71,7 @@ function closeDeleteModal() {
   document.getElementById("deleteModal").classList.add("hidden");
 }
 
-/* ================= SAVE (ADD / EDIT) ================= */
+/* SAVE (ADD / EDIT) */
 
 function formatTime(t) {
   if (!t) return "--:--";
@@ -137,7 +137,7 @@ function saveReminder() {
   closeReminderModal();
 }
 
-/* ================= DELETE ================= */
+/* DELETE */
 
 function confirmDelete() {
   if (selectedCard) selectedCard.remove();

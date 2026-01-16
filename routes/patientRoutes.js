@@ -4,7 +4,7 @@ const path = require("path");
 const InviteCode = require("../models/InviteCode");
 const User = require("../models/User");
 
-/* ================= AUTH MIDDLEWARE ================= */
+/* AUTH MIDDLEWARE */
 function requirePatient(req, res, next) {
   if (!req.session.user) {
     // If client expects JSON (fetch/XHR), respond with 401; otherwise redirect to login
@@ -24,7 +24,7 @@ function requirePatient(req, res, next) {
   next();
 }
 
-/* ================= CHECK IF LINKED ================= */
+/* CHECK IF LINKED */
 async function requireLinked(req, res, next) {
   try {
     if (!req.session.user) {
@@ -67,7 +67,7 @@ async function requireLinked(req, res, next) {
   }
 }
 
-/* ================= WELCOME / INVITE PAGE ================= */
+/* WELCOME INVITE PAGE */
 router.get("/welcome", requirePatient, async (req, res) => {
   try {
     const user = await User.findById(req.session.user.id);
@@ -92,7 +92,7 @@ router.get("/welcome", requirePatient, async (req, res) => {
   }
 });
 
-/* ================= FETCH INVITE CODE ================= */
+/* FETCH INVITE CODE */
 router.get("/invite-code", requirePatient, async (req, res) => {
   try {
     let invite = await InviteCode.findOne({
@@ -119,7 +119,7 @@ router.get("/invite-code", requirePatient, async (req, res) => {
         expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
       });
 
-      console.log(`🔁 Generated new invite for patient ${req.session.user.id}: ${code}`);
+      console.log(` Generated new invite for patient ${req.session.user.id}: ${code}`);
     }
 
     res.json({ 
@@ -137,7 +137,7 @@ router.get("/invite-code", requirePatient, async (req, res) => {
   }
 });
 
-/* ================= REGENERATE INVITE CODE ================= */
+/* REGENERATE INVITE CODE */
 router.post("/invite-code/regenerate", requirePatient, async (req, res) => {
   try {
     // Generate unique code
@@ -159,7 +159,7 @@ router.post("/invite-code/regenerate", requirePatient, async (req, res) => {
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
     });
 
-    console.log(`🔁 Regenerated invite code for patient ${req.session.user.id}: ${code}`);
+    console.log(` Regenerated invite code for patient ${req.session.user.id}: ${code}`);
 
     res.json({ success: true, code: invite.code, expiresAt: invite.expiresAt });
   } catch (err) {
@@ -168,7 +168,7 @@ router.post("/invite-code/regenerate", requirePatient, async (req, res) => {
   }
 });
 
-/* ================= LINK STATUS (POLLING) ================= */
+/* LINK STATUS POLLING */
 router.get("/link-status", requirePatient, async (req, res) => {
   try {
     const user = await User.findById(req.session.user.id);
@@ -182,7 +182,7 @@ router.get("/link-status", requirePatient, async (req, res) => {
 
     // Update session if status changed
     if (user.linked && !req.session.user.linked) {
-      console.log(`✅ Patient ${user.email} is now linked`);
+      console.log(` Patient ${user.email} is now linked`);
       req.session.user.linked = true;
       
       await req.session.save();
@@ -203,42 +203,42 @@ router.get("/link-status", requirePatient, async (req, res) => {
   }
 });
 
-/* ================= DASHBOARD ================= */
+/* DASHBOARD */
 router.get("/dashboard", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/dashboard.html")
   );
 });
 
-/* ================= MEMORY BOARD ================= */
+/* MEMORY BOARD */
 router.get("/memory", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/memory.html")
   );
 });
 
-/* ================= REMINDERS ================= */
+/* REMINDERS */
 router.get("/reminders", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/reminders.html")
   );
 });
 
-/* ================= MEDICATION ================= */
+/* MEDICATION */
 router.get("/medication", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/medication.html")
   );
 });
 
-/* ================= SELF CARE ================= */
+/* SELF CARE */
 router.get("/selfcare", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/selfcare.html")
   );
 });
 
-/* ================= PROFILE ================= */
+/* PROFILE */
 router.get("/profile", requirePatient, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/patient/profile.html")

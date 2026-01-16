@@ -60,7 +60,7 @@ function validatePhoneWithCountry(phone) {
   return true;
 }
 
-/* ================= LOAD PROFILE DATA ================= */
+/* LOAD PROFILE DATA */
 async function loadProfile() {
   try {
     const res = await fetch("/api/profile", { credentials: 'include' });
@@ -144,7 +144,7 @@ const phoneParts = parsePhoneToParts(profile.phone || "");
   }
 }
 
-/* ================= DISPLAY CAREGIVER DETAILS ================= */
+/* DISPLAY CAREGIVER DETAILS */
 function displayCaregiverDetails(linkedUser, linkedProfile) {
   const container = document.getElementById("caregiverDetails");
 
@@ -172,7 +172,7 @@ function displayCaregiverDetails(linkedUser, linkedProfile) {
   `;
 }
 
-/* ================= SAVE PROFILE ================= */
+/* SAVE PROFILE */
 document.getElementById("profileForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -271,7 +271,7 @@ document.getElementById("profileForm").addEventListener("submit", async (e) => {
   }
 });
 
-/* ================= HANDLE PROFILE IMAGE UPLOAD ================= */
+/* HANDLE PROFILE IMAGE UPLOAD */
 
 document.addEventListener("DOMContentLoaded", () => {
   loadProfile();
@@ -339,7 +339,7 @@ document.getElementById("profileImageInput").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-/* ================= CHECK PROFILE STATUS ================= */
+/* CHECK PROFILE STATUS */
 async function checkProfileStatus() {
   try {
     const res = await fetch("/api/profile/status", { credentials: 'include' });

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 
-/* ================= AUTH PAGES ================= */
+/* AUTH PAGES */
 
 router.get("/login", (req, res) => {
   if (req.session.user) {
@@ -33,7 +33,7 @@ router.get("/verify-otp", (req, res) => {
   res.sendFile("otp.html", { root: "views/auth" });
 });
 
-/* ================= AUTH ACTIONS ================= */
+/* AUTH ACTIONS */
 
 router.post("/signup", authController.signup);
 router.post("/verify-otp", authController.verifyOTP);

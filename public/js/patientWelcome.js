@@ -15,7 +15,7 @@ async function loadInviteCode() {
       codeElement.innerText = "Loading...";
     }
 
-    // ✅ FIXED: Use correct endpoint
+    // FIXED: Use correct endpoint
     const res = await fetch("/patient/invite-code", {
       method: "GET",
       credentials: "include",
@@ -35,12 +35,12 @@ async function loadInviteCode() {
       if (codeElement) {
         codeElement.innerText = data.code;
       }
-      console.log("✅ Invite code loaded:", data.code);
+      console.log(" Invite code loaded:", data.code);
     } else {
       if (codeElement) {
         codeElement.innerText = "CODE ERROR";
       }
-      console.error("❌ No invite code in response");
+      console.error(" No invite code in response");
     }
 
   } catch (err) {
@@ -80,8 +80,8 @@ async function checkLinkStatus() {
     const data = await res.json();
 
     if (data.linked) {
-      // ✅ Caregiver has linked!
-      console.log("✅ Caregiver linked successfully!");
+      //  Caregiver has linked!
+      console.log(" Caregiver linked successfully!");
 
       // Stop polling
       if (pollingInterval) {
@@ -99,7 +99,7 @@ async function checkLinkStatus() {
       // Update status text
       const statusElement = document.getElementById("statusText");
       if (statusElement) {
-        statusElement.innerText = "✅ Caregiver linked successfully! You can now access your dashboard.";
+        statusElement.innerText = " Caregiver linked successfully! You can now access your dashboard.";
         statusElement.style.color = "green";
       }
 
@@ -180,7 +180,7 @@ async function regenerateInviteCode() {
       statusElement.style.color = "green";
     }
 
-    console.log("✅ Invite regenerated:", data.code);
+    console.log(" Invite regenerated:", data.code);
   } catch (err) {
     console.error("Failed to regenerate invite code:", err);
     const btn = document.getElementById("regenerateBtn");
@@ -200,7 +200,7 @@ async function regenerateInviteCode() {
  * Initialize the page
  */
 function init() {
-  console.log("🚀 Patient welcome page initialized");
+  console.log(" Patient welcome page initialized");
 
   // Load invite code
   loadInviteCode();

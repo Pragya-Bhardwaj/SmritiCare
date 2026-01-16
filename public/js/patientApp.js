@@ -1,6 +1,5 @@
 /**
  * patientApp.js
- * ------------------------
  * Handles ONLY sidebar navigation
  * No CRUD, no modals, no dashboard logic
  */

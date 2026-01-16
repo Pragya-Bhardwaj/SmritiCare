@@ -28,7 +28,7 @@
 </div>
 
 <script>
-/* ================= TIMER ================= */
+/* TIMER */
 let timeLeft = 300; // 5 minutes
 const timerEl = document.getElementById("timer");
 
@@ -44,7 +44,7 @@ const countdown = setInterval(() => {
   }
 }, 1000);
 
-/* ================= VERIFY OTP ================= */
+/* VERIFY OTP */
 async function verifyOTP(e) {
   e.preventDefault();
 
@@ -73,7 +73,7 @@ async function verifyOTP(e) {
   window.location.href = data.redirect;
 }
 
-/* ================= RESEND OTP ================= */
+/* RESEND OTP */
 async function resendOTP() {
   const btn = document.getElementById("resendBtn");
   btn.disabled = true;

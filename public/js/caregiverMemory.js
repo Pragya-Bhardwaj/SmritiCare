@@ -1,7 +1,7 @@
 let selectedCard = null;
 let isEdit = false;
 
-/* ================= OPEN ================= */
+/* OPEN */
 
 function openAddModal() {
   isEdit = false;
@@ -32,7 +32,7 @@ function openDeleteModal(btn) {
   document.getElementById("deleteModal").classList.remove("hidden");
 }
 
-/* ================= CLOSE ================= */
+/* CLOSE */
 
 function closeMemoryModal() {
   document.getElementById("memoryModal").classList.add("hidden");
@@ -42,7 +42,7 @@ function closeDeleteModal() {
   document.getElementById("deleteModal").classList.add("hidden");
 }
 
-/* ================= SAVE ================= */
+/* SAVE */
 
 function saveMemory() {
   const title = document.getElementById("memoryTitle").value.trim();
@@ -75,7 +75,7 @@ function saveMemory() {
   closeMemoryModal();
 }
 
-/* ================= DELETE ================= */
+/* DELETE */
 
 function confirmDelete() {
   if (selectedCard) selectedCard.remove();

@@ -45,7 +45,7 @@ function parsePhoneToParts(phone) {
   return { country: '', number: '' };
 }
 
-/* ================= LOAD PROFILE DATA ================= */
+/* LOAD PROFILE DATA */
 async function loadProfile() {
   try {
     const res = await fetch("/api/profile");
@@ -106,7 +106,7 @@ async function loadProfile() {
   }
 }
 
-/* ================= DISPLAY PATIENT DETAILS ================= */
+/* DISPLAY PATIENT DETAILS */
 function displayPatientDetails(linkedUser, linkedProfile) {
   const container = document.getElementById("patientDetails");
 
@@ -150,7 +150,7 @@ function displayPatientDetails(linkedUser, linkedProfile) {
   `;
 }
 
-/* ================= CALCULATE AGE ================= */
+/* CALCULATE AGE */
 function calculateAge(dateOfBirth) {
   const dob = new Date(dateOfBirth);
   const today = new Date();
@@ -164,7 +164,7 @@ function calculateAge(dateOfBirth) {
   return age + " years";
 }
 
-/* ================= SAVE PROFILE ================= */
+/* SAVE PROFILE */
 document.getElementById("profileForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -230,7 +230,7 @@ document.getElementById("profileForm").addEventListener("submit", async (e) => {
   }
 });
 
-/* ================= HANDLE PROFILE IMAGE UPLOAD ================= */
+/* HANDLE PROFILE IMAGE UPLOAD */
 document.getElementById("profileImageInput").addEventListener("change", (e) => {
   const file = e.target.files[0];
   
@@ -262,7 +262,7 @@ document.getElementById("profileImageInput").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-/* ================= CHECK PROFILE STATUS ================= */
+/* CHECK PROFILE STATUS */
 async function checkProfileStatus() {
   try {
     const res = await fetch("/api/profile/status");
@@ -282,7 +282,7 @@ async function checkProfileStatus() {
   }
 }
 
-/* ================= INIT ================= */
+/* INIT */
 document.addEventListener("DOMContentLoaded", () => {
   loadProfile();
   checkProfileStatus();

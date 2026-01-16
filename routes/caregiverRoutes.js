@@ -4,7 +4,7 @@ const path = require("path");
 const InviteCode = require("../models/InviteCode");
 const User = require("../models/User");
 
-/* ================= AUTH MIDDLEWARE ================= */
+/* AUTH MIDDLEWARE */
 function requireCaregiver(req, res, next) {
   if (!req.session.user || req.session.user.role !== "caregiver") {
     return res.redirect("/auth/login");
@@ -12,7 +12,7 @@ function requireCaregiver(req, res, next) {
   next();
 }
 
-/* ================= CHECK IF LINKED ================= */
+/* CHECK IF LINKED */
 async function requireLinked(req, res, next) {
   try {
     const user = await User.findById(req.session.user.id);
@@ -25,7 +25,7 @@ async function requireLinked(req, res, next) {
       return res.redirect("/caregiver/link");
     }
 
-    // ✅ CRITICAL FIX: Ensure patientId is in session
+    //  CRITICAL FIX: Ensure patientId is in session
     if (!req.session.user.patientId && user.linkedUser) {
       req.session.user.patientId = user.linkedUser;
       await req.session.save();
@@ -38,7 +38,7 @@ async function requireLinked(req, res, next) {
   }
 }
 
-/* ================= LINK PAGE ================= */
+/* LINK PAGE */
 router.get("/link", requireCaregiver, async (req, res) => {
   try {
     const caregiver = await User.findById(req.session.user.id);
@@ -65,7 +65,7 @@ router.get("/link", requireCaregiver, async (req, res) => {
   }
 });
 
-/* ================= LINK ACTION ================= */
+/* LINK ACTION */
 router.post("/link", requireCaregiver, async (req, res) => {
   try {
     const { code } = req.body;
@@ -139,7 +139,7 @@ router.post("/link", requireCaregiver, async (req, res) => {
       });
     }
 
-    // 🔗 LINK BOTH SIDES
+    //  LINK BOTH SIDES
     invite.used = true;
     invite.usedBy = caregiver._id;
 
@@ -156,7 +156,7 @@ router.post("/link", requireCaregiver, async (req, res) => {
       patient.save()
     ]);
 
-    // ✅ CRITICAL FIX: Store patientId in session
+    //  CRITICAL FIX: Store patientId in session
     req.session.user.linked = true;
     req.session.user.patientId = patient._id.toString();
 
@@ -170,7 +170,7 @@ router.post("/link", requireCaregiver, async (req, res) => {
         });
       }
 
-      console.log("✅ Link successful. Session:", req.session.user);
+      console.log(" Link successful. Session:", req.session.user);
 
       res.json({ 
         success: true,
@@ -188,49 +188,49 @@ router.post("/link", requireCaregiver, async (req, res) => {
   }
 });
 
-/* ================= DASHBOARD ================= */
+/* DASHBOARD */
 router.get("/dashboard", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/dashboard.html")
   );
 });
 
-/* ================= REMINDERS ================= */
+/* REMINDERS */
 router.get("/reminders", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/reminders.html")
   );
 });
 
-/* ================= MEDICATION ================= */
+/* MEDICATION */
 router.get("/medication", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/medication.html")
   );
 });
 
-/* ================= MEMORY BOARD ================= */
+/* MEMORY BOARD */
 router.get("/memory", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/memory.html")
   );
 });
 
-/* ================= SELF CARE ================= */
+/* SELF CARE */
 router.get("/selfcare", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/selfcare.html")
   );
 });
 
-/* ================= LIVE LOCATION ================= */
+/* LIVE LOCATION */
 router.get("/location", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/location.html")
   );
 });
 
-/* ================= PROFILE ================= */
+/* PROFILE */
 router.get("/profile", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/profile.html")

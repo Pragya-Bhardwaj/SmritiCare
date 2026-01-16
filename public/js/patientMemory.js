@@ -8,7 +8,7 @@ let currentMemories = [];
 let currentCategory = "All";
 let currentSearch = "";
 
-/* ================= INITIALIZATION ================= */
+/* INITIALIZATION */
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeMemoryBoard();
@@ -19,20 +19,20 @@ function initializeMemoryBoard() {
   loadMemories();
 }
 
-/* ================= EVENT LISTENERS ================= */
+/* EVENT LISTENERS */
 
 function setupEventListeners() {
   // No add/edit/delete buttons for patients
   // Only setup viewing and playback functionality
 }
 
-/* ================= CATEGORY FILTERS ================= */
+/* CATEGORY FILTERS */
 
 
 
 
 
-/* ================= LOAD MEMORIES ================= */
+/* LOAD MEMORIES */
 
 async function loadMemories() {
   try {
@@ -125,7 +125,7 @@ function createMemoryCard(memory) {
   `;
 }
 
-/* ================= AUDIO PLAYBACK ================= */
+/* AUDIO PLAYBACK */
 
 function playAudio(url) {
   const audio = new Audio(url);
@@ -135,7 +135,7 @@ function playAudio(url) {
   });
 }
 
-/* ================= UTILITY FUNCTIONS ================= */
+/* UTILITY FUNCTIONS */
 
 function escapeHtml(text) {
   const div = document.createElement('div');

@@ -1,6 +1,5 @@
 /**
  * caregiverDashboard.js
- * ------------------------
  * Handles sidebar navigation for caregiver pages
  */
 

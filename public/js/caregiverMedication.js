@@ -1,7 +1,7 @@
 let selectedCard = null;
 let isEdit = false;
 
-/* ================= OPEN ================= */
+/* OPEN */
 
 function openAddModal() {
   isEdit = false;
@@ -59,7 +59,7 @@ function openDeleteModal(btn) {
   document.getElementById("deleteModal").classList.remove("hidden");
 }
 
-/* ================= CLOSE ================= */
+/* CLOSE */
 
 function closeMedModal() {
   document.getElementById("medModal").classList.add("hidden");
@@ -69,7 +69,7 @@ function closeDeleteModal() {
   document.getElementById("deleteModal").classList.add("hidden");
 }
 
-/* ================= SAVE ================= */
+/* SAVE */
 
 function formatTime(t) {
   if (!t) return "--:--";
@@ -135,7 +135,7 @@ function saveMedication() {
   closeMedModal();
 }
 
-/* ================= DELETE ================= */
+/* DELETE */
 
 function confirmDelete() {
   if (selectedCard) selectedCard.remove();

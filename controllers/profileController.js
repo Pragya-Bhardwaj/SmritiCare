@@ -3,7 +3,7 @@ const User = require("../models/User");
 const PatientProfile = require("../models/PatientProfile");
 const CaregiverProfile = require("../models/CaregiverProfile");
 
-/* ================= GET PROFILE DATA ================= */
+/* GET PROFILE DATA */
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -62,7 +62,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-/* ================= UPDATE PROFILE ================= */
+/* UPDATE PROFILE */
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -107,7 +107,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-/* ================= CHECK PROFILE STATUS ================= */
+/* CHECK PROFILE STATUS */
 exports.getProfileStatus = async (req, res) => {
   try {
     const userId = req.session.user.id;

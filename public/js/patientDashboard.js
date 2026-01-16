@@ -1,6 +1,5 @@
 /**
  * patientDashboard.js
- * ------------------------
  * Handles loading patient name and memory board on dashboard
  */
 
@@ -10,9 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadMemories();
 });
 
-/**
- * Load and display patient's name
- */
+/* Load and display patient's name */
 async function loadPatientName() {
   try {
     const res = await fetch("/api/profile", { 
@@ -40,9 +37,7 @@ async function loadPatientName() {
   }
 }
 
-/**
- * Load and display memory board (first 3 memories)
- */
+/*Load and display memory board (first 3 memories) */
 async function loadMemories() {
   try {
     const res = await fetch("/memory/api/memories", { 

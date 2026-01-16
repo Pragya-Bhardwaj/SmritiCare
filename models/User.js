@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       required: true
     },
 
-    /* ================= EMAIL VERIFICATION ================= */
+    /* EMAIL VERIFICATION */
     isEmailVerified: {
       type: Boolean,
       default: false
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
 
     otp: otpSchema,
 
-    /* ================= LINKING ================= */
+    /* LINKING */
     linked: {
       type: Boolean,
       default: false

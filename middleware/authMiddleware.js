@@ -1,7 +1,5 @@
 
-/**
- * Middleware to check if user is authenticated
- */
+/*Middleware to check if user is authenticated*/
 exports.isAuthenticated = (req, res, next) => {
   if (!req.session.user) {
     return res.redirect("/auth/login");
@@ -9,9 +7,7 @@ exports.isAuthenticated = (req, res, next) => {
   next();
 };
 
-/**
- * Middleware to check if user is a caregiver
- */
+/* Middleware to check if user is a caregiver*/
 exports.isCaregiver = (req, res, next) => {
   if (!req.session.user) {
     return res.redirect("/auth/login");
@@ -24,9 +20,7 @@ exports.isCaregiver = (req, res, next) => {
   next();
 };
 
-/**
- * Middleware to check if user is a patient
- */
+/* Middleware to check if user is a patient */
 exports.isPatient = (req, res, next) => {
   if (!req.session.user) {
     return res.redirect("/auth/login");
@@ -39,9 +33,7 @@ exports.isPatient = (req, res, next) => {
   next();
 };
 
-/**
- * Middleware to check if user is linked
- */
+/* Middleware to check if user is linked*/
 exports.isLinked = async (req, res, next) => {
   try {
     if (!req.session.user) {
@@ -72,9 +64,7 @@ exports.isLinked = async (req, res, next) => {
   }
 };
 
-/**
- * API middleware to check authentication (returns JSON)
- */
+/* API middleware to check authentication (returns JSON) */
 exports.requireAuth = (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).json({ 
@@ -85,9 +75,7 @@ exports.requireAuth = (req, res, next) => {
   next();
 };
 
-/**
- * API middleware to check if caregiver (returns JSON)
- */
+/* API middleware to check if caregiver (returns JSON)*/
 exports.requireCaregiver = (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).json({ 
@@ -106,9 +94,7 @@ exports.requireCaregiver = (req, res, next) => {
   next();
 };
 
-/**
- * API middleware to check if patient (returns JSON)
- */
+/* API middleware to check if patient (returns JSON) */
 exports.requirePatient = (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).json({ 
