@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Memory = require("../models/Memory");
-const SelfCare = require("../models/SelfCare");
+const SelfCare = require("../models/selfcare");
 
 function requirePatient(req, res, next) {
   if (!req.session.user || req.session.user.role !== "patient") {

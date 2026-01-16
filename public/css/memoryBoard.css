@@ -100,6 +100,9 @@
   display: -webkit-box;
   -webkit-line-clamp: 2; /* show up to 2 lines */
   -webkit-box-orient: vertical;
+    
+  
+
 }
 
 .memory-notes {
