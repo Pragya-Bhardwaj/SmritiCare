@@ -1,4 +1,4 @@
-/* ================= AUTH LAYOUT ================= */
+/* AUTH LAYOUT */
 
 .auth-wrapper {
   min-height: 100vh;
@@ -32,7 +32,7 @@
   margin-bottom: 24px;
 }
 
-/* ================= FORM ================= */
+/* FORM */
 
 .auth-card form {
   display: flex;
@@ -61,7 +61,7 @@
 }
 
 
-/* ================= BUTTON ================= */
+/* BUTTON */
 
 .auth-btn {
   margin-top: 10px;
@@ -74,7 +74,7 @@
   cursor: pointer;
 }
 
-/* ================= LINKS ================= */
+/* LINKS */
 
 .auth-link {
   text-align: center;
@@ -107,7 +107,7 @@
 }
 
 
-/* ================= INVITE CODE ================= */
+/* INVITE CODE */
 
 .invite-code {
   margin: 20px 0;
@@ -121,7 +121,7 @@
   color: #1d4ed8;
 }
 
-/* ================= RESPONSIVE ================= */
+/* RESPONSIVE */
 
 @media (max-width: 480px) {
   .auth-card {
@@ -166,7 +166,7 @@
   font-size: 12px;
   margin-top: 6px;
 }
-/* ================= PASSWORD STRENGTH ================= */
+/* PASSWORD STRENGTH */
 
 .strength {
   font-size: 12px;

@@ -1,6 +1,4 @@
-/* ============================= */
 /* MEMORY BOARD STYLING */
-/* ============================= */
 
 .memory-board-section {
   margin: 30px 0;
@@ -203,9 +201,7 @@
   color: #b91c1c;
 }
 
-/* ============================= */
 /* RESPONSIVE */
-/* ============================= */
 
 @media (max-width: 768px) {
   .memory-grid {

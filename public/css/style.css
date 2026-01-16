@@ -1,6 +1,4 @@
-/* ============================= */
-/* GLOBAL RESET (ONCE ONLY) */
-/* ============================= */
+/* GLOBAL RESET */
 
 * {
   margin: 0;
@@ -14,9 +12,7 @@ body {
   color: #334155;
 }
 
-/* ============================= */
 /* COLOR TOKENS */
-/* ============================= */
 
 :root {
   --primary: #3b82f6;
@@ -27,9 +23,7 @@ body {
   --card-bg: #ffffff;
 }
 
-/* ============================= */
 /* COMMON BUTTONS */
-/* ============================= */
 
 .primary-btn {
   background: var(--primary);
@@ -56,9 +50,7 @@ body {
   font-size: 18px;
 }
 
-/* ============================= */
 /* TEXT HELPERS */
-/* ============================= */
 
 .small {
   font-size: 14px;
@@ -70,9 +62,7 @@ body {
   font-weight: 600;
 }
 
-/* ============================= */
 /* STATUS TAGS */
-/* ============================= */
 
 .status {
   padding: 6px 12px;
@@ -91,9 +81,7 @@ body {
   color: var(--warning);
 }
 
-/* ============================= */
-/* MODAL (GLOBAL) */
-/* ============================= */
+/* MODAL */
 
 .modal {
   position: fixed;
@@ -105,9 +93,7 @@ body {
   z-index: 1000;
 }
 
-/* ============================= */
 /* PROFILE COMPLETION BADGE */
-/* ============================= */
 
 .profile-badge,
 #profileBadge {
