@@ -122,7 +122,7 @@ exports.signup = async (req, res) => {
         code,
         patientId: user._id,
         used: false,
-        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+        expiresAt: Date.now() +  24 * 60 * 60 * 1000 // 7 days
       });
 
       console.log(` Patient profile created with invite code: ${code}`);

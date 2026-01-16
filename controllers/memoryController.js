@@ -55,12 +55,12 @@ exports.addMemory = async (req, res) => {
       }
     }
 
-    // Normalize tags
-    let tagArray = [];
-    if (tags) {
-      if (Array.isArray(tags)) tagArray = tags;
-      else if (typeof tags === 'string') tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
-    }
+    // // Normalize tags
+    // let tagArray = [];
+    // if (tags) {
+    //   if (Array.isArray(tags)) tagArray = tags;
+    //   else if (typeof tags === 'string') tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+    // }
 
     // Create memory
     const memory = await Memory.create({
@@ -70,10 +70,9 @@ exports.addMemory = async (req, res) => {
       description: description ? description.trim() : "",
       relation: relation ? relation.trim() : undefined,
       notes: notes ? notes.trim() : undefined,
-      category: category ? category.trim() : undefined,
       imageUrl: imagePath,
       audioUrl: audioPath,
-      tags: tagArray
+
     });
 
     // Populate references for response

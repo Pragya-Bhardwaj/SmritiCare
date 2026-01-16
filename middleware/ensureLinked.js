@@ -3,9 +3,5 @@ module.exports = function ensureLinked(req, res, next) {
     return res.redirect("/auth/login");
   }
 
-  if (!req.session.user.linked) {
-    return res.redirect("/waiting");
-  }
-
   next();
 };
