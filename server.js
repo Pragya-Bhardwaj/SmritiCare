@@ -28,7 +28,7 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 24 * 60 * 60 // 1 day in seconds
+      ttl: 7 * 24 * 60 * 60 // 7 days in seconds
     }),
     cookie: {
       httpOnly: true,
@@ -106,5 +106,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(` SmritiCare server running on http://localhost:${PORT}`);
-  console.log(` Environment: ${process.env.NODE_ENV || "development"}`);
+  
 });
