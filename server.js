@@ -50,6 +50,10 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
+// Set EJS as view engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 /* STATIC FILES */
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/views", express.static(path.join(__dirname, "views")));
