@@ -1,0 +1,146 @@
+.sub {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .tab:hover {
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .tab.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  .reminders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .reminder-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    border-left: 4px solid #667eea;
+  }
+
+  .reminder-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .reminder-card.done {
+    opacity: 0.6;
+    border-left-color: #10b981;
+  }
+
+  .reminder-card.done .reminder-content h3 {
+    text-decoration: line-through;
+    color: #6b7280;
+  }
+
+  .reminder-card.done .reminder-content p {
+    color: #9ca3af;
+  }
+
+  .reminder-content {
+    flex: 1;
+  }
+
+  .reminder-content h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    transition: all 0.3s;
+  }
+
+  .reminder-content p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .reminder-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reminder-toggle {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    accent-color: #667eea;
+  }
+
+   .time-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .time-select select {
+    padding: 8px 10px;
+    min-width: 64px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 14px;
+  }
+
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .filter-tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .reminder-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .reminder-action {
+      width: 100%;
+      justify-content: flex-start;
+      margin-top: 8px;
+    }
+  }
