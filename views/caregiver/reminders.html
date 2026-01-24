@@ -1,167 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reminders - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
+  <link rel="stylesheet" href="/css/reminder.css">
 </head>
+
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">SmritiCare</h2>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2 class="logo">SmritiCare</h2>
 
-    <nav>
-      <a href="/caregiver/dashboard">Dashboard</a>
-      <a href="/caregiver/memory">Memory Board</a>
-      <a href="/caregiver/reminders">Reminders</a>
-      <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/location">Live Location</a>
-      <a href="/caregiver/selfcare">Self Care</a>
-      <a href="/caregiver/profile">Profile</a>
-      <a href="/auth/logout" class="logout-btn">Logout</a>
-    </nav>
-  </aside>
+      <nav>
+        <a href="/caregiver/dashboard">Dashboard</a>
+        <a href="/caregiver/memory">Memory Board</a>
+        <a href="/caregiver/reminders" class="active">Reminders</a>
+        <a href="/caregiver/medication">Medications</a>
+        <a href="/caregiver/location">Live Location</a>
+        <a href="/caregiver/selfcare">Self Care</a>
+        <a href="/caregiver/profile" id="profileLink">
+          <span>Profile</span>
+          <span id="profileBadge"
+            style="display:none; color: #dc2626; font-size: 18px; margin-left: 8px; animation: pulse 2s infinite;">●</span>
+        </a>
+        <a href="/auth/logout" class="logout-btn">Logout</a>
+      </nav>
+    </aside>
 
-  <!-- MAIN -->
-  <main class="main">
+    <!-- MAIN -->
+    <main class="main">
 
-    <div class="page-header">
-      <div>
-        <h1>Reminders</h1>
-        <p class="small">Daily tasks you help the patient remember</p>
-      </div>
-
-      <button class="primary-btn" onclick="openAddModal()">＋ Add Reminder</button>
-    </div>
-
-    <!-- SAMPLE DATA -->
-    <section class="card-list" id="reminderList">
-
-      <div class="card reminder-card">
+      <div class="page-header">
         <div>
-          <strong class="title">Morning Walk</strong>
-          <p class="small time" data-time="07:00">07:00 AM</p>
-          <p class="small meta"><span class="classification">Daily</span> • <span class="rtype">Hygiene</span></p>
+          <h1>Reminders</h1>
+          <p class="small">Daily tasks you help the patient remember</p>
         </div>
 
-        <span class="status done">Done</span>
-
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
+        <button class="primary-btn" onclick="openAddModal()">+ Add Reminder</button>
       </div>
 
-      <div class="card reminder-card">
-        <div>
-          <strong class="title">Breakfast</strong>
-          <p class="small time" data-time="09:00">09:00 AM</p>
-          <p class="small meta"><span class="classification">Daily</span> • <span class="rtype">Meal</span></p>
+      <!-- REMINDERS LIST -->
+      <section class="card-list" id="reminderList">
+        <!-- Reminders will be loaded here via JavaScript -->
+        <div class="card" style="text-align: center; padding: 40px; color: #999;">
+          <p>Loading reminders...</p>
         </div>
+      </section>
+    </main>
+  </div>
 
-        <span class="status pending">Pending</span>
+  <!-- ADD / EDIT MODAL -->
+  <div class="modal hidden" id="reminderModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">Add Reminder</h3>
 
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
+      <input type="text" id="reminderTitle" placeholder="Reminder title (e.g., Morning Medicine, Breakfast)" required>
+
+      <label
+        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+        Time
+      </label>
+      <div class="time-select">
+        <select id="reminderHour">
+          <option>01</option>
+          <option>02</option>
+          <option>03</option>
+          <option>04</option>
+          <option>05</option>
+          <option>06</option>
+          <option>07</option>
+          <option>08</option>
+          <option>09</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+        </select>
+
+        <select id="reminderMinute">
+          <option>00</option>
+          <option>15</option>
+          <option>30</option>
+          <option>45</option>
+        </select>
+
+        <select id="reminderAmPm">
+          <option>AM</option>
+          <option>PM</option>
+        </select>
       </div>
 
-      <div class="card reminder-card">
-        <div>
-          <strong class="title">Evening Medicine</strong>
-          <p class="small time" data-time="20:00">08:00 PM</p>
-          <p class="small meta"><span class="classification">Daily</span> • <span class="rtype">Medicine</span></p>
-        </div>
-
-        <span class="status pending">Pending</span>
-
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
-      </div>
-
-    </section>
-  </main>
-</div>
-
-<!-- ADD / EDIT MODAL -->
-<div class="modal hidden" id="reminderModal">
-  <div class="modal-box">
-    <h3 id="modalTitle">Add Reminder</h3>
-
-    <input type="text" id="reminderTitle" placeholder="Reminder title">
-
-    <div class="time-select">
-      <select id="reminderHour">
-        <option>01</option>
-        <option>02</option>
-        <option>03</option>
-        <option>04</option>
-        <option>05</option>
-        <option>06</option>
-        <option>07</option>
-        <option>08</option>
-        <option>09</option>
-        <option>10</option>
-        <option>11</option>
-        <option>12</option>
+      <label
+        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+        Frequency
+      </label>
+      <select id="reminderClassification">
+        <option value="Daily">Daily</option>
+        <option value="Weekly">Weekly</option>
+        <option value="Monthly">Monthly</option>
+        <option value="Once">Once</option>
       </select>
 
-      <select id="reminderMinute">
-        <option>00</option>
-        <option>15</option>
-        <option>30</option>
-        <option>45</option>
+      <label
+        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+        Category
+      </label>
+      <select id="reminderType">
+        <option value="Medicine">Medicine</option>
+        <option value="Meal">Meal</option>
+        <option value="Appointment">Appointment</option>
+        <option value="Hygiene">Hygiene</option>
+        <option value="Other">Other</option>
       </select>
 
-      <select id="reminderAmPm">
-        <option>AM</option>
-        <option>PM</option>
-      </select>
-    </div>
-
-    <select id="reminderClassification">
-      <option value="Daily">Daily</option>
-      <option value="Weekly">Weekly</option>
-      <option value="Monthly">Monthly</option>
-    </select>
-
-    <select id="reminderType">
-      <option value="Medicine">Medicine</option>
-      <option value="Meal">Meal</option>
-      <option value="Appointment">Appointment</option>
-      <option value="Hygiene">Hygiene</option>
-    </select>
-
-    <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeReminderModal()">Cancel</button>
-      <button class="primary-btn" onclick="saveReminder()">Save</button>
+      <div class="modal-actions">
+        <button class="secondary-btn" onclick="closeReminderModal()">Cancel</button>
+        <button class="primary-btn" onclick="saveReminder()">Save</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- DELETE CONFIRMATION MODAL -->
-<div class="modal hidden" id="deleteModal">
-  <div class="modal-box">
-    <h3>Delete Reminder?</h3>
-    <p class="small">This action cannot be undone.</p>
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div class="modal hidden" id="deleteModal">
+    <div class="modal-box">
+      <h3>Delete Reminder?</h3>
+      <p class="small">This action cannot be undone.</p>
 
-    <div class="modal-actions">
-      <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
-      <button class="primary-btn" onclick="confirmDelete()">Delete</button>
+      <div class="modal-actions">
+        <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
+        <button class="primary-btn" onclick="confirmDelete()">Delete</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script src="/js/profileStatusChecker.js"></script>
-<script src="/js/caregiverDashboard.js"></script>
-<script src="/js/caregiverReminders.js"></script>
+
+  <script src="/js/profileStatusChecker.js"></script>
+  <script src="/js/caregiverDashboard.js"></script>
+  <script src="/js/caregiverReminders.js"></script>
 </body>
+
 </html>

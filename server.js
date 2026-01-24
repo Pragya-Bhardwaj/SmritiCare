@@ -59,6 +59,7 @@ const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
+const reminderRoutes = require("./routes/reminderRoutes");
 const patientApiRoutes = require("./routes/patientApiRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 
@@ -67,6 +68,7 @@ app.use("/auth", authRoutes);
 app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
+app.use("/reminder", reminderRoutes);
 app.use("/api/patient", patientApiRoutes);
 app.use("/", profileRoutes);
 
@@ -106,5 +108,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(` SmritiCare server running on http://localhost:${PORT}`);
-  
 });

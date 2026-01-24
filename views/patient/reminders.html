@@ -1,89 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reminders - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
+  <link rel="stylesheet" href="/css/reminder.css">
 </head>
+
 <body>
 
-<div class="dashboard">
+  <div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">SmritiCare</div>
-    <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/memory">Memory Board</a>
-    <a href="/patient/reminders" class="active">Reminders</a>
-    <a href="/patient/medication">Medication</a>
-    <a href="/patient/selfcare">Self Care</a>
-    <a href="/patient/profile">Profile</a>
-    <a href="/auth/logout" class="logout-btn">Logout</a>
-  </aside>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">SmritiCare</div>
+      <a href="/patient/dashboard">Dashboard</a>
+      <a href="/patient/memory">Memory Board</a>
+      <a href="/patient/reminders" class="active">Reminders</a>
+      <a href="/patient/medication">Medication</a>
+      <a href="/patient/selfcare">Self Care</a>
+      <a href="/patient/profile" id="profileLink">
+        <span>Profile</span>
+        <span id="profileBadge"
+          style="display:none; color: #dc2626; font-size: 18px; margin-left: 8px; animation: pulse 2s infinite;">●</span>
+      </a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </aside>
 
-  <!-- MAIN CONTENT -->
-  <main class="main">
-    
-    <h1>Reminders</h1>
+    <!-- MAIN CONTENT -->
+    <main class="main">
 
-    <div class="filter-tabs">
-      <button class="tab active">All</button>
-      <button class="tab">Medicine</button>
-      <button class="tab">Meal</button>
-      <button class="tab">Appointment</button>
-      <button class="tab">Hygiene</button>
-    </div>
+      <h1>Your Reminders</h1>
+      <p class="sub" style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Mark reminders as complete to track
+        your progress</p>
 
-    <div class="reminders-list">
-      <div class="card reminder-card" data-status="pending">
-        <div class="reminder-content">
-          <h3>Morning Medicine</h3>
-          <p>9:00 AM • Daily</p>
-        </div>
-        <div class="reminder-action">
-          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
+      <!-- CATEGORY FILTER TABS -->
+      <div class="filter-tabs">
+        <button class="tab active">All</button>
+        <button class="tab">Medicine</button>
+        <button class="tab">Meal</button>
+        <button class="tab">Appointment</button>
+        <button class="tab">Hygiene</button>
+      </div>
+
+      <!-- REMINDERS LIST -->
+      <div class="reminders-list">
+        <!-- Reminders will be loaded here via JavaScript -->
+        <div class="card" style="text-align: center; padding: 40px; color: #999;">
+          <p>Loading reminders...</p>
         </div>
       </div>
 
-      <div class="card reminder-card done" data-status="done">
-        <div class="reminder-content">
-          <h3>Breakfast</h3>
-          <p>9:30 AM • Daily</p>
-        </div>
-        <div class="reminder-action">
-          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done" checked>
-        </div>
-      </div>
+    </main>
 
-      <div class="card reminder-card" data-status="pending">
-        <div class="reminder-content">
-          <h3>Blood Pressure Check</h3>
-          <p>11:00 AM • Daily</p>
-        </div>
-        <div class="reminder-action">
-          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
-        </div>
-      </div>
+  </div>
 
-      <div class="card reminder-card" data-status="pending">
-        <div class="reminder-content">
-          <h3>Doctor Visit</h3>
-          <p>2:00 PM • Weekly</p>
-        </div>
-        <div class="reminder-action">
-          <input type="checkbox" class="reminder-toggle" aria-label="Mark as done">
-        </div>
-      </div>
-    </div>
 
-  </main>
-
-</div>
-
-<script src="/js/profileStatusChecker.js"></script>
-<script src="/js/patientApp.js"></script>
-<script src="/js/patientReminders.js"></script>
+  <script src="/js/profileStatusChecker.js"></script>
+  <script src="/js/patientApp.js"></script>
+  <script src="/js/patientReminders.js"></script>
 </body>
+
 </html>
