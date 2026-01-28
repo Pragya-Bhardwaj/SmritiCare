@@ -1,14 +1,11 @@
 const Memory = require("../models/Memory");
-
+const cloudinary = require("../config/cloudinary");
 /**
  * Add a new memory
  * Only caregivers can add memories for their linked patient
  */
 exports.addMemory = async (req, res) => {
   try {
-    console.log("SESSION USER:", req.session.user);
-
-    // Validate session
     if (!req.session.user) {
       return res.status(401).json({ 
         error: "Unauthorized",
@@ -16,7 +13,6 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    // Only caregivers can add memories
     if (req.session.user.role !== "caregiver") {
       return res.status(403).json({ 
         error: "Forbidden",
@@ -24,7 +20,6 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    // Check if caregiver is linked to a patient
     if (!req.session.user.patientId) {
       return res.status(400).json({ 
         error: "Not linked",
@@ -32,8 +27,7 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    // Accept text fields and files (multer handles files)
-    const { title, description, relation, notes, category, tags } = req.body;
+    const { title, description, relation, notes, imageUrl, imagePublicId, audioUrl, audioPublicId } = req.body;
 
     if (!title || title.trim() === "") {
       return res.status(400).json({ 
@@ -42,27 +36,6 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    // Handle uploaded files (if any)
-    let imagePath = req.body.imageUrl || undefined;
-    let audioPath = req.body.audioUrl || undefined;
-
-    if (req.files) {
-      if (req.files.image && req.files.image[0]) {
-        imagePath = `/uploads/memories/images/${req.files.image[0].filename}`;
-      }
-      if (req.files.audio && req.files.audio[0]) {
-        audioPath = `/uploads/memories/audio/${req.files.audio[0].filename}`;
-      }
-    }
-
-    // // Normalize tags
-    // let tagArray = [];
-    // if (tags) {
-    //   if (Array.isArray(tags)) tagArray = tags;
-    //   else if (typeof tags === 'string') tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
-    // }
-
-    // Create memory
     const memory = await Memory.create({
       caregiverId: req.session.user.id,
       patientId: req.session.user.patientId,
@@ -70,12 +43,12 @@ exports.addMemory = async (req, res) => {
       description: description ? description.trim() : "",
       relation: relation ? relation.trim() : undefined,
       notes: notes ? notes.trim() : undefined,
-      imageUrl: imagePath,
-      audioUrl: audioPath,
-
+      imageUrl,
+      imagePublicId,
+      audioUrl,
+      audioPublicId
     });
 
-    // Populate references for response
     await memory.populate([
       { path: "caregiverId", select: "name email" },
       { path: "patientId", select: "name" }
@@ -170,9 +143,8 @@ exports.getMemories = async (req, res) => {
 exports.updateMemory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, relation, notes, category, tags } = req.body;
+    const { title, description, relation, notes, imageUrl, imagePublicId, audioUrl, audioPublicId } = req.body;
 
-    // Validate session
     if (!req.session.user || req.session.user.role !== "caregiver") {
       return res.status(401).json({ 
         error: "Unauthorized",
@@ -180,7 +152,6 @@ exports.updateMemory = async (req, res) => {
       });
     }
 
-    // Find memory and verify ownership
     const memory = await Memory.findById(id);
 
     if (!memory) {
@@ -197,34 +168,39 @@ exports.updateMemory = async (req, res) => {
       });
     }
 
-    // Debug: log incoming update payload
-    console.log('Update payload:', { body: req.body, files: Object.keys(req.files || {}) });
-
-    // Handle uploaded files (replace only if provided)
-    if (req.files) {
-      if (req.files.image && req.files.image[0]) {
-        memory.imageUrl = `/uploads/memories/images/${req.files.image[0].filename}`;
-      }
-      if (req.files.audio && req.files.audio[0]) {
-        memory.audioUrl = `/uploads/memories/audio/${req.files.audio[0].filename}`;
+    // Delete old media from Cloudinary if new media uploaded
+    if (imageUrl && memory.imagePublicId && imagePublicId !== memory.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(memory.imagePublicId);
+      } catch (err) {
+        console.error("Failed to delete old image:", err);
       }
     }
 
-    // Update fields (update even if empty string provided)
-    if (Object.prototype.hasOwnProperty.call(req.body, 'title')) memory.title = title ? title.trim() : '';
-    if (Object.prototype.hasOwnProperty.call(req.body, 'description')) memory.description = description ? description.trim() : '';
-    if (Object.prototype.hasOwnProperty.call(req.body, 'relation')) memory.relation = relation ? relation.trim() : '';
-    if (Object.prototype.hasOwnProperty.call(req.body, 'notes')) memory.notes = notes ? notes.trim() : '';
-    if (Object.prototype.hasOwnProperty.call(req.body, 'category')) memory.category = category ? category.trim() : '';
-    if (Object.prototype.hasOwnProperty.call(req.body, 'tags')) {
-      if (Array.isArray(tags)) memory.tags = tags;
-      else if (typeof tags === 'string') memory.tags = tags.split(',').map(t => t.trim()).filter(Boolean);
-      else memory.tags = [];
+    if (audioUrl && memory.audioPublicId && audioPublicId !== memory.audioPublicId) {
+      try {
+        await cloudinary.uploader.destroy(memory.audioPublicId, { resource_type: 'video' });
+      } catch (err) {
+        console.error("Failed to delete old audio:", err);
+      }
+    }
+
+    // Update fields
+    if (title !== undefined) memory.title = title.trim();
+    if (description !== undefined) memory.description = description.trim();
+    if (relation !== undefined) memory.relation = relation.trim();
+    if (notes !== undefined) memory.notes = notes.trim();
+    if (imageUrl !== undefined) {
+      memory.imageUrl = imageUrl;
+      memory.imagePublicId = imagePublicId;
+    }
+    if (audioUrl !== undefined) {
+      memory.audioUrl = audioUrl;
+      memory.audioPublicId = audioPublicId;
     }
 
     await memory.save();
 
-    // Populate references to return a consistent object to client
     await memory.populate([
       { path: "caregiverId", select: "name email" },
       { path: "patientId", select: "name" }
@@ -246,11 +222,12 @@ exports.updateMemory = async (req, res) => {
 
 
 // Delete a memory
+
+
 exports.deleteMemory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate session
     if (!req.session.user || req.session.user.role !== "caregiver") {
       return res.status(401).json({ 
         error: "Unauthorized",
@@ -258,7 +235,6 @@ exports.deleteMemory = async (req, res) => {
       });
     }
 
-    // Find memory and verify ownership
     const memory = await Memory.findById(id);
 
     if (!memory) {
@@ -273,6 +249,19 @@ exports.deleteMemory = async (req, res) => {
         error: "Forbidden",
         message: "You can only delete your own memories" 
       });
+    }
+
+    // Delete files from Cloudinary
+    try {
+      if (memory.imagePublicId) {
+        await cloudinary.uploader.destroy(memory.imagePublicId);
+      }
+      if (memory.audioPublicId) {
+        await cloudinary.uploader.destroy(memory.audioPublicId, { resource_type: 'video' });
+      }
+    } catch (cloudinaryError) {
+      console.error("Cloudinary deletion error:", cloudinaryError);
+      // Continue with database deletion even if Cloudinary fails
     }
 
     await memory.deleteOne();
@@ -290,4 +279,3 @@ exports.deleteMemory = async (req, res) => {
     });
   }
 };
-

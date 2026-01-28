@@ -4,9 +4,100 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Location - SmritiCare</title>
-  <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
+  
+  <!-- Mapbox GL JS -->
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+  
+  <style>
+    #map {
+      width: 100%;
+      height: 500px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    .location-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .info-card {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .info-card h4 {
+      margin: 0 0 8px 0;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .info-card p {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-indicator.active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-indicator.inactive {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .refresh-btn {
+      margin-top: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+    }
+
+    .error-message {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
@@ -31,15 +122,60 @@
   <!-- MAIN -->
   <main class="main">
 
-    <h1>Live Location</h1>
-    <p class="small">Track patient location in real-time</p>
+    <div class="page-header">
+      <div>
+        <h1>Live Location</h1>
+        <p class="small">Track patient location in real-time</p>
+      </div>
+      <button class="primary-btn refresh-btn" onclick="refreshLocation()">🔄 Refresh</button>
+    </div>
 
-    <div class="card" style="margin-top: 20px;">
-      <h3>Current Location</h3>
-      <p>Patient last seen near <strong>Central Park</strong></p>
-      <p class="small">This is sample location info.</p>
+    <!-- Status Card -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 id="patientName">Loading...</h3>
+          <p class="small" id="lastUpdate">Checking location...</p>
+        </div>
+        <span class="status-indicator inactive" id="statusIndicator">
+          <span class="status-dot"></span>
+          <span id="statusText">No Signal</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Location Info Grid -->
+    <div class="location-info" id="locationInfo" style="display: none;">
+      <div class="info-card">
+        <h4>📍 Latitude</h4>
+        <p id="latitude">--</p>
+      </div>
+      <div class="info-card">
+        <h4>📍 Longitude</h4>
+        <p id="longitude">--</p>
+      </div>
+      <div class="info-card">
+        <h4>🎯 Accuracy</h4>
+        <p id="accuracy">--</p>
+      </div>
+      <div class="info-card">
+        <h4>⏱️ Last Updated</h4>
+        <p id="timestamp">--</p>
+      </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+  </main>
+</div>
 
 <script src="/js/profileStatusChecker.js"></script>
 <script src="/js/caregiverDashboard.js"></script>
+<script src="/js/caregiverLocation.js"></script>
+
 </body>
 </html>

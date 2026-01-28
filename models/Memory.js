@@ -30,21 +30,25 @@ const memorySchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-
   imageUrl: {
     type: String
   },
+  imagePublicId: {
+    type: String
+  },
   audioUrl: {
+    type: String
+  },
+  audioPublicId: {
     type: String
   },
   tags: [{
     type: String
   }]
 }, {
-  timestamps: true // Automatically adds createdAt and updatedAt
+  timestamps: true
 });
 
-// Compound index for efficient queries
 memorySchema.index({ patientId: 1, caregiverId: 1 });
 memorySchema.index({ createdAt: -1 });
 

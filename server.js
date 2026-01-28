@@ -5,6 +5,9 @@ const mongoose = require("mongoose");
 const path = require("path");
 const MongoStore = require("connect-mongo");
 
+
+
+
 const app = express();
 
 /* DATABASE CONNECTION */
@@ -66,6 +69,7 @@ const memoryRoutes = require("./routes/memoryRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
 const patientApiRoutes = require("./routes/patientApiRoutes");
 const profileRoutes = require("./routes/profileRoutes");
+const locationRoutes = require("./routes/locationRoutes");
 
 // Mount routes
 app.use("/auth", authRoutes);
@@ -75,6 +79,8 @@ app.use("/memory", memoryRoutes);
 app.use("/reminder", reminderRoutes);
 app.use("/api/patient", patientApiRoutes);
 app.use("/", profileRoutes);
+// Location routes
+app.use("/", locationRoutes);
 
 
 /* ROOT ROUTE */
@@ -88,7 +94,10 @@ app.get("/", (req, res) => {
   }
   res.redirect("/auth/login");
 });
-
+// Mapbox config route
+app.get("/api/config/mapbox", (req, res) => {
+  res.json({ token: process.env.MAPBOX_ACCESS_TOKEN });
+});
 /* 404 HANDLER */
 app.use((req, res) => {
   res.status(404).send(`
