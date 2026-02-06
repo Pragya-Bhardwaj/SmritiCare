@@ -35,40 +35,10 @@
         <div class="col">Time</div>
         <div class="col">Notes</div>
       </div>
-
-      <div class="table-row">
-        <div class="col"><strong>Aricept (Donepezil)</strong></div>
-        <div class="col"><span class="badge badge-blue">10mg</span></div>
-        <div class="col">9:00 AM</div>
-        <div class="col">Take with breakfast</div>
-      </div>
-
-      <div class="table-row">
-        <div class="col"><strong>Namenda (Memantine)</strong></div>
-        <div class="col"><span class="badge badge-blue">20mg</span></div>
-        <div class="col">9:00 PM</div>
-        <div class="col">Take before bed</div>
-      </div>
-
-      <div class="table-row">
-        <div class="col"><strong>Blood Pressure Medicine</strong></div>
-        <div class="col"><span class="badge badge-blue">5mg</span></div>
-        <div class="col">11:00 AM</div>
-        <div class="col">Check BP before taking</div>
-      </div>
-
-      <div class="table-row">
-        <div class="col"><strong>Vitamin D3</strong></div>
-        <div class="col"><span class="badge badge-blue">1000 IU</span></div>
-        <div class="col">9:00 AM</div>
-        <div class="col">With breakfast</div>
-      </div>
-
-      <div class="table-row">
-        <div class="col"><strong>Omega-3 Fish Oil</strong></div>
-        <div class="col"><span class="badge badge-blue">1000mg</span></div>
-        <div class="col">1:00 PM</div>
-        <div class="col">After lunch</div>
+      <div id="medicationRows">
+        <div class="table-row">
+          <div class="col" style="grid-column: 1 / -1; color: #999;">Loading medications...</div>
+        </div>
       </div>
     </div>
 
@@ -78,5 +48,6 @@
 
 <script src="/js/profileStatusChecker.js"></script>
 <script src="/js/patientApp.js"></script>
+<script src="/js/patientMedication.js"></script>
 </body>
 </html>
