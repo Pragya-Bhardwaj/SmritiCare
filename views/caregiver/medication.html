@@ -37,57 +37,13 @@
         <p class="small">Track medicines and dosage schedules</p>
       </div>
 
-      <button class="primary-btn" onclick="openAddModal()">＋ Add Medication</button>
+      <button class="primary-btn" onclick="openAddModal()">+ Add Medication</button>
     </div>
 
-    <!-- SAMPLE DATA -->
     <section class="card-list" id="medicationList">
-
-      <div class="card medication-card">
-        <div>
-          <strong class="title">Paracetamol</strong>
-          <p class="small meta"><span class="dose">500 mg</span> • <span class="time" data-time="09:00">09:00 AM</span></p>
-          <p class="small notes">Take after breakfast</p>
-        </div>
-
-        <span class="status done">Taken</span>
-
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
+      <div class="card" style="text-align: center; padding: 40px; color: #999;">
+        <p>Loading medications...</p>
       </div>
-
-      <div class="card medication-card">
-        <div>
-          <strong class="title">Vitamin D</strong>
-          <p class="small meta"><span class="dose">1 capsule</span> • <span class="time" data-time="13:00">01:00 PM</span></p>
-          <p class="small notes">Weekly supplement</p>
-        </div>
-
-        <span class="status pending">Pending</span>
-
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
-      </div>
-
-      <div class="card medication-card">
-        <div>
-          <strong class="title">Insulin</strong>
-          <p class="small meta"><span class="dose">10 units</span> • <span class="time" data-time="21:00">09:00 PM</span></p>
-          <p class="small notes">Store refrigerated</p>
-        </div>
-
-        <span class="status pending">Pending</span>
-
-        <div class="actions">
-          <button class="edit-btn" onclick="openEditModal(this)">Edit</button>
-          <button class="delete-btn" onclick="openDeleteModal(this)">Delete</button>
-        </div>
-      </div>
-
     </section>
   </main>
 </div>

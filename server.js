@@ -67,6 +67,7 @@ const patientRoutes = require("./routes/patientRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
+const medicationRoutes = require("./routes/medicationRoutes");
 const patientApiRoutes = require("./routes/patientApiRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const locationRoutes = require("./routes/locationRoutes");
@@ -77,6 +78,7 @@ app.use("/patient", patientRoutes);
 app.use("/caregiver", caregiverRoutes);
 app.use("/memory", memoryRoutes);
 app.use("/reminder", reminderRoutes);
+app.use("/medication", medicationRoutes);
 app.use("/api/patient", patientApiRoutes);
 app.use("/", profileRoutes);
 // Location routes
