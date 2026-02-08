@@ -4,21 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Location - SmritiCare</title>
+  <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
-  
-  <!-- Mapbox GL JS -->
+
+  <!-- Mapbox GL JS & CSS -->
   <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
-  
+
   <style>
+    /* Map Container */
     #map {
       width: 100%;
-      height: 500px;
+      height: 600px;
       border-radius: 12px;
       margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: #f3f4f6;
     }
 
+    /* Location Info Grid */
     .location-info {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -28,33 +33,70 @@
 
     .info-card {
       background: white;
-      padding: 16px;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #667eea;
     }
 
     .info-card h4 {
-      margin: 0 0 8px 0;
+      margin: 0 0 12px 0;
       color: #64748b;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .info-card p {
       margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+      word-break: break-all;
+    }
+
+    .info-card p.small {
+      font-size: 13px;
+      font-weight: 400;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    /* Status Indicator */
+    .status-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .status-info h3 {
+      margin: 0 0 6px 0;
+      color: #1e293b;
       font-size: 18px;
       font-weight: 600;
-      color: #1e293b;
+    }
+
+    .status-info p {
+      margin: 0;
+      color: #64748b;
+      font-size: 14px;
     }
 
     .status-indicator {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 10px;
+      padding: 12px 20px;
       border-radius: 20px;
       font-size: 14px;
       font-weight: 600;
+      white-space: nowrap;
     }
 
     .status-indicator.active {
@@ -67,115 +109,229 @@
       color: #92400e;
     }
 
+    .status-indicator.offline {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: currentColor;
       animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* Controls */
+    .location-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .refresh-btn,
+    .pan-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
     }
 
     .refresh-btn {
-      margin-top: 20px;
+      background: #667eea;
+      color: white;
     }
 
-    .loading {
-      text-align: center;
+    .refresh-btn:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .refresh-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .pan-btn {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .pan-btn:hover {
+      background: #e5e7eb;
+      transform: translateY(-2px);
+    }
+
+    /* Error Message */
+    #errorMessage {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      border-left: 4px solid #dc2626;
+    }
+
+    /* Loading State */
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
       padding: 40px;
       color: #64748b;
     }
 
-    .error-message {
-      background: #fee2e2;
-      color: #b91c1c;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 20px;
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #map {
+        height: 400px;
+      }
+
+      .location-info {
+        grid-template-columns: 1fr;
+      }
+
+      .status-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .location-controls {
+        flex-direction: column;
+      }
+
+      .refresh-btn,
+      .pan-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">SmritiCare</h2>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2 class="logo">SmritiCare</h2>
 
-    <nav>
-      <a href="/caregiver/dashboard">Dashboard</a>
-      <a href="/caregiver/memory">Memory Board</a>
-      <a href="/caregiver/reminders">Reminders</a>
-      <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/location">Live Location</a>
-      <a href="/caregiver/selfcare">Self Care</a>
-      <a href="/caregiver/profile">Profile</a>
-      <a href="/auth/logout" class="logout-btn">Logout</a>
-    </nav>
-  </aside>
+      <nav>
+        <a href="/caregiver/dashboard">Dashboard</a>
+        <a href="/caregiver/memory">Memory Board</a>
+        <a href="/caregiver/reminders">Reminders</a>
+        <a href="/caregiver/medication">Medications</a>
+        <a href="/caregiver/location" class="active">Live Location</a>
+        <a href="/caregiver/selfcare">Self Care</a>
+        <a href="/caregiver/profile">
+          <span>Profile</span>
+          <span id="profileBadge" style="display:none; color: #dc2626; font-size: 18px; margin-left: 8px; animation: pulse 2s infinite;">●</span>
+        </a>
+        <a href="/auth/logout" class="logout-btn">Logout</a>
+      </nav>
+    </aside>
 
-  <!-- MAIN -->
-  <main class="main">
+    <!-- MAIN -->
+    <main class="main">
 
-    <div class="page-header">
-      <div>
-        <h1>Live Location</h1>
-        <p class="small">Track patient location in real-time</p>
-      </div>
-      <button class="primary-btn refresh-btn" onclick="refreshLocation()">🔄 Refresh</button>
-    </div>
-
-    <!-- Status Card -->
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <!-- PAGE HEADER -->
+      <div class="page-header">
         <div>
-          <h3 id="patientName">Loading...</h3>
-          <p class="small" id="lastUpdate">Checking location...</p>
+          <h1>Live Location</h1>
+          <p class="small">Track your linked patient's real-time location</p>
         </div>
-        <span class="status-indicator inactive" id="statusIndicator">
+      </div>
+
+      <!-- STATUS CARD -->
+      <div class="status-card">
+        <div class="status-info">
+          <h3 id="patientName">Loading...</h3>
+          <p id="lastUpdate">Fetching location...</p>
+        </div>
+        <span class="status-indicator offline" id="statusIndicator">
           <span class="status-dot"></span>
-          <span id="statusText">No Signal</span>
+          <span id="statusText">Loading</span>
         </span>
       </div>
-    </div>
 
-    <!-- Location Info Grid -->
-    <div class="location-info" id="locationInfo" style="display: none;">
-      <div class="info-card">
-        <h4>📍 Latitude</h4>
-        <p id="latitude">--</p>
+      <!-- CONTROLS -->
+      <div class="location-controls">
+        <button class="refresh-btn" id="refreshBtn" onclick="refreshLocation()">
+          🔄 Refresh Location
+        </button>
+        <button class="pan-btn" id="panBtn" onclick="panToLocation()">
+          📍 Center Map
+        </button>
       </div>
-      <div class="info-card">
-        <h4>📍 Longitude</h4>
-        <p id="longitude">--</p>
+
+      <!-- LOCATION INFO GRID -->
+      <div class="location-info" id="locationInfo" style="display: none;">
+        <div class="info-card">
+          <h4>📍 Latitude</h4>
+          <p id="latitude">--</p>
+          <p class="small">Decimal degrees</p>
+        </div>
+        <div class="info-card">
+          <h4>🧭 Longitude</h4>
+          <p id="longitude">--</p>
+          <p class="small">Decimal degrees</p>
+        </div>
+        <div class="info-card">
+          <h4>🎯 Accuracy</h4>
+          <p id="accuracy">--</p>
+          <p class="small">Margin of error</p>
+        </div>
+        <div class="info-card">
+          <h4>⏰ Last Updated</h4>
+          <p id="timestamp">--</p>
+          <p class="small">Relative time</p>
+        </div>
       </div>
-      <div class="info-card">
-        <h4>🎯 Accuracy</h4>
-        <p id="accuracy">--</p>
-      </div>
-      <div class="info-card">
-        <h4>⏱️ Last Updated</h4>
-        <p id="timestamp">--</p>
-      </div>
-    </div>
 
-    <!-- Map Container -->
-    <div id="map"></div>
+      <!-- MAP CONTAINER -->
+      <div id="map"></div>
 
-    <!-- Error Message -->
-    <div id="errorMessage" class="error-message" style="display: none;"></div>
+      <!-- ERROR MESSAGE -->
+      <div id="errorMessage" role="alert"></div>
 
-  </main>
-</div>
+    </main>
+  </div>
 
-<script src="/js/profileStatusChecker.js"></script>
-<script src="/js/caregiverDashboard.js"></script>
-<script src="/js/caregiverLocation.js"></script>
-
+  <!-- Scripts -->
+  <script src="/js/profileStatusChecker.js"></script>
+  <script src="/js/caregiverDashboard.js"></script>
+  <script src="/js/caregiverLocation.js"></script>
 </body>
 </html>

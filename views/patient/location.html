@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Sharing - SmritiCare</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/patient.css">
+
+  <style>
+    .location-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .location-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    .location-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: #f0f9ff;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+      margin-bottom: 20px;
+    }
+
+    .location-status.active {
+      background: #d1fae5;
+      border-left-color: #10b981;
+    }
+
+    .location-status.inactive {
+      background: #fef3c7;
+      border-left-color: #f59e0b;
+    }
+
+    .status-icon {
+      font-size: 32px;
+    }
+
+    .status-text h3 {
+      margin: 0 0 4px 0;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .status-text p {
+      margin: 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .feature-item {
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .feature-item h4 {
+      margin: 0 0 8px 0;
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .feature-item p {
+      margin: 0;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-toggle {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .btn-enable {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-enable:hover {
+      background: #059669;
+    }
+
+    .btn-disable {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-disable:hover {
+      background: #dc2626;
+    }
+
+    .info-box {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 20px;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .privacy-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #e2e8f0;
+    }
+
+    .privacy-section h3 {
+      color: #1e293b;
+      margin: 0 0 12px 0;
+    }
+
+    .privacy-section p {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+    }
+
+    .privacy-section ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .privacy-section li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">SmritiCare</div>
+      <a href="/patient/dashboard">Dashboard</a>
+      <a href="/patient/memory">Memory Board</a>
+      <a href="/patient/reminders">Reminders</a>
+      <a href="/patient/medication">Medication</a>
+      <a href="/patient/selfcare">Self Care</a>
+      <a href="/patient/profile">Profile</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <div class="location-container">
+
+        <!-- PAGE HEADER -->
+        <div style="margin-bottom: 30px;">
+          <h1>Location Sharing</h1>
+          <p class="sub">Share your location with your caregiver for added safety</p>
+        </div>
+
+        <!-- STATUS -->
+        <div class="location-status active" id="locationStatus">
+          <div class="status-icon">📍</div>
+          <div class="status-text">
+            <h3 id="statusTitle">Location Sharing Active</h3>
+            <p id="statusMessage">Your caregiver can see your live location and location history</p>
+          </div>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="location-card">
+          <h2>Your Location Safety</h2>
+          
+          <div class="feature-list">
+            <div class="feature-item">
+              <h4>🔴 Real-Time Tracking</h4>
+              <p>Your caregiver can view your current location on a live map updated every 30 seconds.</p>
+            </div>
+
+            <div class="feature-item">
+              <h4>📊 Location History</h4>
+              <p>Your caregiver can see the places you've visited in the last 24 hours as a path on the map.</p>
+            </div>
+
+            <div class="feature-item">
+              <h4>📡 Accurate Location</h4>
+              <p>Location updates include GPS accuracy information to ensure precision.</p>
+            </div>
+
+            <div class="feature-item">
+              <h4>🔋 Battery Efficient</h4>
+              <p>Smart location tracking that minimizes battery drain by updating only when you move.</p>
+            </div>
+
+            <div class="feature-item">
+              <h4>🛡️ Privacy Protected</h4>
+              <p>Only your linked caregiver can see your location. Your data is encrypted and secure.</p>
+            </div>
+
+            <div class="feature-item">
+              <h4>⏸️ Easy Control</h4>
+              <p>You can pause location sharing anytime. It resumes automatically when the app is opened.</p>
+            </div>
+          </div>
+
+          <!-- CONTROLS -->
+          <div class="controls">
+            <button class="btn-toggle btn-disable" id="pauseBtn" onclick="pauseTracking()">
+              ⏸️ Pause Sharing
+            </button>
+            <button class="btn-toggle btn-enable" id="resumeBtn" onclick="resumeTracking()" style="display: none;">
+              ▶️ Resume Sharing
+            </button>
+          </div>
+
+          <!-- INFO -->
+          <div class="info-box">
+            <strong>ℹ️ Note:</strong> Location sharing runs in the background on all pages. The banner at the top of your screen will remind you when it's active. Make sure to keep location permission enabled in your phone's settings for best results.
+          </div>
+        </div>
+
+        <!-- PRIVACY SECTION -->
+        <div class="location-card privacy-section">
+          <h3>🛡️ Your Privacy & Security</h3>
+          
+          <p><strong>How your location is protected:</strong></p>
+          <ul>
+            <li><strong>Encrypted transmission:</strong> All location data is sent over secure HTTPS connections</li>
+            <li><strong>Limited access:</strong> Only your linked caregiver can view your location</li>
+            <li><strong>Data retention:</strong> Location history is automatically deleted after 7 days</li>
+            <li><strong>Your control:</strong> You can pause sharing or stop it completely anytime</li>
+            <li><strong>Accurate location:</strong> Only precise GPS coordinates are stored, not address details</li>
+          </ul>
+
+          <p style="margin-top: 16px;"><strong>How your caregiver uses this:</strong></p>
+          <ul>
+            <li>To ensure your safety and well-being</li>
+            <li>To quickly find you in case of emergency</li>
+            <li>To understand your daily routine and movement patterns</li>
+            <li>To provide better care and support</li>
+          </ul>
+
+          <p style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+            <strong>Question?</strong> Contact your caregiver if you have any concerns about location sharing.
+          </p>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Location Tracking Script -->
+  <script src="/js/patientLocationSharing.js"></script>
+
+  <script>
+    /**
+     * UI Functions for location control
+     */
+
+    function pauseTracking() {
+      if (typeof stopLocationTracking === 'function') {
+        stopLocationTracking();
+        
+        // Update UI
+        document.getElementById('pauseBtn').style.display = 'none';
+        document.getElementById('resumeBtn').style.display = 'block';
+        
+        const status = document.getElementById('locationStatus');
+        status.classList.remove('active');
+        status.classList.add('inactive');
+        document.getElementById('statusTitle').textContent = 'Location Sharing Paused';
+        document.getElementById('statusMessage').textContent = 'Location sharing will resume when you reopen the app';
+      }
+    }
+
+    function resumeTracking() {
+      if (typeof startLocationTracking === 'function') {
+        startLocationTracking();
+        
+        // Update UI
+        document.getElementById('pauseBtn').style.display = 'block';
+        document.getElementById('resumeBtn').style.display = 'none';
+        
+        const status = document.getElementById('locationStatus');
+        status.classList.remove('inactive');
+        status.classList.add('active');
+        document.getElementById('statusTitle').textContent = 'Location Sharing Active';
+        document.getElementById('statusMessage').textContent = 'Your caregiver can see your live location and location history';
+      }
+    }
+
+    // Check tracking status on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // The patientLocationSharing.js will initialize automatically
+      // Just set up the UI based on tracking status if needed
+    });
+  </script>
+</body>
+</html>
