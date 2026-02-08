@@ -1,29 +1,29 @@
 /**
- * patientLocationSharing.js - Enhanced Version
- * Background location tracking with one-time popup notification
+ * patientLocationSharing.js - Enhanced Version with Maximum Accuracy
+ * Background location tracking with permission-based popup notification
  * Include this script on all patient pages to continuously share location
  */
 
 let locationWatchId = null;
 let lastLocation = null;
 let isTracking = false;
-let popupShown = false; // Track if popup has been shown
+let popupShown = false; // Track if popup has been shown in current session
 
 // Configuration
 const CONFIG = {
-  UPDATE_INTERVAL: 30000, // Update every 30 seconds
-  MIN_DISTANCE: 20, // Only update if moved 20+ meters
-  HIGH_ACCURACY: true,
-  TIMEOUT: 30000,
-  MAX_AGE: 0,
-  BANNER_DURATION: 10000,
-  POPUP_STORAGE_KEY: 'smriticare_location_popup_shown' // LocalStorage key
+  UPDATE_INTERVAL: 15000, // Update every 15 seconds (more frequent)
+  MIN_DISTANCE: 5, // Update even for small movements (5 meters instead of 20)
+  HIGH_ACCURACY: true, // Maximum GPS accuracy
+  TIMEOUT: 60000, // Longer timeout for better accuracy (60 seconds)
+  MAX_AGE: 0, // Always get fresh location
+  ENABLE_HIGH_ACCURACY: true,
+  MAXIMUM_AGE: 0
 };
 
 /**
  * Initialize location tracking on page load
  */
-function initializeLocationTracking() {
+async function initializeLocationTracking() {
   if (isTracking) {
     console.log('ℹ️ Location tracking already initialized');
     return;
@@ -35,30 +35,54 @@ function initializeLocationTracking() {
     return;
   }
 
-  // Check if popup has already been shown in this session/device
-  const hasShownPopup = localStorage.getItem(CONFIG.POPUP_STORAGE_KEY);
-
-  if (!hasShownPopup) {
-    // First time - show the popup
-    showLocationEnablePopup();
+  // Check actual location permission status
+  const permissionStatus = await checkLocationPermission();
+  
+  if (permissionStatus === 'granted') {
+    // Permission already granted - start tracking directly
+    console.log('✅ Location permission already granted');
+    startLocationTracking();
+  } else if (permissionStatus === 'denied') {
+    // Permission explicitly denied - show permanent banner
+    console.log('❌ Location permission denied');
+    showPermanentBanner();
   } else {
-    // Already shown before - just request permission silently
-    requestLocationPermission();
+    // Permission not yet determined - show popup AND permanent banner
+    console.log('❓ Location permission not determined - showing popup');
+    showLocationEnablePopup();
+    showPermanentBanner();
   }
 
-  console.log('🔍 Location tracking initialization started');
+  console.log('🔐 Location tracking initialization started');
 }
 
 /**
- * Show one-time popup notification for enabling location sharing
- * This is shown only once per device
+ * Check current location permission status
+ * Returns: 'granted', 'denied', or 'prompt'
+ */
+async function checkLocationPermission() {
+  if (!navigator.permissions) {
+    // Permissions API not available - try direct geolocation check
+    return 'prompt';
+  }
+
+  try {
+    const result = await navigator.permissions.query({ name: 'geolocation' });
+    return result.state; // 'granted', 'denied', or 'prompt'
+  } catch (error) {
+    console.warn('⚠️ Could not check permission status:', error);
+    return 'prompt';
+  }
+}
+
+/**
+ * Show popup notification for enabling location sharing
+ * Non-dismissible - user must make a choice
+ * No timer - stays until user interacts
  */
 function showLocationEnablePopup() {
   if (popupShown) return;
   popupShown = true;
-
-  // Mark popup as shown in localStorage
-  localStorage.setItem(CONFIG.POPUP_STORAGE_KEY, 'true');
 
   const popup = document.createElement('div');
   popup.id = 'location-enable-popup';
@@ -68,12 +92,13 @@ function showLocationEnablePopup() {
   popup.style.cssText = `
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     animation: fadeIn 0.3s ease-out;
+    backdrop-filter: blur(4px);
   `;
 
   popup.innerHTML = `
@@ -96,84 +121,105 @@ function showLocationEnablePopup() {
 
       .popup-content {
         background: white;
-        border-radius: 16px;
-        padding: 32px;
-        max-width: 420px;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 480px;
         width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: slideUp 0.4s ease-out;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        animation: slideUp 0.5s ease-out;
         text-align: center;
+        position: relative;
       }
 
       .popup-icon {
-        font-size: 64px;
-        margin-bottom: 20px;
+        font-size: 72px;
+        margin-bottom: 24px;
         display: block;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
       }
 
       .popup-title {
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 700;
         color: #1e293b;
-        margin: 0 0 12px 0;
+        margin: 0 0 16px 0;
+        line-height: 1.3;
       }
 
       .popup-subtitle {
-        font-size: 14px;
+        font-size: 15px;
         color: #64748b;
-        line-height: 1.6;
-        margin: 0 0 24px 0;
+        line-height: 1.7;
+        margin: 0 0 28px 0;
       }
 
       .popup-features {
-        background: #f0f9ff;
-        border-left: 4px solid #667eea;
-        padding: 16px;
-        border-radius: 8px;
-        margin-bottom: 24px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-left: 5px solid #667eea;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 28px;
         text-align: left;
       }
 
+      .popup-features-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 16px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
       .feature-item {
-        font-size: 13px;
+        font-size: 14px;
         color: #334155;
-        margin: 8px 0;
+        margin: 12px 0;
         display: flex;
         align-items: flex-start;
-        gap: 8px;
+        gap: 12px;
+        line-height: 1.6;
       }
 
       .feature-item::before {
         content: "✓";
         color: #10b981;
         font-weight: bold;
+        font-size: 18px;
         flex-shrink: 0;
       }
 
       .popup-actions {
         display: flex;
-        gap: 12px;
+        gap: 14px;
         flex-direction: column;
       }
 
       .popup-btn {
-        padding: 14px 24px;
+        padding: 16px 28px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         font-weight: 600;
         cursor: pointer;
-        font-size: 15px;
-        transition: all 0.2s;
+        font-size: 16px;
+        transition: all 0.3s;
+        font-family: inherit;
       }
 
       .btn-enable {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
+        box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
       }
 
       .btn-enable:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
       }
 
       .btn-enable:active {
@@ -183,31 +229,39 @@ function showLocationEnablePopup() {
       .btn-not-now {
         background: #f1f5f9;
         color: #64748b;
+        border: 2px solid #e2e8f0;
       }
 
       .btn-not-now:hover {
         background: #e2e8f0;
+        border-color: #cbd5e1;
       }
 
       .popup-footer {
-        font-size: 12px;
+        font-size: 13px;
         color: #94a3b8;
-        margin-top: 16px;
-        line-height: 1.5;
+        margin-top: 20px;
+        line-height: 1.6;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .popup-footer strong {
+        color: #64748b;
       }
 
       @media (max-width: 480px) {
         .popup-content {
-          padding: 24px;
+          padding: 32px 24px;
         }
 
         .popup-title {
-          font-size: 18px;
+          font-size: 22px;
         }
 
         .popup-btn {
-          padding: 12px 20px;
-          font-size: 14px;
+          padding: 14px 24px;
+          font-size: 15px;
         }
       }
     </style>
@@ -218,19 +272,21 @@ function showLocationEnablePopup() {
       <h2 class="popup-title" id="popup-title">Enable Location Sharing?</h2>
       
       <p class="popup-subtitle">
-        Share your location with your caregiver for added safety and peace of mind
+        Help your caregiver keep you safe by sharing your real-time location. This allows them to find you quickly in case of emergency.
       </p>
 
       <div class="popup-features">
-        <div class="feature-item">Real-time location updates</div>
-        <div class="feature-item">24-hour location history</div>
-        <div class="feature-item">Only visible to your caregiver</div>
-        <div class="feature-item">You can pause anytime</div>
+        <div class="popup-features-title">🔒 How It Helps:</div>
+        <div class="feature-item">High-accuracy real-time tracking every 15 seconds</div>
+        <div class="feature-item">Detailed location history for the last 24 hours</div>
+        <div class="feature-item">Only visible to your linked caregiver</div>
+        <div class="feature-item">Encrypted and secure - your privacy is protected</div>
+        <div class="feature-item">You can pause sharing anytime from your profile</div>
       </div>
 
       <div class="popup-actions">
         <button class="popup-btn btn-enable" onclick="enableLocationFromPopup()">
-          🟢 Enable Location
+          🟢 Enable Location Sharing
         </button>
         <button class="popup-btn btn-not-now" onclick="dismissLocationPopup()">
           Not Now
@@ -238,23 +294,12 @@ function showLocationEnablePopup() {
       </div>
 
       <div class="popup-footer">
-        <p style="margin: 0;">
-          Your location is encrypted and secure.<br>
-          This request appears once per device.
-        </p>
+        <strong>📌 Important:</strong> This popup and the banner at the top will keep appearing until you enable location sharing. Your caregiver needs this to ensure your safety.
       </div>
     </div>
   `;
 
   document.body.appendChild(popup);
-
-  // Close on Escape key
-  const handleEscape = (e) => {
-    if (e.key === 'Escape') {
-      dismissLocationPopup();
-    }
-  };
-  document.addEventListener('keydown', handleEscape, { once: true });
 }
 
 /**
@@ -272,10 +317,7 @@ function enableLocationFromPopup() {
 function dismissLocationPopup() {
   console.log('⏭️ User dismissed location popup');
   removePopup();
-  // Show banner instead, asking again later
-  setTimeout(() => {
-    showLocationPermissionBanner();
-  }, 1000);
+  // Permanent banner stays visible
 }
 
 /**
@@ -289,6 +331,7 @@ function removePopup() {
       if (popup.parentNode) {
         popup.parentNode.removeChild(popup);
       }
+      popupShown = false; // Allow popup to show again next time
     }, 300);
   }
 }
@@ -300,23 +343,23 @@ function requestLocationPermission() {
   navigator.geolocation.getCurrentPosition(
     (position) => {
       console.log('✅ Location permission granted');
-      removeBanner();
+      removePermanentBanner();
       startLocationTracking();
     },
     (error) => {
-      console.warn('❌ Location permission denied:', error.message);
-      showLocationPermissionBanner();
+      console.warn('⚠️ Location permission denied:', error.message);
+      showPermanentBanner();
     },
     {
-      enableHighAccuracy: CONFIG.HIGH_ACCURACY,
+      enableHighAccuracy: true,
       timeout: CONFIG.TIMEOUT,
-      maximumAge: CONFIG.MAX_AGE
+      maximumAge: 0
     }
   );
 }
 
 /**
- * Start continuous location tracking
+ * Start continuous location tracking with high accuracy
  */
 function startLocationTracking() {
   if (isTracking) {
@@ -326,18 +369,18 @@ function startLocationTracking() {
 
   isTracking = true;
 
-  // Watch position with high accuracy
+  // Watch position with MAXIMUM accuracy
   locationWatchId = navigator.geolocation.watchPosition(
     handleLocationUpdate,
     handleLocationError,
     {
-      enableHighAccuracy: CONFIG.HIGH_ACCURACY,
+      enableHighAccuracy: true, // Use GPS
       timeout: CONFIG.TIMEOUT,
-      maximumAge: CONFIG.MAX_AGE
+      maximumAge: 0 // Always fresh
     }
   );
 
-  console.log('🟢 Live location tracking started');
+  console.log('🟢 High-accuracy location tracking started');
 
   // Send location immediately
   navigator.geolocation.getCurrentPosition(
@@ -345,9 +388,34 @@ function startLocationTracking() {
       const { latitude, longitude, accuracy } = position.coords;
       updateLocationOnServer(latitude, longitude, accuracy);
       lastLocation = { latitude, longitude, accuracy };
+      console.log(`📍 Initial location: ${latitude.toFixed(7)}, ${longitude.toFixed(7)} (±${Math.round(accuracy)}m)`);
     },
-    (error) => console.warn('Failed to get initial location:', error)
+    (error) => console.warn('Failed to get initial location:', error),
+    {
+      enableHighAccuracy: true,
+      timeout: CONFIG.TIMEOUT,
+      maximumAge: 0
+    }
   );
+
+  // Also update location at regular intervals even if patient doesn't move
+  setInterval(() => {
+    if (isTracking) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude, accuracy } = position.coords;
+          updateLocationOnServer(latitude, longitude, accuracy);
+          lastLocation = { latitude, longitude, accuracy };
+        },
+        (error) => console.warn('Periodic update failed:', error),
+        {
+          enableHighAccuracy: true,
+          timeout: CONFIG.TIMEOUT,
+          maximumAge: 0
+        }
+      );
+    }
+  }, CONFIG.UPDATE_INTERVAL);
 }
 
 /**
@@ -365,8 +433,9 @@ function handleLocationUpdate(position) {
       longitude
     );
 
-    if (distance < CONFIG.MIN_DISTANCE) {
-      console.log(`↔️ Moved only ${distance.toFixed(1)}m, skipping update`);
+    if (distance < CONFIG.MIN_DISTANCE && accuracy > 20) {
+      // Only skip if movement is tiny AND accuracy is poor
+      console.log(`↔️ Moved only ${distance.toFixed(1)}m with accuracy ±${Math.round(accuracy)}m, skipping update`);
       return;
     }
   }
@@ -376,7 +445,7 @@ function handleLocationUpdate(position) {
   lastLocation = { latitude, longitude, accuracy };
 
   console.log(
-    `📍 Location updated: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+    `📍 Location updated: ${latitude.toFixed(7)}, ${longitude.toFixed(7)} (±${Math.round(accuracy)}m)`
   );
 }
 
@@ -400,13 +469,13 @@ async function updateLocationOnServer(latitude, longitude, accuracy) {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error(`❌ Location update failed: ${response.status}`);
+      console.error(`⚠️ Location update failed: ${response.status}`);
       return;
     }
 
     console.log('✅ Location sent to caregiver');
   } catch (error) {
-    console.error('❌ Network error:', error);
+    console.error('⚠️ Network error:', error);
   }
 }
 
@@ -419,7 +488,7 @@ function handleLocationError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
       console.log('User denied location permission');
-      showLocationPermissionBanner();
+      showPermanentBanner();
       break;
     case error.POSITION_UNAVAILABLE:
       console.log('Location information unavailable');
@@ -449,10 +518,14 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Show permission request banner
+ * Show PERMANENT banner that stays until permission is granted
+ * Non-dismissible
  */
-function showLocationPermissionBanner() {
-  removeBanner();
+function showPermanentBanner() {
+  // Check if already exists
+  if (document.getElementById('location-permission-banner')) {
+    return;
+  }
 
   const banner = document.createElement('div');
   banner.id = 'location-permission-banner';
@@ -463,35 +536,39 @@ function showLocationPermissionBanner() {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #fef3c7, #fcd34d);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     color: #92400e;
-    padding: 14px 20px;
+    padding: 16px 20px;
     text-align: center;
     font-size: 14px;
     font-weight: 500;
     z-index: 9999;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slideDown 0.3s ease-out;
+    animation: slideDown 0.5s ease-out;
+    border-bottom: 3px solid #fbbf24;
   `;
 
   banner.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; max-width: 100%;">
-      <span>📍</span>
-      <span style="flex: 1;">Please enable location sharing so your caregiver can help you if needed.</span>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; max-width: 100%; flex-wrap: wrap;">
+      <span style="font-size: 24px;">📍</span>
+      <span style="flex: 1; min-width: 280px; font-weight: 600;">
+        ⚠️ Location Sharing Required: Your caregiver needs your location to keep you safe. Please enable location sharing.
+      </span>
       <button id="enableLocationBtn" style="
-        margin-left: 12px;
-        padding: 8px 20px;
+        padding: 10px 24px;
         background: #92400e;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 700;
         white-space: nowrap;
-        transition: background 0.2s;
-      " onmouseover="this.style.background='#7a3408'" onmouseout="this.style.background='#92400e'">
-        Enable Location
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(146, 64, 14, 0.3);
+      " onmouseover="this.style.background='#7c2d12'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(146, 64, 14, 0.4)'" 
+         onmouseout="this.style.background='#92400e'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(146, 64, 14, 0.3)'">
+        🟢 Enable Now
       </button>
     </div>
     <style>
@@ -515,26 +592,22 @@ function showLocationPermissionBanner() {
     requestLocationPermission();
   });
 
-  // Auto-hide after duration
-  setTimeout(() => {
-    if (document.getElementById('location-permission-banner')) {
-      removeBanner();
-    }
-  }, CONFIG.BANNER_DURATION);
+  console.log('⚠️ Permanent location banner displayed');
 }
 
 /**
- * Remove permission banner
+ * Remove permanent banner (only when permission is granted)
  */
-function removeBanner() {
+function removePermanentBanner() {
   const banner = document.getElementById('location-permission-banner');
   if (banner) {
-    banner.style.animation = 'slideUp 0.3s ease-out forwards';
+    banner.style.animation = 'slideDown 0.3s ease-out reverse';
     setTimeout(() => {
       if (banner.parentNode) {
         banner.parentNode.removeChild(banner);
       }
     }, 300);
+    console.log('✅ Permanent banner removed (permission granted)');
   }
 }
 
@@ -550,11 +623,12 @@ function showLocationNotSupported() {
     right: 0;
     background: #fee2e2;
     color: #b91c1c;
-    padding: 14px 20px;
+    padding: 16px 20px;
     text-align: center;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     z-index: 9999;
+    border-bottom: 3px solid #dc2626;
   `;
   message.textContent =
     '⚠️ Location sharing is not supported by your browser. Please update your browser.';
@@ -585,15 +659,6 @@ function getTrackingStatus() {
   };
 }
 
-/**
- * Reset popup (for testing - shows popup again)
- */
-function resetLocationPopup() {
-  localStorage.removeItem(CONFIG.POPUP_STORAGE_KEY);
-  popupShown = false;
-  console.log('🔄 Location popup reset - will show again on next page load');
-}
-
 // ============================================
 // AUTO-INITIALIZATION
 // ============================================
@@ -611,8 +676,8 @@ window.addEventListener('beforeunload', stopLocationTracking);
 // Restart tracking if page becomes visible
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && !isTracking) {
-    console.log('📍 Page visible, resuming location tracking...');
-    requestLocationPermission();
+    console.log('📍 Page visible, checking location status...');
+    initializeLocationTracking();
   }
 });
 
@@ -620,4 +685,3 @@ document.addEventListener('visibilitychange', () => {
 window.requestLocationPermission = requestLocationPermission;
 window.stopLocationTracking = stopLocationTracking;
 window.getTrackingStatus = getTrackingStatus;
-window.resetLocationPopup = resetLocationPopup;
