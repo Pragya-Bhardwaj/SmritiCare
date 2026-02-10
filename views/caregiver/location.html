@@ -12,6 +12,10 @@
   <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
 
+  <!-- Mapbox Geocoder for address search -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+
   <style>
     /* Map Container */
     #map {
@@ -37,6 +41,14 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       border-left: 4px solid #667eea;
+    }
+
+    .info-card.warning {
+      border-left-color: #ef4444;
+    }
+
+    .info-card.success {
+      border-left-color: #10b981;
     }
 
     .info-card h4 {
@@ -114,21 +126,108 @@
       color: #6b7280;
     }
 
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: pulse 2s infinite;
+    /* Safe Zone Section */
+    .safe-zone-section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.5;
-      }
+    .safe-zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .safe-zone-header h2 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .safe-zone-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 12px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Address Search */
+    #geocoder {
+      margin-bottom: 16px;
+    }
+
+    .mapboxgl-ctrl-geocoder {
+      width: 100% !important;
+      max-width: none !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+      border: 1px solid #e5e7eb !important;
+    }
+
+    /* Safe Zone Info Display */
+    .safe-zone-display {
+      background: #f0f9ff;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #3b82f6;
+      margin-top: 16px;
+    }
+
+    .safe-zone-display h4 {
+      margin: 0 0 12px 0;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .safe-zone-display p {
+      margin: 8px 0;
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .safe-zone-display .label {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     /* Controls */
@@ -139,8 +238,7 @@
       flex-wrap: wrap;
     }
 
-    .refresh-btn,
-    .pan-btn {
+    .btn {
       padding: 12px 24px;
       border: none;
       border-radius: 8px;
@@ -150,31 +248,64 @@
       font-size: 14px;
     }
 
-    .refresh-btn {
+    .btn-primary {
       background: #667eea;
       color: white;
     }
 
-    .refresh-btn:hover:not(:disabled) {
+    .btn-primary:hover:not(:disabled) {
       background: #5568d3;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
-    .refresh-btn:disabled {
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
       background: #cbd5e1;
       cursor: not-allowed;
       opacity: 0.6;
     }
 
-    .pan-btn {
-      background: #f3f4f6;
-      color: #4b5563;
+    /* Safe Zone Status Badge */
+    .safe-zone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: 12px;
     }
 
-    .pan-btn:hover {
-      background: #e5e7eb;
-      transform: translateY(-2px);
+    .safe-zone-badge.inside {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .safe-zone-badge.outside {
+      background: #fee2e2;
+      color: #b91c1c;
+      animation: pulse 2s infinite;
     }
 
     /* Error Message */
@@ -188,28 +319,12 @@
       border-left: 4px solid #dc2626;
     }
 
-    /* Loading State */
-    .loading-spinner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 40px;
-      color: #64748b;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #667eea;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
       }
     }
 
@@ -233,9 +348,12 @@
         flex-direction: column;
       }
 
-      .refresh-btn,
-      .pan-btn {
+      .btn {
         width: 100%;
+      }
+
+      .safe-zone-form {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -270,7 +388,7 @@
       <div class="page-header">
         <div>
           <h1>Live Location</h1>
-          <p class="small">Track your linked patient's real-time location</p>
+          <p class="small">Track your linked patient's real-time location and configure safe zone</p>
         </div>
       </div>
 
@@ -281,18 +399,83 @@
           <p id="lastUpdate">Fetching location...</p>
         </div>
         <span class="status-indicator offline" id="statusIndicator">
-          <span class="status-dot"></span>
           <span id="statusText">Loading</span>
+          <span id="safeZoneBadge"></span>
         </span>
+      </div>
+
+      <!-- SAFE ZONE CONFIGURATION -->
+      <div class="safe-zone-section">
+        <div class="safe-zone-header">
+          <h2>🛡️ Safe Zone Configuration</h2>
+        </div>
+
+        <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
+          Set a safe zone for your patient. You'll receive email alerts when they move more than 500 meters from this location.
+        </p>
+
+        <!-- Address Search -->
+        <div id="geocoder"></div>
+
+        <form id="safeZoneForm">
+          <div class="safe-zone-form">
+            <div class="form-group">
+              <label for="safeZoneName">Zone Name</label>
+              <input type="text" id="safeZoneName" placeholder="e.g., Home" required>
+            </div>
+
+            <div class="form-group">
+              <label for="safeZoneRadius">Radius (meters)</label>
+              <select id="safeZoneRadius">
+                <option value="100">100m</option>
+                <option value="250">250m</option>
+                <option value="500" selected>500m</option>
+                <option value="1000">1 km</option>
+                <option value="2000">2 km</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="safeZoneAddress">Address</label>
+              <input type="text" id="safeZoneAddress" placeholder="Enter or search address above" required readonly>
+            </div>
+
+            <input type="hidden" id="safeZoneLatitude">
+            <input type="hidden" id="safeZoneLongitude">
+          </div>
+
+          <div class="location-controls">
+            <button type="submit" class="btn btn-primary" id="saveSafeZoneBtn">
+              💾 Save Safe Zone
+            </button>
+            <button type="button" class="btn btn-danger" id="deleteSafeZoneBtn" style="display: none;">
+              🗑️ Delete Safe Zone
+            </button>
+          </div>
+        </form>
+
+        <!-- Current Safe Zone Display -->
+        <div id="safeZoneDisplay" style="display: none;" class="safe-zone-display">
+          <h4>✅ Active Safe Zone</h4>
+          <p><span class="label">Name:</span> <span id="displayZoneName"></span></p>
+          <p><span class="label">Address:</span> <span id="displayZoneAddress"></span></p>
+          <p><span class="label">Radius:</span> <span id="displayZoneRadius"></span></p>
+          <p style="font-size: 13px; margin-top: 12px; color: #64748b;">
+            📧 Email alerts will be sent if patient moves outside this zone (cooldown: 30 minutes between alerts)
+          </p>
+        </div>
       </div>
 
       <!-- CONTROLS -->
       <div class="location-controls">
-        <button class="refresh-btn" id="refreshBtn" onclick="refreshLocation()">
+        <button class="btn btn-primary" id="refreshBtn" onclick="refreshLocation()">
           🔄 Refresh Location
         </button>
-        <button class="pan-btn" id="panBtn" onclick="panToLocation()">
+        <button class="btn btn-secondary" id="panBtn" onclick="panToLocation()">
           📍 Center Map
+        </button>
+        <button class="btn btn-secondary" id="panToSafeZoneBtn" onclick="panToSafeZone()" style="display: none;">
+          🛡️ View Safe Zone
         </button>
       </div>
 
@@ -313,10 +496,10 @@
           <p id="accuracy">--</p>
           <p class="small">Margin of error</p>
         </div>
-        <div class="info-card">
-          <h4>⏰ Last Updated</h4>
-          <p id="timestamp">--</p>
-          <p class="small">Relative time</p>
+        <div class="info-card" id="safeZoneDistanceCard" style="display: none;">
+          <h4>🛡️ Safe Zone Distance</h4>
+          <p id="safeZoneDistance">--</p>
+          <p class="small" id="safeZoneDistanceLabel">--</p>
         </div>
       </div>
 

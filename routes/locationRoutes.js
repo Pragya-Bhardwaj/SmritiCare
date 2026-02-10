@@ -44,7 +44,7 @@ function requireCaregiver(req, res, next) {
 /**
  * POST /api/location/update
  * Patient updates their location
- * Called by patientLocationSharing.js periodically
+ * Automatically checks safe zone and sends alerts
  */
 router.post(
   "/api/location/update",
@@ -56,7 +56,7 @@ router.post(
 /**
  * GET /api/location/patient
  * Caregiver gets linked patient's current location
- * Returns latest location record with patient info
+ * Returns latest location record with patient info and safe zone status
  */
 router.get(
   "/api/location/patient",
@@ -68,10 +68,6 @@ router.get(
 /**
  * GET /api/location/history
  * Get location history
- * Query parameters:
- *   - hours: Number of hours of history to retrieve (default: 24, max: 72)
- *   - limit: Maximum number of location points (default: 100, max: 500)
- * Accessible to both patients (own) and caregivers (linked patient)
  */
 router.get(
   "/api/location/history",
@@ -82,9 +78,6 @@ router.get(
 /**
  * GET /api/location/distance
  * Get total distance traveled
- * Query parameters:
- *   - hours: Number of hours to calculate distance for (default: 24, max: 72)
- * Accessible to both patients (own) and caregivers (linked patient)
  */
 router.get(
   "/api/location/distance",
@@ -93,14 +86,42 @@ router.get(
 );
 
 /**
- * POST /api/location/cleanup
- * Admin only: Clear old location data
- * Keeps only last 7 days of location history
+ * SAFE ZONE ROUTES
+ */
+
+/**
+ * POST /api/location/safe-zone
+ * Create or update safe zone for patient
+ * Caregiver only
  */
 router.post(
-  "/api/location/cleanup",
+  "/api/location/safe-zone",
   requireAuth,
-  locationController.cleanupOldLocations
+  requireCaregiver,
+  locationController.setSafeZone
+);
+
+/**
+ * GET /api/location/safe-zone
+ * Get safe zone configuration
+ * Both caregiver and patient can view
+ */
+router.get(
+  "/api/location/safe-zone",
+  requireAuth,
+  locationController.getSafeZone
+);
+
+/**
+ * DELETE /api/location/safe-zone
+ * Delete safe zone
+ * Caregiver only
+ */
+router.delete(
+  "/api/location/safe-zone",
+  requireAuth,
+  requireCaregiver,
+  locationController.deleteSafeZone
 );
 
 module.exports = router;
