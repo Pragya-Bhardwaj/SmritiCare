@@ -1,52 +1,99 @@
 /**
- * caregiverLocation.js - Enhanced with Safe Zone Management
- * Real-time location display with safe zone configuration
+ * caregiverLocation.js
+ * Real-time location display for caregivers using Mapbox GL JS
+ * Shows patient's live location with accuracy circle and location history
  */
 
 let map;
 let marker;
-let safeZoneCircle;
-let safeZoneMarker;
-let geocoder;
+let accuracyCircle;
+let routeSource;
 let refreshInterval;
 let MAPBOX_TOKEN = '';
 let patientData = null;
-let currentSafeZone = null;
 
 // Configuration
 const CONFIG = {
-  DEFAULT_LAT: 28.7041,
+  DEFAULT_LAT: 28.7041, // New Delhi
   DEFAULT_LNG: 77.1025,
   DEFAULT_ZOOM: 12,
-  LOCATION_REFRESH_INTERVAL: 30000,
+  LOCATION_REFRESH_INTERVAL: 30000, // 30 seconds
   MAP_STYLE: 'mapbox://styles/mapbox/streets-v12',
   MARKER_SIZE: 32,
-  SAFE_ZONE_COLOR: '#3b82f6',
-  SAFE_ZONE_OPACITY: 0.2,
-  SAFE_ZONE_STROKE_COLOR: '#3b82f6',
-  SAFE_ZONE_STROKE_OPACITY: 0.8
+  CIRCLE_COLOR: '#667eea',
+  CIRCLE_OPACITY: 0.3,
+  CIRCLE_STROKE_COLOR: '#667eea',
+  CIRCLE_STROKE_OPACITY: 0.6
 };
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Safely add a layer to the map, optionally before settlement-label
+ * This prevents errors when settlement-label doesn't exist yet
+ */
+function safeAddLayer(layerConfig, beforeId = 'settlement-label') {
+  if (!map) {
+    console.warn('Map not initialized');
+    return false;
+  }
+
+  try {
+    // Check if the map style is loaded
+    if (!map.isStyleLoaded()) {
+      console.warn('Map style not loaded yet, cannot add layer');
+      return false;
+    }
+
+    // If beforeId is specified, check if that layer exists
+    if (beforeId && map.getLayer(beforeId)) {
+      map.addLayer(layerConfig, beforeId);
+    } else {
+      // Add without beforeId if the target layer doesn't exist
+      map.addLayer(layerConfig);
+    }
+    return true;
+  } catch (error) {
+    console.error('Error adding layer:', error);
+    return false;
+  }
+}
 
 // ============================================
 // INITIALIZATION
 // ============================================
 
+/**
+ * Initialize map on page load
+ */
 async function initializeLocation() {
   try {
+    // Fetch Mapbox token from backend
     await fetchMapboxToken();
+
+    // Initialize Mapbox map
     initializeMap();
-    await loadSafeZone();
+
+    // Load patient's location
     await loadPatientLocation();
-    
+
+    // Start auto-refresh interval
     refreshInterval = setInterval(loadPatientLocation, CONFIG.LOCATION_REFRESH_INTERVAL);
 
-    console.log('✅ Location tracking initialized with safe zone support');
+    // Location history will be loaded after map finishes loading (see map.on('load') handler)
+
+    console.log('✅ Location tracking initialized');
   } catch (error) {
     console.error('❌ Initialization error:', error);
     showError('Failed to initialize location tracking');
   }
 }
 
+/**
+ * Fetch Mapbox token from backend
+ */
 async function fetchMapboxToken() {
   try {
     const response = await fetch('/api/config/mapbox', {
@@ -71,6 +118,9 @@ async function fetchMapboxToken() {
   }
 }
 
+/**
+ * Initialize Mapbox map
+ */
 function initializeMap() {
   if (!MAPBOX_TOKEN) {
     showError('Mapbox token not available');
@@ -90,336 +140,37 @@ function initializeMap() {
   // Add controls
   map.addControl(new mapboxgl.NavigationControl(), 'top-right');
   map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+  // Add scale
   map.addControl(new mapboxgl.ScaleControl());
 
-  // Initialize geocoder for address search
-  geocoder = new MapboxGeocoder({
-    accessToken: MAPBOX_TOKEN,
-    mapboxgl: mapboxgl,
-    placeholder: 'Search for safe zone address...',
-    marker: false
-  });
-
-  document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-
-  // Handle address selection
-  geocoder.on('result', (e) => {
-    const { center, place_name } = e.result;
-    document.getElementById('safeZoneAddress').value = place_name;
-    document.getElementById('safeZoneLongitude').value = center[0];
-    document.getElementById('safeZoneLatitude').value = center[1];
-  });
-
+  // Wait for map to load before adding sources and layers
   map.on('load', () => {
     console.log('✅ Mapbox map loaded');
-  });
-}
-
-// ============================================
-// SAFE ZONE MANAGEMENT
-// ============================================
-
-async function loadSafeZone() {
-  try {
-    const response = await fetch('/api/location/safe-zone', {
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.safeZone) {
-      currentSafeZone = data.safeZone;
-      displaySafeZone(data.safeZone);
-      populateSafeZoneForm(data.safeZone);
-      
-      console.log('✅ Safe zone loaded');
-    } else {
-      console.log('ℹ️ No safe zone configured');
-    }
-  } catch (error) {
-    console.error('❌ Failed to load safe zone:', error);
-  }
-}
-
-function displaySafeZone(safeZone) {
-  if (!map) return;
-
-  // Remove existing safe zone visualizations
-  removeSafeZoneFromMap();
-
-  const { latitude, longitude, radius, name, address } = safeZone;
-
-  // Add safe zone marker
-  const el = document.createElement('div');
-  el.style.cssText = `
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border: 4px solid white;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-  `;
-  el.innerHTML = '🛡️';
-
-  safeZoneMarker = new mapboxgl.Marker(el)
-    .setLngLat([longitude, latitude])
-    .setPopup(
-      new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`
-          <div style="padding: 12px; font-size: 14px;">
-            <strong style="display: block; margin-bottom: 8px; font-size: 16px;">🛡️ Safe Zone</strong>
-            <div style="margin-bottom: 6px;">
-              <strong>Name:</strong> ${name}<br>
-              <strong>Address:</strong> ${address}<br>
-              <strong>Radius:</strong> ${radius}m
-            </div>
-            <small style="color: #666;">Patient will be monitored within this zone</small>
-          </div>
-        `)
-    )
-    .addTo(map);
-
-  // Add safe zone circle
-  if (!map.getSource('safe-zone-circle')) {
-    map.addSource('safe-zone-circle', {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [longitude, latitude]
-        },
-        properties: {
-          radius: radius
-        }
+    // Wait a moment to ensure style is fully loaded
+    setTimeout(() => {
+      if (map.isStyleLoaded()) {
+        loadLocationHistory();
       }
-    });
-
-    // Add fill layer
-    map.addLayer({
-      id: 'safe-zone-fill',
-      type: 'circle',
-      source: 'safe-zone-circle',
-      paint: {
-        'circle-radius': {
-          stops: [
-            [0, 0],
-            [20, metersToPixelsAtMaxZoom(radius, latitude)]
-          ],
-          base: 2
-        },
-        'circle-color': CONFIG.SAFE_ZONE_COLOR,
-        'circle-opacity': CONFIG.SAFE_ZONE_OPACITY
-      }
-    });
-
-    // Add stroke layer
-    map.addLayer({
-      id: 'safe-zone-stroke',
-      type: 'circle',
-      source: 'safe-zone-circle',
-      paint: {
-        'circle-radius': {
-          stops: [
-            [0, 0],
-            [20, metersToPixelsAtMaxZoom(radius, latitude)]
-          ],
-          base: 2
-        },
-        'circle-color': 'transparent',
-        'circle-stroke-width': 3,
-        'circle-stroke-color': CONFIG.SAFE_ZONE_STROKE_COLOR,
-        'circle-stroke-opacity': CONFIG.SAFE_ZONE_STROKE_OPACITY
-      }
-    });
-  }
-
-  // Update safe zone display
-  document.getElementById('safeZoneDisplay').style.display = 'block';
-  document.getElementById('displayZoneName').textContent = name;
-  document.getElementById('displayZoneAddress').textContent = address;
-  document.getElementById('displayZoneRadius').textContent = `${radius}m`;
-  document.getElementById('deleteSafeZoneBtn').style.display = 'inline-block';
-  document.getElementById('panToSafeZoneBtn').style.display = 'inline-block';
-
-  console.log(`✅ Safe zone displayed: ${name} (${radius}m)`);
-}
-
-function populateSafeZoneForm(safeZone) {
-  document.getElementById('safeZoneName').value = safeZone.name;
-  document.getElementById('safeZoneAddress').value = safeZone.address;
-  document.getElementById('safeZoneLatitude').value = safeZone.latitude;
-  document.getElementById('safeZoneLongitude').value = safeZone.longitude;
-  document.getElementById('safeZoneRadius').value = safeZone.radius;
-}
-
-function removeSafeZoneFromMap() {
-  if (safeZoneMarker) {
-    safeZoneMarker.remove();
-    safeZoneMarker = null;
-  }
-
-  if (map && map.getSource('safe-zone-circle')) {
-    if (map.getLayer('safe-zone-fill')) map.removeLayer('safe-zone-fill');
-    if (map.getLayer('safe-zone-stroke')) map.removeLayer('safe-zone-stroke');
-    map.removeSource('safe-zone-circle');
-  }
-}
-
-// Helper: Convert meters to pixels at max zoom
-function metersToPixelsAtMaxZoom(meters, latitude) {
-  return meters / 0.075 / Math.cos(latitude * Math.PI / 180);
-}
-
-// ============================================
-// SAFE ZONE FORM HANDLERS
-// ============================================
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('safeZoneForm');
-  
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await saveSafeZone();
+    }, 100);
   });
 
-  document.getElementById('deleteSafeZoneBtn').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete the safe zone? You will no longer receive alerts if the patient leaves this area.')) {
-      await deleteSafeZone();
+  // Additional safety: listen for style load event
+  map.on('styledata', () => {
+    // Style has loaded or changed
+    if (map.isStyleLoaded()) {
+      console.log('✅ Map style fully loaded');
     }
   });
-});
-
-async function saveSafeZone() {
-  const name = document.getElementById('safeZoneName').value.trim();
-  const address = document.getElementById('safeZoneAddress').value.trim();
-  const latitude = document.getElementById('safeZoneLatitude').value;
-  const longitude = document.getElementById('safeZoneLongitude').value;
-  const radius = parseInt(document.getElementById('safeZoneRadius').value);
-
-  if (!name || !address || !latitude || !longitude) {
-    alert('Please fill in all fields and select an address from the search');
-    return;
-  }
-
-  const btn = document.getElementById('saveSafeZoneBtn');
-  btn.disabled = true;
-  btn.textContent = '💾 Saving...';
-
-  try {
-    const response = await fetch('/api/location/safe-zone', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        name,
-        address,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        radius
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.success) {
-      currentSafeZone = data.safeZone;
-      displaySafeZone(data.safeZone);
-      showSuccess('Safe zone saved successfully! Email alerts are now active.');
-      
-      // Pan to safe zone
-      map.flyTo({
-        center: [data.safeZone.longitude, data.safeZone.latitude],
-        zoom: 14,
-        duration: 1000
-      });
-    } else {
-      throw new Error(data.message || 'Failed to save safe zone');
-    }
-  } catch (error) {
-    console.error('❌ Save safe zone error:', error);
-    alert('Failed to save safe zone. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '💾 Save Safe Zone';
-  }
-}
-
-async function deleteSafeZone() {
-  const btn = document.getElementById('deleteSafeZoneBtn');
-  btn.disabled = true;
-  btn.textContent = '🗑️ Deleting...';
-
-  try {
-    const response = await fetch('/api/location/safe-zone', {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.success) {
-      currentSafeZone = null;
-      removeSafeZoneFromMap();
-      
-      // Clear form
-      document.getElementById('safeZoneForm').reset();
-      document.getElementById('safeZoneLatitude').value = '';
-      document.getElementById('safeZoneLongitude').value = '';
-      
-      // Hide display
-      document.getElementById('safeZoneDisplay').style.display = 'none';
-      document.getElementById('deleteSafeZoneBtn').style.display = 'none';
-      document.getElementById('panToSafeZoneBtn').style.display = 'none';
-      document.getElementById('safeZoneDistanceCard').style.display = 'none';
-      
-      showSuccess('Safe zone deleted. Email alerts are now disabled.');
-    } else {
-      throw new Error(data.message || 'Failed to delete safe zone');
-    }
-  } catch (error) {
-    console.error('❌ Delete safe zone error:', error);
-    alert('Failed to delete safe zone. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '🗑️ Delete Safe Zone';
-  }
-}
-
-function panToSafeZone() {
-  if (currentSafeZone) {
-    map.flyTo({
-      center: [currentSafeZone.longitude, currentSafeZone.latitude],
-      zoom: 15,
-      duration: 800
-    });
-  }
 }
 
 // ============================================
 // LOCATION LOADING
 // ============================================
 
+/**
+ * Load patient's current location from server
+ */
 async function loadPatientLocation() {
   try {
     const response = await fetch('/api/location/patient', {
@@ -434,7 +185,7 @@ async function loadPatientLocation() {
 
     if (data.location) {
       patientData = data;
-      displayLocation(data.location, data.patient, data.safeZoneStatus);
+      displayLocation(data.location, data.patient);
       hideError();
     } else {
       showNoLocationMessage();
@@ -445,54 +196,80 @@ async function loadPatientLocation() {
   }
 }
 
-function displayLocation(location, patient, safeZoneStatus) {
+/**
+ * Load location history (last 24 hours)
+ */
+async function loadLocationHistory() {
+  try {
+    const response = await fetch('/api/location/history', {
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.locations && data.locations.length > 0) {
+      drawLocationHistory(data.locations);
+      console.log(`✅ Loaded ${data.locations.length} location points`);
+    }
+  } catch (error) {
+    console.error('⚠️ Failed to load location history:', error);
+    // Non-critical error, don't show to user
+  }
+}
+
+/**
+ * Display current location on map
+ */
+function displayLocation(location, patient) {
   const { latitude, longitude, accuracy, timestamp } = location;
 
   // Show location info panel
-  document.getElementById('locationInfo').style.display = 'grid';
+  const locationInfoEl = document.getElementById('locationInfo');
+  if (locationInfoEl) {
+    locationInfoEl.style.display = 'grid';
+  }
 
   // Display coordinates
-  document.getElementById('latitude').textContent = latitude.toFixed(6);
-  document.getElementById('longitude').textContent = longitude.toFixed(6);
-  document.getElementById('accuracy').textContent = accuracy
-    ? `±${Math.round(accuracy)}m`
-    : 'Unknown';
+  const latEl = document.getElementById('latitude');
+  if (latEl) {
+    latEl.textContent = latitude.toFixed(6);
+  }
+  
+  const lngEl = document.getElementById('longitude');
+  if (lngEl) {
+    lngEl.textContent = longitude.toFixed(6);
+  }
+  
+  const accEl = document.getElementById('accuracy');
+  if (accEl) {
+    accEl.textContent = accuracy ? `±${Math.round(accuracy)}m` : 'Unknown';
+  }
 
   // Display relative timestamp
   const timeText = getRelativeTime(new Date(timestamp));
-  document.getElementById('timestamp').textContent = timeText;
+  const timestampEl = document.getElementById('timestamp');
+  if (timestampEl) {
+    timestampEl.textContent = timeText;
+  }
 
   // Update status indicator
-  updateStatusIndicator(timestamp, safeZoneStatus);
+  updateStatusIndicator(timestamp);
 
   // Update patient name
   if (patient && patient.name) {
-    document.getElementById('patientName').textContent = patient.name;
+    const patientNameEl = document.getElementById('patientName');
+    if (patientNameEl) {
+      patientNameEl.textContent = patient.name;
+    }
   }
 
-  document.getElementById('lastUpdate').textContent = `Last seen ${timeText}`;
-
-  // Display safe zone status
-  if (safeZoneStatus) {
-    const card = document.getElementById('safeZoneDistanceCard');
-    const distanceEl = document.getElementById('safeZoneDistance');
-    const labelEl = document.getElementById('safeZoneDistanceLabel');
-    
-    card.style.display = 'block';
-    
-    if (safeZoneStatus.isInside) {
-      card.classList.remove('warning');
-      card.classList.add('success');
-      distanceEl.textContent = `${safeZoneStatus.distanceFromEdge}m`;
-      labelEl.textContent = 'Inside safe zone';
-      distanceEl.style.color = '#10b981';
-    } else {
-      card.classList.remove('success');
-      card.classList.add('warning');
-      distanceEl.textContent = `${safeZoneStatus.distanceFromEdge}m`;
-      labelEl.textContent = '⚠️ Outside safe zone';
-      distanceEl.style.color = '#ef4444';
-    }
+  const lastUpdateEl = document.getElementById('lastUpdate');
+  if (lastUpdateEl) {
+    lastUpdateEl.textContent = `Last seen ${timeText}`;
   }
 
   // Update map
@@ -501,6 +278,10 @@ function displayLocation(location, patient, safeZoneStatus) {
   console.log(`✅ Location displayed: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
 }
 
+
+/**
+ * Update map with patient location marker and accuracy circle
+ */
 function updateMapDisplay(lat, lng, accuracy) {
   if (!map) return;
 
@@ -546,6 +327,11 @@ function updateMapDisplay(lat, lng, accuracy) {
     )
     .addTo(map);
 
+  // Add accuracy circle
+  if (accuracy && accuracy < 5000) {
+    addAccuracyCircle(lat, lng, accuracy);
+  }
+
   // Fly to location
   map.flyTo({
     center: [lng, lat],
@@ -555,16 +341,127 @@ function updateMapDisplay(lat, lng, accuracy) {
   });
 }
 
-function updateStatusIndicator(timestamp, safeZoneStatus) {
+/**
+ * Add accuracy circle to map
+ */
+function addAccuracyCircle(lat, lng, radiusInMeters) {
+  if (!map) return;
+
+  // Remove old circle
+  if (map.getSource('accuracy-circle')) {
+    if (map.getLayer('accuracy-circle-fill')) {
+      map.removeLayer('accuracy-circle-fill');
+    }
+    if (map.getLayer('accuracy-circle-stroke')) {
+      map.removeLayer('accuracy-circle-stroke');
+    }
+    map.removeSource('accuracy-circle');
+  }
+
+  // Convert meters to degrees (approximate)
+  const radiusInDegrees = radiusInMeters / 111000;
+
+  // Create circle source
+  map.addSource('accuracy-circle', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [lng, lat]
+      }
+    }
+  });
+
+  // Add circle fill layer - use safe helper function
+  const fillLayerConfig = {
+    id: 'accuracy-circle-fill',
+    type: 'circle',
+    source: 'accuracy-circle',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, radiusInMeters / 50, 20, radiusInMeters / 20],
+      'circle-color': CONFIG.CIRCLE_COLOR,
+      'circle-opacity': CONFIG.CIRCLE_OPACITY
+    }
+  };
+
+  safeAddLayer(fillLayerConfig, 'settlement-label');
+
+  // Add circle stroke layer
+  safeAddLayer({
+    id: 'accuracy-circle-stroke',
+    type: 'circle',
+    source: 'accuracy-circle',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, radiusInMeters / 50, 20, radiusInMeters / 20],
+      'circle-color': 'transparent',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': CONFIG.CIRCLE_STROKE_COLOR,
+      'circle-stroke-opacity': CONFIG.CIRCLE_STROKE_OPACITY
+    }
+  }, 'settlement-label');
+
+  console.log(`✅ Accuracy circle added: ${radiusInMeters.toFixed(0)}m radius`);
+}
+
+/**
+ * Draw location history path on map
+ */
+function drawLocationHistory(locations) {
+  if (!map || locations.length === 0) return;
+
+  // Convert locations to GeoJSON LineString
+  const coordinates = locations.map(loc => [loc.longitude, loc.latitude]);
+
+  // Remove old route
+  if (map.getSource('location-route')) {
+    if (map.getLayer('location-route')) {
+      map.removeLayer('location-route');
+    }
+    map.removeSource('location-route');
+  }
+
+  // Add route source
+  map.addSource('location-route', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: coordinates.reverse() // Reverse to show chronological order
+      }
+    }
+  });
+
+  // Add route layer using safe helper function
+  const layerConfig = {
+    id: 'location-route',
+    type: 'line',
+    source: 'location-route',
+    paint: {
+      'line-color': '#667eea',
+      'line-width': 3,
+      'line-opacity': 0.6,
+      'line-dasharray': [5, 5]
+    }
+  };
+
+  safeAddLayer(layerConfig, 'settlement-label');
+
+  console.log(`✅ Location history path drawn with ${locations.length} points`);
+}
+
+/**
+ * Update status indicator based on last update time
+ */
+function updateStatusIndicator(timestamp) {
   const statusIndicator = document.getElementById('statusIndicator');
   const statusText = document.getElementById('statusText');
-  const safeZoneBadge = document.getElementById('safeZoneBadge');
 
   const now = new Date();
   const lastUpdate = new Date(timestamp);
   const diffMinutes = Math.floor((now - lastUpdate) / 60000);
 
-  // Location status
   if (diffMinutes < 2) {
     statusIndicator.className = 'status-indicator active';
     statusText.textContent = '🟢 Active Now';
@@ -573,24 +470,14 @@ function updateStatusIndicator(timestamp, safeZoneStatus) {
     statusIndicator.className = 'status-indicator active';
     statusText.textContent = '🟡 Active Recently';
     statusText.style.color = '#92400e';
-  } else {
+  } else if (diffMinutes < 30) {
     statusIndicator.className = 'status-indicator inactive';
     statusText.textContent = '⚪ Inactive';
     statusText.style.color = '#6b7280';
-  }
-
-  // Safe zone badge
-  if (safeZoneStatus) {
-    if (safeZoneStatus.isInside) {
-      safeZoneBadge.className = 'safe-zone-badge inside';
-      safeZoneBadge.innerHTML = '🛡️ Inside Safe Zone';
-    } else {
-      safeZoneBadge.className = 'safe-zone-badge outside';
-      safeZoneBadge.innerHTML = '⚠️ Outside Safe Zone';
-    }
   } else {
-    safeZoneBadge.innerHTML = '';
-    safeZoneBadge.className = '';
+    statusIndicator.className = 'status-indicator offline';
+    statusText.textContent = '⚫ Offline';
+    statusText.style.color = '#7c3aed';
   }
 }
 
@@ -598,6 +485,9 @@ function updateStatusIndicator(timestamp, safeZoneStatus) {
 // UTILITY FUNCTIONS
 // ============================================
 
+/**
+ * Get relative time string (e.g., "5 minutes ago")
+ */
 function getRelativeTime(date) {
   const now = new Date();
   const diffMs = now - date;
@@ -615,6 +505,9 @@ function getRelativeTime(date) {
   }
 }
 
+/**
+ * Show no location message
+ */
 function showNoLocationMessage() {
   document.getElementById('locationInfo').style.display = 'none';
   document.getElementById('statusIndicator').className = 'status-indicator offline';
@@ -624,14 +517,22 @@ function showNoLocationMessage() {
   showError('Patient has not shared their location yet. Please ask them to enable location sharing.');
 }
 
+/**
+ * Show error message
+ */
 function showError(message) {
   const errorEl = document.getElementById('errorMessage');
   if (errorEl) {
     errorEl.textContent = message;
     errorEl.style.display = 'block';
+  } else {
+    console.error('Error:', message);
   }
 }
 
+/**
+ * Hide error message
+ */
 function hideError() {
   const errorEl = document.getElementById('errorMessage');
   if (errorEl) {
@@ -639,7 +540,34 @@ function hideError() {
   }
 }
 
-function showSuccess(message) {
+/**
+ * Refresh location manually (button click)
+ */
+async function refreshLocation() {
+  const btn = document.querySelector('.refresh-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '🔄 Refreshing...';
+  }
+
+  try {
+    await loadPatientLocation();
+    await loadLocationHistory();
+    showSuccessMessage('Location updated');
+  } catch (error) {
+    showError('Failed to refresh location');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '🔄 Refresh';
+    }
+  }
+}
+
+/**
+ * Show success message
+ */
+function showSuccessMessage(message) {
   const alertEl = document.createElement('div');
   alertEl.style.cssText = `
     position: fixed;
@@ -657,32 +585,16 @@ function showSuccess(message) {
 
   document.body.appendChild(alertEl);
 
+  // Auto-remove after 3 seconds
   setTimeout(() => {
     alertEl.style.animation = 'slideOut 0.3s ease-out forwards';
     setTimeout(() => alertEl.remove(), 300);
   }, 3000);
 }
 
-async function refreshLocation() {
-  const btn = document.querySelector('.refresh-btn');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '🔄 Refreshing...';
-  }
-
-  try {
-    await loadPatientLocation();
-    showSuccess('Location updated');
-  } catch (error) {
-    showError('Failed to refresh location');
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '🔄 Refresh';
-    }
-  }
-}
-
+/**
+ * Pan map to location
+ */
 function panToLocation() {
   if (patientData && patientData.location) {
     const { latitude, longitude } = patientData.location;
@@ -703,11 +615,13 @@ function panToLocation() {
 
 document.addEventListener('DOMContentLoaded', initializeLocation);
 
+// Refresh location when window regains focus
 window.addEventListener('focus', async () => {
   console.log('🔍 Window focused, refreshing location...');
   await loadPatientLocation();
 });
 
+// Cleanup on page unload
 window.addEventListener('beforeunload', () => {
   if (refreshInterval) {
     clearInterval(refreshInterval);
@@ -715,12 +629,8 @@ window.addEventListener('beforeunload', () => {
   if (marker) {
     marker.remove();
   }
-  if (safeZoneMarker) {
-    safeZoneMarker.remove();
-  }
 });
 
 // Expose functions globally
 window.refreshLocation = refreshLocation;
 window.panToLocation = panToLocation;
-window.panToSafeZone = panToSafeZone;

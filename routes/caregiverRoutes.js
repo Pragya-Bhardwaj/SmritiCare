@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require("path");
 const InviteCode = require("../models/InviteCode");
 const User = require("../models/User");
+const locationController = require("../controllers/locationController");
 
 /* AUTH MIDDLEWARE */
 function requireCaregiver(req, res, next) {
@@ -235,6 +236,33 @@ router.get("/profile", requireCaregiver, requireLinked, (req, res) => {
   res.sendFile(
     path.join(__dirname, "../views/caregiver/profile.html")
   );
+});
+
+// Safe Zone API
+router.post("/safezones", requireCaregiver, requireLinked, locationController.setSafeZone);
+router.get("/safezones", requireCaregiver, requireLinked, async (req, res) => {
+  // Return all safe zones for this caregiver
+  const caregiverId = req.session.user.id;
+  const zones = await require("../models/SafeZone").find({ caregiverId }).lean();
+  res.json(zones.map(z => ({
+    _id: z._id,
+    name: z.name,
+    address: z.address,
+    radius: z.radius,
+    latitude: z.coordinates.coordinates[1],
+    longitude: z.coordinates.coordinates[0]
+  })));
+});
+router.delete("/safezones/:id", requireCaregiver, requireLinked, async (req, res) => {
+  const zoneId = req.params.id;
+  const caregiverId = req.session.user.id;
+  const SafeZone = require("../models/SafeZone");
+  const zone = await SafeZone.findOneAndDelete({ _id: zoneId, caregiverId });
+  if (zone) {
+    res.json({ success: true, message: "Safe zone deleted" });
+  } else {
+    res.status(404).json({ success: false, message: "Safe zone not found" });
+  }
 });
 
 module.exports = router;
