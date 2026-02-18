@@ -38,11 +38,54 @@
     </div>
   </div>
 </div>
+<!-- Notification Permission Modal -->
+<div id="notificationModal" class="notification-modal hidden">
+  <div class="notification-modal-content">
+    <div class="notification-modal-header">
+      <h2>🔔 Enable Notifications?</h2>
+      <button class="close-modal" onclick="closeNotificationModal()">&times;</button>
+    </div>
+    
+    <div class="notification-modal-body">
+      <p>Get helpful reminders throughout the day to keep you engaged and supported.</p>
+      
+      <div class="notification-benefits">
+        <div class="benefit-item">
+          <span class="benefit-icon">👨‍👩‍👧‍👦</span>
+          <span>See your family photos</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">💭</span>
+          <span>View precious memories</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">⏰</span>
+          <span>Get hourly check-ins</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🤝</span>
+          <span>Support is here for you</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="notification-modal-footer">
+      <button class="btn btn-secondary" onclick="declineNotifications()">Not Now</button>
+      <button class="btn btn-primary" onclick="enableNotifications()">Enable Notifications</button>
+    </div>
+  </div>
+</div>
 
+<!-- Include Firebase before your other scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging.js"></script>
+<script src="/js/firebase-client.js"></script>
 <!-- IMPORTANT: Load location tracking on ALL patient pages -->
 <script src="/js/patientLocationSharing.js"></script>
 <script src="/js/patientWelcome.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging.js"></script>
+<script src="/js/firebase-client.js"></script>
 
 </body>
 </html>

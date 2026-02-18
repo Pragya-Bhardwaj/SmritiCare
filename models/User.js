@@ -56,11 +56,23 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null
-    }
+    },
+      fcmTokens: {
+    type: [String],
+    default: [],
+    select: false
+  },
+
+  notificationsEnabled: {
+    type: Boolean,
+    default: true
+  }
   },
   {
     timestamps: true
   }
+
+
 );
 
 module.exports = mongoose.model("User", userSchema);
