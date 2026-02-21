@@ -1,14 +1,6 @@
-const admin = require('firebase-admin');
 const User = require('../models/User');
 const fs = require('fs');
-
-// Initialize Firebase Admin
-const serviceAccount = JSON.parse(
-  fs.readFileSync(process.env.FIREBASE_ADMIN_SDK_KEY, 'utf8')
-);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// ...existing code...
 
 const notificationMessages = [
   { title: 'Good afternoon!', body: 'Open your page' },
