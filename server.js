@@ -4,7 +4,7 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const path = require("path");
 const MongoStore = require("connect-mongo");
-const { initializeNotificationScheduler } = require('./services/notificationScheduler');
+
 
 
 
@@ -85,7 +85,7 @@ app.use("/api/patient", patientApiRoutes);
 app.use("/", profileRoutes);
 // Location routes
 app.use("/", locationRoutes);
-app.use('/api/notifications', require('./routes/notificationRoutes'));
+
 
 
 /* ROOT ROUTE */
