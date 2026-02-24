@@ -41,4 +41,10 @@ router.post("/resend-otp", authController.resendOTP);
 router.post("/login", authController.login);
 router.get("/logout", authController.logout);
 
+/* GOOGLE CALENDAR */
+
+router.get("/google/connect",  authController.connectGoogleCalendar);
+router.get("/google/callback", authController.googleCalendarCallback);
+router.get("/google/status",   authController.googleCalendarStatus);
+
 module.exports = router;
