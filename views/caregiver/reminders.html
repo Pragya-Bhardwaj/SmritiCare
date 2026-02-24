@@ -9,6 +9,112 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/caregiver.css">
   <link rel="stylesheet" href="/css/reminder.css">
+  <style>
+    /* Google Calendar Banner */
+    .gcal-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .gcal-banner .gcal-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gcal-banner .gcal-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .gcal-banner .gcal-text strong {
+      display: block;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .gcal-banner .gcal-text span {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Connect button */
+    .gcal-connect-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: #374151;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .gcal-connect-btn:hover {
+      background: #f8fafc;
+      border-color: #4285F4;
+      color: #4285F4;
+    }
+
+    /* Connected badge */
+    .gcal-connected-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Toast notification */
+    .gcal-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .gcal-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gcal-toast.success { border-left: 4px solid #22c55e; }
+    .gcal-toast.error   { border-left: 4px solid #ef4444; }
+  </style>
 </head>
 
 <body>
@@ -47,13 +153,38 @@
         <button class="primary-btn" onclick="openAddModal()">+ Add Reminder</button>
       </div>
 
+      <!-- GOOGLE CALENDAR BANNER -->
+      <div class="gcal-banner" id="gcalBanner">
+        <div class="gcal-info">
+          <!-- Google Calendar SVG icon -->
+          <svg class="gcal-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="10" width="36" height="34" rx="3" fill="#fff" stroke="#dadce0" stroke-width="2"/>
+            <rect x="6" y="10" width="36" height="10" rx="3" fill="#4285F4"/>
+            <rect x="6" y="16" width="36" height="4" fill="#4285F4"/>
+            <line x1="16" y1="10" x2="16" y2="6" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="32" y1="10" x2="32" y2="6" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="24" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#4285F4" font-family="Arial">24</text>
+          </svg>
+          <div class="gcal-text">
+            <strong>Google Calendar Sync</strong>
+            <span id="gcalStatusText">Connect to auto-sync reminders to your Google Calendar</span>
+          </div>
+        </div>
+
+        <!-- This div swaps between connect button and connected badge -->
+        <div id="gcalAction">
+          <!-- Filled dynamically by JS based on connection status -->
+          <span style="font-size:13px; color:#94a3b8;">Checking...</span>
+        </div>
+      </div>
+
       <!-- REMINDERS LIST -->
       <section class="card-list" id="reminderList">
-        <!-- Reminders will be loaded here via JavaScript -->
         <div class="card" style="text-align: center; padding: 40px; color: #999;">
           <p>Loading reminders...</p>
         </div>
       </section>
+
     </main>
   </div>
 
@@ -64,41 +195,24 @@
 
       <input type="text" id="reminderTitle" placeholder="Reminder title (e.g., Morning Medicine, Breakfast)" required>
 
-      <label
-        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+      <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
         Time
       </label>
       <div class="time-select">
         <select id="reminderHour">
-          <option>01</option>
-          <option>02</option>
-          <option>03</option>
-          <option>04</option>
-          <option>05</option>
-          <option>06</option>
-          <option>07</option>
-          <option>08</option>
-          <option>09</option>
-          <option>10</option>
-          <option>11</option>
-          <option>12</option>
+          <option>01</option><option>02</option><option>03</option><option>04</option>
+          <option>05</option><option>06</option><option>07</option><option>08</option>
+          <option>09</option><option>10</option><option>11</option><option>12</option>
         </select>
-
         <select id="reminderMinute">
-          <option>00</option>
-          <option>15</option>
-          <option>30</option>
-          <option>45</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
         </select>
-
         <select id="reminderAmPm">
-          <option>AM</option>
-          <option>PM</option>
+          <option>AM</option><option>PM</option>
         </select>
       </div>
 
-      <label
-        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+      <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
         Frequency
       </label>
       <select id="reminderClassification">
@@ -108,8 +222,7 @@
         <option value="Once">Once</option>
       </select>
 
-      <label
-        style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
+      <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
         Category
       </label>
       <select id="reminderType">
@@ -132,7 +245,6 @@
     <div class="modal-box">
       <h3>Delete Reminder?</h3>
       <p class="small">This action cannot be undone.</p>
-
       <div class="modal-actions">
         <button class="secondary-btn" onclick="closeDeleteModal()">Cancel</button>
         <button class="primary-btn" onclick="confirmDelete()">Delete</button>
@@ -140,6 +252,8 @@
     </div>
   </div>
 
+  <!-- TOAST -->
+  <div class="gcal-toast" id="gcalToast"></div>
 
   <script src="/js/profileStatusChecker.js"></script>
   <script src="/js/caregiverDashboard.js"></script>

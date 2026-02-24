@@ -4,6 +4,7 @@ const PatientProfile = require("../models/PatientProfile");
 const CaregiverProfile = require("../models/CaregiverProfile");
 const InviteCode = require("../models/InviteCode");
 const nodemailer = require("nodemailer");
+const { getAuthUrl, exchangeCodeForTokens } = require("../utils/googleCalendar");
 
 /* MAIL SETUP */
 const transporter = nodemailer.createTransport({
@@ -376,5 +377,103 @@ exports.resendOTP = async (req, res) => {
   } catch (err) {
     console.error("Resend OTP error:", err);
     res.status(500).json({ error: "Failed to resend OTP. Please try again." });
+  }
+};
+
+// Redirect user to Google OAuth consent screen
+exports.connectGoogleCalendar = (req, res) => {
+  if (!req.session.user) return res.redirect("/auth/login");
+  const url = getAuthUrl(req.session.user.id);
+  res.redirect(url);
+};
+
+// Google redirects back here after user grants permission
+exports.googleCalendarCallback = async (req, res) => {
+  try {
+    const { code, state: userId } = req.query;
+
+    if (!code || !userId) return res.redirect("/caregiver/dashboard?calendarError=true");
+
+    const tokens = await exchangeCodeForTokens(code);
+
+    await User.findByIdAndUpdate(userId, {
+      googleTokens: {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expiry_date: tokens.expiry_date
+      },
+      googleCalendarConnected: true
+    });
+
+    // Update session
+    if (req.session.user && req.session.user.id === userId) {
+      req.session.user.googleCalendarConnected = true;
+      await req.session.save();
+    }
+
+    res.redirect("/caregiver/dashboard?calendarConnected=true");
+  } catch (err) {
+    console.error("Google Calendar callback error:", err);
+    res.redirect("/caregiver/dashboard?calendarError=true");
+  }
+};
+
+
+
+
+/* GOOGLE CALENDAR - Redirect to Google consent screen */
+exports.connectGoogleCalendar = (req, res) => {
+  if (!req.session.user) return res.redirect("/auth/login");
+  const url = getAuthUrl(req.session.user.id);
+  res.redirect(url);
+};
+
+/* GOOGLE CALENDAR - Google redirects back here after user approves */
+exports.googleCalendarCallback = async (req, res) => {
+  try {
+    const { code, state: userId } = req.query;
+
+    if (!code || !userId) {
+      return res.redirect("/caregiver/reminders?calendarError=true");
+    }
+
+    const tokens = await exchangeCodeForTokens(code);
+
+    await User.findByIdAndUpdate(userId, {
+      googleTokens: {
+        access_token:  tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expiry_date:   tokens.expiry_date
+      },
+      googleCalendarConnected: true
+    });
+
+    // Keep session in sync
+    if (req.session.user && req.session.user.id === userId) {
+      req.session.user.googleCalendarConnected = true;
+      await req.session.save();
+    }
+
+    res.redirect("/caregiver/reminders?calendarConnected=true");
+
+  } catch (err) {
+    console.error("Google Calendar callback error:", err);
+    res.redirect("/caregiver/reminders?calendarError=true");
+  }
+};
+
+/* GOOGLE CALENDAR - Return connection status for logged-in user */
+exports.googleCalendarStatus = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await User.findById(req.session.user.id).select("googleCalendarConnected");
+    res.json({ googleCalendarConnected: user?.googleCalendarConnected || false });
+
+  } catch (err) {
+    console.error("Google Calendar status error:", err);
+    res.status(500).json({ error: "Failed to check status" });
   }
 };

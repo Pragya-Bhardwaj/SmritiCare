@@ -56,7 +56,19 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null
-    }
+    },
+
+
+googleTokens: {
+  access_token: { type: String, default: null },
+  refresh_token: { type: String, default: null },
+  expiry_date: { type: Number, default: null }
+},
+
+googleCalendarConnected: {
+  type: Boolean,
+  default: false
+}
       
   },
   {
