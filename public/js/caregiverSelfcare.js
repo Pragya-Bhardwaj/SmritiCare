@@ -52,14 +52,14 @@ async function loadCaregiverTips() {
 
     const data = await safeJson(res);
     if (!res.ok) {
-      renderCaregiverTips([]);
+      renderCaregiverTips([], data.message || "Unable to load caregiver tips right now.");
       return;
     }
 
     renderCaregiverTips(data.tips || []);
   } catch (err) {
     console.error("Failed to load caregiver tips:", err);
-    renderCaregiverTips([]);
+    renderCaregiverTips([], "Unable to load caregiver tips right now.");
   }
 }
 
@@ -71,7 +71,8 @@ async function loadPatientTips() {
 
     const data = await safeJson(res);
     if (!res.ok) {
-      renderPatientTips([]);
+      patientTips = [];
+      renderPatientTips([], data.message || "Unable to load patient tips right now.");
       return;
     }
 
@@ -79,18 +80,19 @@ async function loadPatientTips() {
     renderPatientTips(patientTips);
   } catch (err) {
     console.error("Failed to load patient tips:", err);
-    renderPatientTips([]);
+    patientTips = [];
+    renderPatientTips([], "Unable to load patient tips right now.");
   }
 }
 
-function renderCaregiverTips(tips) {
+function renderCaregiverTips(tips, emptyMessage = "No static tips available.") {
   const grid = document.getElementById("caregiverTipsGrid");
   if (!grid) return;
 
   if (!tips.length) {
     grid.innerHTML = `
       <div class="card" style="text-align: center; color: #94a3b8;">
-        <p>No static tips available.</p>
+        <p>${escapeHtml(emptyMessage)}</p>
       </div>
     `;
     return;
@@ -104,14 +106,14 @@ function renderCaregiverTips(tips) {
   `).join("");
 }
 
-function renderPatientTips(tips) {
+function renderPatientTips(tips, emptyMessage = "No patient tips yet. Use \"Add Tip for Patient\" to create one.") {
   const list = document.getElementById("patientTipsList");
   if (!list) return;
 
   if (!tips.length) {
     list.innerHTML = `
       <div class="card" style="text-align: center; color: #94a3b8;">
-        <p>No patient tips yet. Use "Add Tip for Patient" to create one.</p>
+        <p>${escapeHtml(emptyMessage)}</p>
       </div>
     `;
     return;

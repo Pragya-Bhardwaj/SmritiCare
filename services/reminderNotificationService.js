@@ -427,9 +427,8 @@ function startReminderNotificationService() {
   }
 
   intervalRef = setInterval(notificationTick, CHECK_INTERVAL_MS);
-  notificationTick();
   console.log(
-    `Click notification service started (interval=${CHECK_INTERVAL_MS}ms, siteUrl=${SITE_URL})`
+    `Click notification service started (interval=${CHECK_INTERVAL_MS}ms, first send after 5 hours, siteUrl=${SITE_URL})`
   );
 }
 
