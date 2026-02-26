@@ -9,20 +9,31 @@
   <link rel="stylesheet" href="/css/patient.css">
 </head>
 <body>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-logo">SmritiCare</div>
+      <a href="/patient/dashboard">Dashboard</a>
+      <a href="/patient/memory">Memory Board</a>
+      <a href="/patient/reminders">Reminders</a>
+      <a href="/patient/medication">Medication</a>
+      <a href="/patient/selfcare" class="active">Self Care</a>
+      <a href="/patient/profile">Profile</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </aside>
 
-<div class="dashboard">
+    <main class="main">
+      <h1>Self Care</h1>
+      <p class="sub" style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+        Tips shared by your caregiver
+      </p>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">SmritiCare</div>
-    <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/memory">Memory Board</a>
-    <a href="/patient/reminders">Reminders</a>
-    <a href="/patient/medication">Medication</a>
-    <a href="/patient/selfcare" class="active">Self Care</a>
-    <a href="/patient/profile">Profile</a>
-    <a href="/auth/logout" class="logout-btn">Logout</a>
-  </aside>
+      <section class="dashboard-grid" id="patientTipsGrid">
+        <div class="card" style="text-align: center; color: #94a3b8;">
+          <p>Loading tips...</p>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <!-- MAIN CONTENT -->
   <main class="main">

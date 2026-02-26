@@ -2,27 +2,28 @@
 <html>
 <head>
   <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body>
+<body class="login-page">
 
-<div class="auth-wrapper">
-  <div class="auth-card">
+<div class="auth-wrapper login-wrapper">
+  <div class="auth-card login-card">
     <h2 class="auth-title">Welcome Back</h2>
     <p class="auth-subtitle">Login to continue</p>
 
-    <form onsubmit="login(event)">
+    <form onsubmit="login(event)" class="login-form">
       <input id="email" type="email" placeholder="Email" required>
       <p class="error" id="emailError"></p>
 
       <input id="password" type="password" placeholder="Password" required>
       <p class="error" id="passwordError"></p>
 
-      <button class="auth-btn" id="loginBtn">Login</button>
+      <button class="auth-btn login-btn" id="loginBtn">Login</button>
     </form>
 
     <div class="auth-link">
-      <a href="#">Forgot Password?</a>
+      <a href="/auth/forgot-password" class="forgot-link-anchor">Forgot Password?</a>
     </div>
 
     <div class="auth-link">
@@ -56,23 +57,31 @@ async function login(e) {
   }
 
   btn.disabled = true;
+  btn.innerText = "Logging in...";
 
-  const res = await fetch("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ email, password })
-  });
+  try {
+    const res = await fetch("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.error) {
-    passwordError.innerText = data.error;
+    if (data.error) {
+      passwordError.innerText = data.error;
+      btn.disabled = false;
+      btn.innerText = "Login";
+      return;
+    }
+
+    window.location.href = data.redirect;
+  } catch (err) {
+    passwordError.innerText = "Network error. Please try again.";
     btn.disabled = false;
-    return;
+    btn.innerText = "Login";
   }
-
-  window.location.href = data.redirect;
 }
 </script>
 

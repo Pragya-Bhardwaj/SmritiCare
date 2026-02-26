@@ -2,22 +2,28 @@
 <html>
 <head>
   <title>Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body>
+<body class="signup-page">
 
-<div class="auth-wrapper">
-  <div class="auth-card">
+<div class="auth-wrapper signup-wrapper">
+  <div class="auth-card signup-card">
     <h2 class="auth-title">Create Account</h2>
     <p class="auth-subtitle">Signup to get started</p>
 
-    <form onsubmit="signup(event)">
+    <form onsubmit="signup(event)" class="signup-form">
       <input id="name" placeholder="Full Name" required>
 
       <input id="email" type="email" placeholder="Email" required>
 
       <input id="password" type="password" placeholder="Password" required>
-      <small id="strength"></small>
+      <div class="strength-wrap">
+        <small id="strength" class="strength">Weak</small>
+        <div class="strength-bar">
+          <span id="strengthBar"></span>
+        </div>
+      </div>
 
       <select id="role" required>
         <option value="">Select Role</option>
@@ -27,7 +33,7 @@
 
       <p class="error" id="error"></p>
 
-      <button class="auth-btn" id="signupBtn">Signup</button>
+      <button class="auth-btn signup-btn" id="signupBtn">Signup</button>
     </form>
 
     <div class="auth-link">
@@ -51,35 +57,57 @@ async function signup(e) {
   const btn = document.getElementById("signupBtn");
 
   error.innerText = "";
-
-  if (!allowedDomains.includes(email.split("@")[1])) {
-    error.innerText = "Invalid email domain";
-    return;
-  }
-
-  if (checkStrength(password) !== "Strong") {
-    error.innerText = "Password not strong enough";
-    return;
-  }
-
   btn.disabled = true;
+  btn.innerText = "Creating...";
 
-  const res = await fetch("/auth/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ name, email, password, role })
-  });
-
-  const data = await res.json();
-
-  if (data.error) {
-    error.innerText = data.error;
+  const domain = email.split("@")[1];
+  if (!domain || !allowedDomains.includes(domain)) {
+    error.innerText = "Invalid email domain";
     btn.disabled = false;
+    btn.innerText = "Signup";
     return;
   }
 
-  window.location.href = "/auth/verify-otp";
+  const passwordRules = getPasswordRuleResults(password);
+  checkStrength(password);
+
+  if (!passwordRules.valid) {
+    error.innerText = `Password warning: ${passwordRules.message}`;
+    btn.disabled = false;
+    btn.innerText = "Signup";
+    return;
+  }
+
+  if (!role) {
+    error.innerText = "Please select a role";
+    btn.disabled = false;
+    btn.innerText = "Signup";
+    return;
+  }
+
+  try {
+    const res = await fetch("/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, email, password, role })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      error.innerText = data.error;
+      btn.disabled = false;
+      btn.innerText = "Signup";
+      return;
+    }
+
+    window.location.href = "/auth/verify-otp";
+  } catch (fetchError) {
+    error.innerText = "Network error. Please try again.";
+    btn.disabled = false;
+    btn.innerText = "Signup";
+  }
 }
 
 /* PASSWORD STRENGTH */
@@ -89,30 +117,59 @@ function checkStrength(pwd) {
   if (pwd.length >= 6) s++;
   if (/[A-Z]/.test(pwd)) s++;
   if (/[0-9]/.test(pwd)) s++;
-  if (/[@$!%*?&]/.test(pwd)) s++;
+  if (/[@$!%*?&#]/.test(pwd)) s++;
 
   const txt = document.getElementById("strength");
+  const bar = document.getElementById("strengthBar");
 
   if (s <= 1) {
     txt.innerText = "Weak";
     txt.className = "strength weak";
+    bar.className = "weak";
+    bar.style.width = "25%";
     return "Weak";
   }
 
   if (s === 2) {
     txt.innerText = "Medium";
-    txt.className = "strength weak";
+    txt.className = "strength medium";
+    bar.className = "medium";
+    bar.style.width = "55%";
     return "Medium";
   }
 
   txt.innerText = "Strong";
   txt.className = "strength strong";
+  bar.className = "strong";
+  bar.style.width = "100%";
   return "Strong";
 }
 
-document.getElementById("password").addEventListener("input", e => {
-  checkStrength(e.target.value);
-});
+function getPasswordRuleResults(pwd) {
+  const missing = [];
+
+  if (pwd.length < 6) missing.push("at least 6 characters");
+  if (!/[A-Z]/.test(pwd)) missing.push("one uppercase letter");
+  if (!/[0-9]/.test(pwd)) missing.push("one number");
+  if (!/[@$!%*?&#]/.test(pwd)) missing.push("one special character (@$!%*?&#)");
+
+  if (!missing.length) {
+    return { valid: true, message: "" };
+  }
+
+  if (missing.length === 1) {
+    return { valid: false, message: `add ${missing[0]}.` };
+  }
+
+  const last = missing[missing.length - 1];
+  const first = missing.slice(0, -1).join(", ");
+  return { valid: false, message: `add ${first}, and ${last}.` };
+}
+
+document.getElementById("strength").innerText = "Not checked";
+document.getElementById("strength").className = "strength";
+document.getElementById("strengthBar").style.width = "0%";
+document.getElementById("strengthBar").className = "";
 </script>
 
 </body>

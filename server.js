@@ -72,7 +72,8 @@ const medicationRoutes = require("./routes/medicationRoutes");
 const patientApiRoutes = require("./routes/patientApiRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const locationRoutes = require("./routes/locationRoutes");
-
+const selfCareRoutes = require("./routes/selfCareRoutes");
+const { startReminderNotificationService } = require("./services/reminderNotificationService");
 
 // Mount routes
 app.use("/auth", authRoutes);
@@ -82,6 +83,7 @@ app.use("/memory", memoryRoutes);
 app.use("/reminder", reminderRoutes);
 app.use("/medication", medicationRoutes);
 app.use("/api/patient", patientApiRoutes);
+app.use("/selfcare", selfCareRoutes);
 app.use("/", profileRoutes);
 // Location routes
 app.use("/", locationRoutes);
@@ -125,5 +127,6 @@ app.use((err, req, res, next) => {
 /* START SERVER */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(` SmritiCare server running on http://localhost:${PORT}`);
+  console.log(`SmritiCare server running on http://localhost:${PORT}`);
+  startReminderNotificationService();
 });
