@@ -187,20 +187,9 @@ function renderReminders() {
         <h3>${escapeHtml(reminder.message)}</h3>
         <p>${formatTime(reminder.schedule)} • ${reminder.frequency}</p>
       </div>
-      <div class="reminder-action">
-        <input 
-          type="checkbox" 
-          class="reminder-toggle" 
-          aria-label="Mark as done"
-          ${reminder.isCompleted ? 'checked' : ''}
-          onchange="toggleReminderStatus('${reminder._id}', this.checked)"
-        >
-      </div>
     </div>
   `).join('');
 
-  // Re-attach checkbox listeners
-  attachCheckboxListeners();
 }
 
 /* SETUP CATEGORY TABS */
@@ -220,82 +209,6 @@ function setupCategoryTabs() {
       renderReminders();
     });
   });
-}
-
-/* ATTACH CHECKBOX LISTENERS */
-function attachCheckboxListeners() {
-  const cards = document.querySelectorAll('.reminder-card');
-
-  cards.forEach(card => {
-    const checkbox = card.querySelector('.reminder-toggle');
-    if (!checkbox) return;
-
-    // Initialize visual state
-    if (checkbox.checked) {
-      card.classList.add('done');
-    } else {
-      card.classList.remove('done');
-    }
-
-    // Listener for toggle (handled inline with onchange)
-  });
-}
-
-/* TOGGLE REMINDER COMPLETION STATUS */
-async function toggleReminderStatus(reminderId, isCompleted) {
-  try {
-    const res = await fetch(`/reminder/api/reminders/${reminderId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ isCompleted })
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      console.error("Failed to update reminder:", data.message);
-      
-      // Revert the checkbox
-      const reminder = allReminders.find(r => r._id === reminderId);
-      if (reminder) {
-        const checkbox = document.querySelector(`[data-id="${reminderId}"] .reminder-toggle`);
-        if (checkbox) checkbox.checked = reminder.isCompleted;
-      }
-      return;
-    }
-
-    const data = await res.json();
-    
-    // Update in local array
-    const idx = allReminders.findIndex(r => r._id === reminderId);
-    if (idx >= 0) {
-      allReminders[idx] = data.reminder;
-    }
-
-    // Update visual state
-    const card = document.querySelector(`[data-id="${reminderId}"]`);
-    if (card) {
-      if (isCompleted) {
-        card.classList.add('done');
-        card.dataset.status = 'done';
-      } else {
-        card.classList.remove('done');
-        card.dataset.status = 'pending';
-      }
-    }
-
-    console.log(" Reminder status updated");
-
-  } catch (err) {
-    console.error("Toggle reminder error:", err);
-    
-    // Revert the checkbox on error
-    const reminder = allReminders.find(r => r._id === reminderId);
-    if (reminder) {
-      const checkbox = document.querySelector(`[data-id="${reminderId}"] .reminder-toggle`);
-      if (checkbox) checkbox.checked = reminder.isCompleted;
-    }
-  }
 }
 
 /* UTILITY FUNCTIONS */

@@ -17,23 +17,29 @@
 .reminder-card {
   position: relative;
   transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  background: var(--surface-tint);
+  border-color: var(--border-strong);
+}
+
+.reminder-card::before {
+  content: none;
 }
 
 .reminder-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(77, 52, 148, 0.18);
+  box-shadow: 0 12px 24px rgba(150, 98, 84, 0.2);
 }
 
 .reminder-card.done {
-  background: linear-gradient(180deg, #fdfbff, #f2eaff);
+  background: var(--surface-tint);
 }
 
 .reminder-card.done .reminder-content h3 {
-  text-decoration: line-through;
+  text-decoration: none;
 }
 
 .reminder-card.done .reminder-content p {
-  color: #8f88b7;
+  color: var(--text-muted);
 }
 
 .reminder-content {

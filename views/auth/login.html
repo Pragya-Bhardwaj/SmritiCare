@@ -8,28 +8,73 @@
 <body class="login-page">
 
 <div class="auth-wrapper login-wrapper">
-  <div class="auth-card login-card">
-    <h2 class="auth-title">Welcome Back</h2>
-    <p class="auth-subtitle">Login to continue</p>
+  <div class="auth-layout">
+    <section class="auth-panel auth-form-panel">
+      <div class="auth-panel-inner">
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to Smriti Care</p>
 
-    <form onsubmit="login(event)" class="login-form">
-      <input id="email" type="email" placeholder="Email" required>
-      <p class="error" id="emailError"></p>
+        <form onsubmit="login(event)" class="login-form">
+          <div class="form-group">
+            <label class="field-label" for="email">Email Address</label>
+            <div class="input-field">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <path d="m3 7 9 6 9-6"></path>
+                </svg>
+              </span>
+              <input id="email" type="email" placeholder="Enter your email" required>
+            </div>
+            <p class="error" id="emailError"></p>
+          </div>
 
-      <input id="password" type="password" placeholder="Password" required>
-      <p class="error" id="passwordError"></p>
+          <div class="form-group">
+            <label class="field-label" for="password">Password</label>
+            <div class="input-field">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="11" width="16" height="9" rx="2"></rect>
+                  <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                </svg>
+              </span>
+              <input id="password" type="password" placeholder="Enter your password" required>
+              <span class="input-suffix" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </span>
+            </div>
+            <p class="error" id="passwordError"></p>
+          </div>
 
-      <button class="auth-btn login-btn" id="loginBtn">Login</button>
-    </form>
+          <div class="form-meta">
+            <a href="/auth/forgot-password" class="forgot-link-anchor">Forgot Password?</a>
+          </div>
 
-    <div class="auth-link">
-      <a href="/auth/forgot-password" class="forgot-link-anchor">Forgot Password?</a>
-    </div>
+          <button class="auth-btn login-btn" id="loginBtn">Sign In</button>
+        </form>
 
-    <div class="auth-link">
-      Don't have an account?
-      <a href="/auth/signup">Signup</a>
-    </div>
+        <div class="divider"><span>or</span></div>
+
+        <div class="auth-link">
+          Don't have an account? <a href="/auth/signup">Create Account</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-panel auth-hero-panel">
+      <div class="auth-hero-inner">
+        <div class="hero-image">
+          <img src="/images/login-hero.png" alt="Caregiver helping patient" onerror="this.onerror=null;this.src='/images/brain.jpg';">
+        </div>
+        <h2 class="hero-title">Caring with Compassion</h2>
+        <p class="hero-text">
+          Providing personalized dementia care with dignity, respect, and understanding.
+        </p>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -57,7 +102,7 @@ async function login(e) {
   }
 
   btn.disabled = true;
-  btn.innerText = "Logging in...";
+  btn.innerText = "Signing in...";
 
   try {
     const res = await fetch("/auth/login", {
@@ -72,7 +117,7 @@ async function login(e) {
     if (data.error) {
       passwordError.innerText = data.error;
       btn.disabled = false;
-      btn.innerText = "Login";
+      btn.innerText = "Sign In";
       return;
     }
 
@@ -80,7 +125,7 @@ async function login(e) {
   } catch (err) {
     passwordError.innerText = "Network error. Please try again.";
     btn.disabled = false;
-    btn.innerText = "Login";
+    btn.innerText = "Sign In";
   }
 }
 </script>

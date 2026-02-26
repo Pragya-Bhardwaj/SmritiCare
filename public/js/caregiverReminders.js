@@ -278,8 +278,6 @@ function renderReminders() {
           </p>
         </div>
 
-        <span class="status ${reminder.isCompleted ? 'done' : 'pending'}">${reminder.isCompleted ? 'Done' : 'Pending'}</span>
-
         <div class="actions">
           <button class="edit-btn" onclick="openEditModal('${reminder._id}')">Edit</button>
           <button class="delete-btn" onclick="openDeleteModal('${reminder._id}')">Delete</button>

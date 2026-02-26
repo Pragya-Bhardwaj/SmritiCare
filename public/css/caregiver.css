@@ -8,7 +8,7 @@
 }
 
 .selfcare {
-  border-left: 4px solid var(--brand-500);
+  border-left: 4px solid var(--brand-600);
 }
 
 .selfcare h3 {
@@ -58,7 +58,16 @@
 
 .reminder-card,
 .medication-card {
-  border-left: 4px solid var(--brand-500);
+  border-left: 4px solid var(--brand-600);
+}
+
+.medication-card {
+  background: var(--surface-tint);
+  border-color: var(--border-strong);
+}
+
+.medication-card::before {
+  content: none;
 }
 
 .reminder-card .meta,
@@ -73,16 +82,16 @@
   align-items: center;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #f1e9ff;
-  color: #5a42be;
+  background: #fde9e6;
+  color: #b75d74;
   font-size: 0.74rem;
   font-weight: 700;
   margin-right: 4px;
 }
 
 .rtype {
-  background: #eadfff;
-  color: #4f3ab2;
+  background: #fbe0d5;
+  color: #a85c34;
 }
 
 .notes,
@@ -151,8 +160,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #7e5ef7;
-  box-shadow: 0 0 0 6px rgba(126, 94, 247, 0.2);
+  background: var(--brand-700);
+  box-shadow: 0 0 0 6px rgba(216, 107, 134, 0.2);
 }
 
 @media (max-width: 980px) {

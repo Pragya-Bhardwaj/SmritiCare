@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load caregiver name into topbar
   loadCaregiverName();
+  setDashboardDate();
 
   const sidebarLinks = document.querySelectorAll(".sidebar nav a");
 
@@ -42,6 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+function setDashboardDate() {
+  const dateEl = document.getElementById("dashboardDate");
+  if (!dateEl) return;
+
+  const today = new Date();
+  const formatted = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+
+  dateEl.textContent = formatted;
+}
 
 async function loadCaregiverName() {
   try {

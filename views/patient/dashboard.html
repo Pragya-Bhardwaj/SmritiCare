@@ -6,6 +6,7 @@
   <title>Patient Dashboard - SmritiCare</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/patient.css">
+  <link rel="stylesheet" href="/css/memoryBoard.css">
   <link rel="icon" href="/favicon.png">
 </head>
 <body>
@@ -13,21 +14,22 @@
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+    <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
-    <a href="/patient/dashboard" class="active">Dashboard</a>
-    <a href="/patient/memory">Memory Board</a>
-    <a href="/patient/reminders">Reminders</a>
-    <a href="/patient/medication">Medication</a>
-    <a href="/patient/selfcare">Self Care</a>
-    <a href="/patient/profile">Profile</a>
-    <a href="/auth/logout" class="logout-btn">Logout</a>
+    <nav>
+      <a href="/patient/dashboard">Dashboard</a>
+      <a href="/patient/memory">Memory Board</a>
+      <a href="/patient/reminders">Reminders</a>
+      <a href="/patient/medication">Medication</a>
+      <a href="/patient/selfcare">Self Care</a>
+      <a href="/patient/profile">Profile</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </nav>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main">
 
-    <!-- TOPBAR -->
     <header class="topbar">
       <div class="user">
         <div>
@@ -35,54 +37,33 @@
           <p id="patientName">Loading...</p>
         </div>
       </div>
+      <div class="date-display">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+          <path d="M16 2v4M8 2v4M3 10h18"></path>
+        </svg>
+        <span id="dashboardDate">Loading date...</span>
+      </div>
     </header>
 
-    <!-- WELCOME CARD -->
     <section class="welcome">
       <div>
         <p class="small">Welcome</p>
         <h1>We're here to help you today.</h1>
-        <p class="sub">💙 Take things one step at a time.</p>
+        <p class="sub"><span class="inline-heart">♥</span>Take things one step at a time.</p>
       </div>
-      <div class="heart">🌼</div>
     </section>
 
-    <h2 class="section-title">Your Care Overview</h2>
+    <section class="card quote-card">
+      “Remember to take care of yourself. Your well-being matters just as much as those who care for you.”
+    </section>
 
-    <!-- DASHBOARD GRID -->
-    <div class="dashboard-grid">
-
-      <div class="card">
-        <h3>Memory Board</h3>
-        <p>View important people and moments.</p>
-        <a href="/patient/memory" class="btn btn-primary">Open</a>
-      </div>
-
-      <div class="card">
-        <h3>Reminders</h3>
-        <p>See your daily reminders.</p>
-        <a href="/patient/reminders" class="btn btn-primary">Open</a>
-      </div>
-
-      <div class="card">
-        <h3>Medication</h3>
-        <p>Check your medicines.</p>
-        <a href="/patient/medication" class="btn btn-primary">Open</a>
-      </div>
-
-      <div class="card">
-        <h3>Self Care</h3>
-        <p>Simple daily wellness tips.</p>
-        <a href="/patient/selfcare" class="btn btn-primary">Open</a>
-      </div>
-
-    </div>
+    <h2 class="section-title">Recent Memories</h2>
+    <div id="memoryGrid" class="memory-grid"></div>
 
   </main>
 
 </div>
-
-
 
 <!-- IMPORTANT: Load location tracking on ALL patient pages -->
 <script src="/js/patientLocationSharing.js"></script>
@@ -91,3 +72,4 @@
 <script src="/js/patientDashboard.js"></script>
 </body>
 </html>
+

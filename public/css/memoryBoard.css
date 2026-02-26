@@ -11,7 +11,7 @@
 }
 
 .memory-item {
-  background: linear-gradient(180deg, #ffffff, #f8f1ff);
+  background: linear-gradient(180deg, #ffffff, #fff5f1);
   border-radius: 16px;
   border: 1px solid var(--border);
   overflow: hidden;
@@ -22,13 +22,13 @@
 
 .memory-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 26px rgba(73, 49, 133, 0.18);
+  box-shadow: 0 14px 26px rgba(150, 98, 84, 0.18);
 }
 
 .memory-image {
   aspect-ratio: 16 / 10;
   min-height: 140px;
-  background: linear-gradient(135deg, #4b3cc9, #a17bff);
+  background: linear-gradient(135deg, var(--brand-700), #f3b0a8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,7 +86,7 @@
   border: none;
   border-radius: 999px;
   padding: 8px 14px;
-  background: linear-gradient(135deg, var(--brand-700), #a17bff);
+  background: linear-gradient(135deg, var(--brand-700), #f3b0a8);
   color: #ffffff;
   font-size: 0.82rem;
   font-weight: 700;
@@ -106,7 +106,7 @@
   padding: 26px;
   border: 1px dashed var(--border);
   border-radius: 14px;
-  background: #faf4ff;
+  background: #fff3ef;
 }
 
 .no-memories-icon {
@@ -127,7 +127,7 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 8px 12px;
-  background: #f5efff;
+  background: #fff1ec;
   color: var(--text-body);
   font-size: 0.86rem;
   font-weight: 700;

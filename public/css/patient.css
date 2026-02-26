@@ -14,7 +14,7 @@
 
 .tab {
   border: 1px solid var(--border);
-  background: #f8f5ff;
+  background: #fdf1ee;
   color: var(--text-body);
   border-radius: 999px;
   padding: 8px 14px;
@@ -31,7 +31,7 @@
 
 .tab.active {
   color: #ffffff;
-  background: linear-gradient(135deg, var(--brand-700), #a17bff);
+  background: linear-gradient(135deg, var(--brand-700), #f3b0a8);
   border-color: transparent;
 }
 
@@ -45,12 +45,12 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  border-left: 4px solid #d3c2ff;
+  border-left: 4px solid var(--brand-500);
 }
 
 .reminder-card.done {
-  border-left-color: #b99eff;
-  opacity: 0.85;
+  border-left-color: var(--brand-500);
+  opacity: 1;
 }
 
 .reminder-content h3 {
@@ -77,7 +77,7 @@
 }
 
 .tip-card {
-  border-left: 4px solid #cbb9ff;
+  border-left: 4px solid var(--brand-500);
 }
 
 .tip-card .tip-meta {
@@ -88,7 +88,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: #ffffff;
+  background: var(--surface-tint);
   box-shadow: var(--shadow-soft);
 }
 
@@ -101,7 +101,7 @@
 }
 
 .table-header {
-  background: #f2edff;
+  background: #f1cfe0;
   color: var(--text-strong);
   font-size: 0.84rem;
   font-weight: 800;
@@ -112,7 +112,7 @@
 .table-row {
   font-size: 0.9rem;
   color: var(--text-body);
-  border-bottom: 1px solid #ece6ff;
+  border-bottom: 1px solid var(--border);
 }
 
 .table-row:last-child {
@@ -135,8 +135,8 @@
 }
 
 .badge-blue {
-  background: #f1e9ff;
-  color: #5a42be;
+  background: #fde9e6;
+  color: #b75d74;
 }
 
 .badge-pending {
@@ -166,12 +166,12 @@
 }
 
 .label {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .value {
-  color: #111827;
+  color: var(--text-strong);
   font-weight: 600;
   font-size: 14px;
 }
