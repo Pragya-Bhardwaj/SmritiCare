@@ -70,128 +70,128 @@ function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
           @media (prefers-color-scheme: dark) {
             body,
             .bg-main {
-              background-color: #0b1220 !important;
+              background-color: #241a18 !important;
             }
 
             .card {
-              background-color: #0f172a !important;
-              border-color: #334155 !important;
+              background-color: #2f211e !important;
+              border-color: #4b3730 !important;
             }
 
             .title {
-              color: #f8fafc !important;
+              color: #fff7f5 !important;
             }
 
             .muted {
-              color: #cbd5e1 !important;
+              color: #e6d2c9 !important;
             }
 
             .code-box {
-              background-color: #111827 !important;
-              border-color: #60a5fa !important;
+              background-color: #362522 !important;
+              border-color: #c27b8d !important;
             }
 
             .code-label {
-              color: #bfdbfe !important;
+              color: #f7cdd6 !important;
             }
 
             .code-value {
-              color: #f8fafc !important;
+              color: #fff7f5 !important;
             }
 
             .info-box {
-              background-color: #082f49 !important;
-              border-left-color: #60a5fa !important;
+              background-color: #4a2d2a !important;
+              border-left-color: #d86b86 !important;
             }
 
             .info-text {
-              color: #dbeafe !important;
+              color: #f8dce4 !important;
             }
 
             .footer {
-              color: #94a3b8 !important;
+              color: #d0bcb2 !important;
             }
 
             .brand-mark {
-              background-color: #1e3a8a !important;
+              background-color: #9d4a60 !important;
             }
 
             .brand-sub {
-              color: #dbeafe !important;
+              color: #f8dce4 !important;
             }
 
             .brand-chip {
-              background-color: #1e40af !important;
-              border-color: #3b82f6 !important;
-              color: #dbeafe !important;
+              background-color: #c46980 !important;
+              border-color: #e8a8b8 !important;
+              color: #fff0f4 !important;
             }
           }
 
           [data-ogsc] .bg-main {
-            background-color: #0b1220 !important;
+            background-color: #241a18 !important;
           }
 
           [data-ogsc] .card {
-            background-color: #0f172a !important;
-            border-color: #334155 !important;
+            background-color: #2f211e !important;
+            border-color: #4b3730 !important;
           }
 
           [data-ogsc] .title {
-            color: #f8fafc !important;
+            color: #fff7f5 !important;
           }
 
           [data-ogsc] .muted {
-            color: #cbd5e1 !important;
+            color: #e6d2c9 !important;
           }
 
           [data-ogsc] .code-box {
-            background-color: #111827 !important;
-            border-color: #60a5fa !important;
+            background-color: #362522 !important;
+            border-color: #c27b8d !important;
           }
 
           [data-ogsc] .code-label {
-            color: #bfdbfe !important;
+            color: #f7cdd6 !important;
           }
 
           [data-ogsc] .code-value {
-            color: #f8fafc !important;
+            color: #fff7f5 !important;
           }
 
           [data-ogsc] .info-box {
-            background-color: #082f49 !important;
-            border-left-color: #60a5fa !important;
+            background-color: #4a2d2a !important;
+            border-left-color: #d86b86 !important;
           }
 
           [data-ogsc] .info-text {
-            color: #dbeafe !important;
+            color: #f8dce4 !important;
           }
 
           [data-ogsc] .footer {
-            color: #94a3b8 !important;
+            color: #d0bcb2 !important;
           }
 
           [data-ogsc] .brand-mark {
-            background-color: #1e3a8a !important;
+            background-color: #9d4a60 !important;
           }
 
           [data-ogsc] .brand-sub {
-            color: #dbeafe !important;
+            color: #f8dce4 !important;
           }
 
           [data-ogsc] .brand-chip {
-            background-color: #1e40af !important;
-            border-color: #3b82f6 !important;
-            color: #dbeafe !important;
+            background-color: #c46980 !important;
+            border-color: #e8a8b8 !important;
+            color: #fff0f4 !important;
           }
         </style>
       </head>
-      <body class="bg-main" style="margin: 0; padding: 0; background-color: #f4f7fb; font-family: Arial, sans-serif;">
-        <table role="presentation" class="bg-main" style="width: 100%; border-collapse: collapse; background-color: #f4f7fb; padding: 24px 0;">
+      <body class="bg-main" style="margin: 0; padding: 0; background-color: #fdeff5; font-family: Arial, sans-serif;">
+        <table role="presentation" class="bg-main" style="width: 100%; border-collapse: collapse; background-color: #fdeff5; padding: 24px 0;">
           <tr>
             <td align="center">
-              <table role="presentation" class="card" style="width: 100%; max-width: 620px; border-collapse: collapse; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden;">
+              <table role="presentation" class="card" style="width: 100%; max-width: 620px; border-collapse: collapse; background-color: #ffffff; border: 1px solid #eadfd4; border-radius: 14px; overflow: hidden;">
                 <tr>
-                  <td style="padding: 18px 24px; background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: #ffffff;">
+                  <td style="padding: 18px 24px; background: linear-gradient(135deg, #d86b86, #f3b0a8); color: #ffffff;">
                     <table role="presentation" style="width: 100%; border-collapse: collapse;">
                       <tr>
                         <td style="width: 54px; vertical-align: middle;">
@@ -199,10 +199,10 @@ function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
                         </td>
                         <td style="vertical-align: middle;">
                           <p style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 0.2px;">SmritiCare</p>
-                          <p class="brand-sub" style="margin: 4px 0 0; font-size: 13px; color: #dbeafe;">Secure account notification</p>
+                          <p class="brand-sub" style="margin: 4px 0 0; font-size: 13px; color: #fff1f4;">Secure account notification</p>
                         </td>
                         <td style="width: 72px; vertical-align: middle;" align="right">
-                          <span class="brand-chip" style="display: inline-block; background: rgba(255, 255, 255, 0.18); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;">
+                          <span class="brand-chip" style="display: inline-block; background: rgba(255, 255, 255, 0.24); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.36); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;">
                             AUTH
                           </span>
                         </td>
@@ -212,22 +212,22 @@ function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
                 </tr>
                 <tr>
                   <td style="padding: 24px 26px 8px;">
-                    <h2 class="title" style="margin: 0; color: #0f172a; font-size: 22px;">${title}</h2>
-                    <p class="muted" style="margin: 10px 0 0; color: #475569; font-size: 15px; line-height: 1.55;">${subtitle}</p>
+                    <h2 class="title" style="margin: 0; color: #3d3a37; font-size: 22px;">${title}</h2>
+                    <p class="muted" style="margin: 10px 0 0; color: #5b5754; font-size: 15px; line-height: 1.55;">${subtitle}</p>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding: 18px 26px 12px;">
-                    <div class="code-box" style="background-color: #f8fafc; border: 1px dashed #93c5fd; border-radius: 12px; text-align: center; padding: 18px;">
-                      <p class="code-label" style="margin: 0 0 8px; color: #1e3a8a; font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 700;">Verification code</p>
-                      <p class="code-value" style="margin: 0; font-size: 34px; color: #0f172a; letter-spacing: 8px; font-weight: 700;">${code}</p>
+                    <div class="code-box" style="background-color: #fff6fa; border: 1px dashed #f4cdd6; border-radius: 12px; text-align: center; padding: 18px;">
+                      <p class="code-label" style="margin: 0 0 8px; color: #b85b72; font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 700;">Verification code</p>
+                      <p class="code-value" style="margin: 0; font-size: 34px; color: #3d3a37; letter-spacing: 8px; font-weight: 700;">${code}</p>
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding: 0 26px 24px;">
-                    <div class="info-box" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 12px;">
-                      <p class="info-text" style="margin: 0; color: #1e3a8a; font-size: 13px; line-height: 1.5;">
+                    <div class="info-box" style="background-color: #fbeaec; border-left: 4px solid #d86b86; border-radius: 8px; padding: 12px;">
+                      <p class="info-text" style="margin: 0; color: #5b5754; font-size: 13px; line-height: 1.5;">
                         This code is valid for <strong>5 minutes</strong>. ${note}
                       </p>
                     </div>
@@ -235,7 +235,7 @@ function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
                 </tr>
                 <tr>
                   <td style="padding: 0 26px 22px;">
-                    <p class="footer" style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                    <p class="footer" style="margin: 0; color: #8c857d; font-size: 12px; line-height: 1.5;">
                       You received this automated email from SmritiCare. Please do not reply to this message.
                     </p>
                   </td>
