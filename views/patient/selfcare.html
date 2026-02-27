@@ -13,69 +13,39 @@
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+    <aside class="sidebar">
     <div class="sidebar-logo">SmritiCare</div>
-    <a href="/patient/dashboard">Dashboard</a>
-    <a href="/patient/memory">Memory Board</a>
-    <a href="/patient/reminders">Reminders</a>
-    <a href="/patient/medication">Medication</a>
-    <a href="/patient/selfcare" class="active">Self Care</a>
-    <a href="/patient/profile">Profile</a>
-    <a href="/auth/logout" class="logout-btn">Logout</a>
+    <nav>
+      <a href="/patient/dashboard">Dashboard</a>
+      <a href="/patient/memory">Memory Board</a>
+      <a href="/patient/reminders">Reminders</a>
+      <a href="/patient/medication">Medication</a>
+      <a href="/patient/selfcare">Self Care</a>
+      <a href="/patient/profile">Profile</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </nav>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main">
-    
     <h1>Self Care</h1>
-    <p class="sub">Simple daily wellness tips</p>
+    <p class="sub" style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+      Tips shared by your caregiver
+    </p>
 
-    <div class="dashboard-grid">
-      <div class="card">
-        <div class="icon-large">🌞</div>
-        <h3>Morning Walk</h3>
-        <p>Take a morning walk in fresh air</p>
+    <section class="dashboard-grid" id="patientTipsGrid">
+      <div class="card" style="text-align: center; color: #94a3b8;">
+        <p>Loading tips...</p>
       </div>
-
-      <div class="card">
-        <div class="icon-large">💧</div>
-        <h3>Stay Hydrated</h3>
-        <p>Drink enough water throughout the day</p>
-      </div>
-
-      <div class="card">
-        <div class="icon-large">🎵</div>
-        <h3>Listen to Music</h3>
-        <p>Enjoy calming music for relaxation</p>
-      </div>
-
-      <div class="card">
-        <div class="icon-large">😴</div>
-        <h3>Good Sleep</h3>
-        <p>Get proper rest and sleep schedule</p>
-      </div>
-
-      <div class="card">
-        <div class="icon-large">🧘</div>
-        <h3>Light Exercise</h3>
-        <p>Gentle stretching and movement</p>
-      </div>
-
-      <div class="card">
-        <div class="icon-large">📖</div>
-        <h3>Reading Time</h3>
-        <p>Spend time reading favorite books</p>
-      </div>
-    </div>
-
+    </section>
   </main>
 
 </div>
 
-
-<!-- IMPORTANT: Load location tracking on ALL patient pages -->
 <script src="/js/patientLocationSharing.js"></script>
 <script src="/js/profileStatusChecker.js"></script>
 <script src="/js/patientApp.js"></script>
+<script src="/js/patientSelfcare.js"></script>
 </body>
 </html>
+

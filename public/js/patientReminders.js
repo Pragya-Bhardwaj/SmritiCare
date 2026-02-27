@@ -1,11 +1,16 @@
 // public/js/patientReminders.js
 let allReminders = [];
 let currentCategory = "All";
+const MISSED_GRACE_MINUTES = 30;
+const BROWSER_NOTIFICATION_CHECK_MS = 30 * 1000;
+let browserNotificationTimer = null;
 
 /* INITIALIZATION */
-document.addEventListener('DOMContentLoaded', () => {
-  loadReminders();
+document.addEventListener('DOMContentLoaded', async () => {
+  await initializeBrowserNotifications();
+  await loadReminders();
   setupCategoryTabs();
+  startBrowserNotificationWatcher();
 });
 
 /* LOAD REMINDERS FROM SERVER */
@@ -27,6 +32,133 @@ async function loadReminders() {
   } catch (err) {
     console.error("Load reminders error:", err);
   }
+}
+
+/* BROWSER NOTIFICATIONS */
+async function initializeBrowserNotifications() {
+  if (!("Notification" in window)) {
+    return;
+  }
+
+  if (Notification.permission === "default") {
+    try {
+      await Notification.requestPermission();
+    } catch (err) {
+      console.error("Notification permission request failed:", err);
+    }
+  }
+}
+
+function startBrowserNotificationWatcher() {
+  if (!("Notification" in window)) return;
+
+  if (browserNotificationTimer) {
+    clearInterval(browserNotificationTimer);
+  }
+
+  browserNotificationTimer = setInterval(
+    checkReminderNotifications,
+    BROWSER_NOTIFICATION_CHECK_MS
+  );
+
+  checkReminderNotifications();
+}
+
+function checkReminderNotifications() {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const dueDateKey = toDateKey(now);
+  const missedRef = new Date(now.getTime() - MISSED_GRACE_MINUTES * 60 * 1000);
+  const missedDateKey = toDateKey(missedRef);
+
+  for (const reminder of allReminders) {
+    if (reminder.isCompleted) continue;
+
+    const reminderMinutes = parseMinutes(reminder.schedule);
+    if (reminderMinutes === null) continue;
+
+    if (currentMinutes === reminderMinutes) {
+      const dueKey = `smriticare:notify:due:${reminder._id}:${dueDateKey}:${reminder.schedule}`;
+      if (!hasLocalNotificationKey(dueKey)) {
+        showBrowserNotification(
+          "Reminder Time",
+          `${reminder.message} at ${formatTime(reminder.schedule)}`,
+          `due-${reminder._id}-${dueDateKey}`
+        );
+        setLocalNotificationKey(dueKey);
+      }
+    }
+
+    if (reminder.category === "Medicine") {
+      const missedAtMinutes = (reminderMinutes + MISSED_GRACE_MINUTES) % (24 * 60);
+      if (currentMinutes === missedAtMinutes) {
+        const missedKey = `smriticare:notify:missed:${reminder._id}:${missedDateKey}:${reminder.schedule}`;
+        if (!hasLocalNotificationKey(missedKey)) {
+          showBrowserNotification(
+            "Medication Missed",
+            `${reminder.message} appears to be missed.`,
+            `missed-${reminder._id}-${missedDateKey}`
+          );
+          setLocalNotificationKey(missedKey);
+        }
+      }
+    }
+  }
+}
+
+function showBrowserNotification(title, body, tag) {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  try {
+    const notification = new Notification(title, {
+      body,
+      tag
+    });
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  } catch (err) {
+    console.error("Browser notification failed:", err);
+  }
+}
+
+function hasLocalNotificationKey(key) {
+  try {
+    return localStorage.getItem(key) === "1";
+  } catch (err) {
+    return false;
+  }
+}
+
+function setLocalNotificationKey(key) {
+  try {
+    localStorage.setItem(key, "1");
+  } catch (err) {
+    // Ignore storage errors.
+  }
+}
+
+function parseMinutes(hhmm) {
+  if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return null;
+  const [hRaw, mRaw] = hhmm.split(':');
+  const h = parseInt(hRaw, 10);
+  const m = parseInt(mRaw, 10);
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return h * 60 + m;
+}
+
+function toDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 /* RENDER REMINDERS */
@@ -55,20 +187,9 @@ function renderReminders() {
         <h3>${escapeHtml(reminder.message)}</h3>
         <p>${formatTime(reminder.schedule)} • ${reminder.frequency}</p>
       </div>
-      <div class="reminder-action">
-        <input 
-          type="checkbox" 
-          class="reminder-toggle" 
-          aria-label="Mark as done"
-          ${reminder.isCompleted ? 'checked' : ''}
-          onchange="toggleReminderStatus('${reminder._id}', this.checked)"
-        >
-      </div>
     </div>
   `).join('');
 
-  // Re-attach checkbox listeners
-  attachCheckboxListeners();
 }
 
 /* SETUP CATEGORY TABS */
@@ -88,82 +209,6 @@ function setupCategoryTabs() {
       renderReminders();
     });
   });
-}
-
-/* ATTACH CHECKBOX LISTENERS */
-function attachCheckboxListeners() {
-  const cards = document.querySelectorAll('.reminder-card');
-
-  cards.forEach(card => {
-    const checkbox = card.querySelector('.reminder-toggle');
-    if (!checkbox) return;
-
-    // Initialize visual state
-    if (checkbox.checked) {
-      card.classList.add('done');
-    } else {
-      card.classList.remove('done');
-    }
-
-    // Listener for toggle (handled inline with onchange)
-  });
-}
-
-/* TOGGLE REMINDER COMPLETION STATUS */
-async function toggleReminderStatus(reminderId, isCompleted) {
-  try {
-    const res = await fetch(`/reminder/api/reminders/${reminderId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ isCompleted })
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      console.error("Failed to update reminder:", data.message);
-      
-      // Revert the checkbox
-      const reminder = allReminders.find(r => r._id === reminderId);
-      if (reminder) {
-        const checkbox = document.querySelector(`[data-id="${reminderId}"] .reminder-toggle`);
-        if (checkbox) checkbox.checked = reminder.isCompleted;
-      }
-      return;
-    }
-
-    const data = await res.json();
-    
-    // Update in local array
-    const idx = allReminders.findIndex(r => r._id === reminderId);
-    if (idx >= 0) {
-      allReminders[idx] = data.reminder;
-    }
-
-    // Update visual state
-    const card = document.querySelector(`[data-id="${reminderId}"]`);
-    if (card) {
-      if (isCompleted) {
-        card.classList.add('done');
-        card.dataset.status = 'done';
-      } else {
-        card.classList.remove('done');
-        card.dataset.status = 'pending';
-      }
-    }
-
-    console.log(" Reminder status updated");
-
-  } catch (err) {
-    console.error("Toggle reminder error:", err);
-    
-    // Revert the checkbox on error
-    const reminder = allReminders.find(r => r._id === reminderId);
-    if (reminder) {
-      const checkbox = document.querySelector(`[data-id="${reminderId}"] .reminder-toggle`);
-      if (checkbox) checkbox.checked = reminder.isCompleted;
-    }
-  }
 }
 
 /* UTILITY FUNCTIONS */

@@ -36,42 +36,42 @@ async function sendSafeZoneAlert(caregiver, patient, distance, safeZone) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff;">
           
           <!-- Header -->
-          <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background: linear-gradient(135deg, #d86b86 0%, #f3b0a8 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">🚨 Safe Zone Alert</h1>
             <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Patient has left their safe zone</p>
           </div>
 
           <!-- Main Content -->
-          <div style="padding: 30px; background: #f9fafb; border: 1px solid #e5e7eb;">
+          <div style="padding: 30px; background: #fff6fa; border: 1px solid #eadfd4;">
             
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ef4444;">
-              <h2 style="margin: 0 0 15px 0; color: #1e293b; font-size: 20px;">⚠️ Alert Details</h2>
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #d86b86;">
+              <h2 style="margin: 0 0 15px 0; color: #3d3a37; font-size: 20px;">⚠️ Alert Details</h2>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Patient:</td>
-                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${patient.name}</td>
+                  <td style="padding: 8px 0; color: #8c857d; font-size: 14px;">Patient:</td>
+                  <td style="padding: 8px 0; color: #3d3a37; font-weight: 600; font-size: 14px;">${patient.name}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Time:</td>
-                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${alertTime}</td>
+                  <td style="padding: 8px 0; color: #8c857d; font-size: 14px;">Time:</td>
+                  <td style="padding: 8px 0; color: #3d3a37; font-weight: 600; font-size: 14px;">${alertTime}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Safe Zone:</td>
-                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${safeZone.name}</td>
+                  <td style="padding: 8px 0; color: #8c857d; font-size: 14px;">Safe Zone:</td>
+                  <td style="padding: 8px 0; color: #3d3a37; font-weight: 600; font-size: 14px;">${safeZone.name}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Address:</td>
-                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${safeZone.address}</td>
+                  <td style="padding: 8px 0; color: #8c857d; font-size: 14px;">Address:</td>
+                  <td style="padding: 8px 0; color: #3d3a37; font-weight: 600; font-size: 14px;">${safeZone.address}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Distance:</td>
-                  <td style="padding: 8px 0; color: #ef4444; font-weight: 700; font-size: 16px;">${Math.round(distance)}m outside safe zone</td>
+                  <td style="padding: 8px 0; color: #8c857d; font-size: 14px;">Distance:</td>
+                  <td style="padding: 8px 0; color: #d86b86; font-weight: 700; font-size: 16px;">${Math.round(distance)}m outside safe zone</td>
                 </tr>
               </table>
             </div>
 
-            <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
-              <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+            <div style="background: #fbeaec; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f3b0a8;">
+              <p style="margin: 0; color: #5b5754; font-size: 14px; line-height: 1.6;">
                 <strong>📍 What This Means:</strong><br>
                 ${patient.name} is currently ${Math.round(distance)} meters away from their designated safe zone (${safeZone.name}). 
                 This could indicate they have wandered away or left their usual area.
@@ -79,8 +79,8 @@ async function sendSafeZoneAlert(caregiver, patient, distance, safeZone) {
             </div>
 
             <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px;">✅ Recommended Actions:</h3>
-              <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.8; font-size: 14px;">
+              <h3 style="margin: 0 0 12px 0; color: #3d3a37; font-size: 16px;">✅ Recommended Actions:</h3>
+              <ul style="margin: 0; padding-left: 20px; color: #5b5754; line-height: 1.8; font-size: 14px;">
                 <li>Check their current location on the SmritiCare dashboard</li>
                 <li>Try calling ${patient.name} to confirm they're safe</li>
                 <li>If you can't reach them, consider checking common locations</li>
@@ -91,9 +91,9 @@ async function sendSafeZoneAlert(caregiver, patient, distance, safeZone) {
             <!-- Action Button -->
             <div style="text-align: center; margin: 25px 0;">
               <a href="${process.env.APP_URL || 'http://localhost:3000'}/caregiver/location" 
-                 style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                 style="display: inline-block; background: linear-gradient(135deg, #d86b86 0%, #f3b0a8 100%); 
                         color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; 
-                        font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                        font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(216, 107, 134, 0.35);">
                 📍 View Live Location
               </a>
             </div>
@@ -101,7 +101,7 @@ async function sendSafeZoneAlert(caregiver, patient, distance, safeZone) {
           </div>
 
           <!-- Footer -->
-          <div style="background: #1e293b; color: #94a3b8; padding: 20px; text-align: center; font-size: 12px; border-radius: 0 0 8px 8px;">
+          <div style="background: #f4cdd6; color: #5b5754; padding: 20px; text-align: center; font-size: 12px; border-radius: 0 0 8px 8px;">
             <p style="margin: 0 0 8px 0;">This is an automated alert from SmritiCare</p>
             <p style="margin: 0; opacity: 0.7;">
               You're receiving this because you're registered as the caregiver for ${patient.name}

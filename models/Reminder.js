@@ -49,11 +49,17 @@ const reminderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  // Add inside reminderSchema:
-
   googleCalendarEventIds: {
     caregiver: { type: String, default: null }, // event ID in caregiver's calendar
     patient: { type: String, default: null }    // event ID in patient's calendar
+  },
+  lastReminderNotificationKey: {
+    type: String,
+    default: ""
+  },
+  lastMissedNotificationKey: {
+    type: String,
+    default: ""
   }
 });
 

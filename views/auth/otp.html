@@ -2,28 +2,57 @@
 <html>
 <head>
   <title>OTP Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body>
+<body class="otp-page">
 
 <div class="auth-wrapper">
-  <div class="auth-card">
-    <h2 class="auth-title">Verify OTP</h2>
-    <p class="auth-subtitle">Check your email</p>
+  <div class="auth-layout">
+    <section class="auth-panel auth-form-panel">
+      <div class="auth-panel-inner">
+        <h1 class="auth-title">Verify Code</h1>
+        <p class="auth-subtitle">Check your email for the 6-digit code.</p>
 
-    <p class="waiting-text" id="timerText">
-      OTP valid for <span id="timer">05:00</span>
-    </p>
+        <p class="waiting-text" id="timerText">
+          OTP valid for <span id="timer">05:00</span>
+        </p>
 
-    <form onsubmit="verifyOTP(event)">
-      <input id="otp" placeholder="Enter 6-digit OTP" required>
-      <p class="error" id="otpError"></p>
+        <form onsubmit="verifyOTP(event)">
+          <div class="form-group">
+            <label class="field-label" for="otp">Verification Code</label>
+            <div class="input-field">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10h-8a3 3 0 0 0-3 3v8"></path>
+                  <path d="M7 14a4 4 0 0 1 0-8h4"></path>
+                  <circle cx="7" cy="14" r="2"></circle>
+                </svg>
+              </span>
+              <input id="otp" placeholder="Enter 6-digit OTP" required>
+            </div>
+            <p class="error" id="otpError"></p>
+          </div>
 
-      <button class="auth-btn" id="verifyBtn">Verify</button>
-      <button type="button" class="auth-btn" id="resendBtn" onclick="resendOTP()">
-        Resend OTP
-      </button>
-    </form>
+          <button class="auth-btn" id="verifyBtn">Verify Code</button>
+          <button type="button" class="auth-btn secondary-btn" id="resendBtn" onclick="resendOTP()">
+            Resend OTP
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section class="auth-panel auth-hero-panel">
+      <div class="auth-hero-inner">
+        <div class="hero-image">
+          <img src="/images/brain.jpg" alt="Smriti Care illustration">
+        </div>
+        <h2 class="hero-title">Secure Access</h2>
+        <p class="hero-text">
+          We use a one-time code to keep your account safe while you verify your email.
+        </p>
+      </div>
+    </section>
   </div>
 </div>
 

@@ -5,6 +5,8 @@ const CaregiverProfile = require("../models/CaregiverProfile");
 const InviteCode = require("../models/InviteCode");
 const nodemailer = require("nodemailer");
 const { getAuthUrl, exchangeCodeForTokens } = require("../utils/googleCalendar");
+const fs = require("fs");
+const path = require("path");
 
 /* MAIL SETUP */
 const transporter = nodemailer.createTransport({
@@ -15,26 +17,285 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+const EMAIL_LOGO_CID = "smriticare-logo";
+
+function getEmailLogoAttachment() {
+  const imageDir = path.join(__dirname, "../public/images");
+  const candidates = [
+    "email-logo.png",
+    "email-logo.jpg",
+    "email-logo.jpeg",
+    "email-logo.webp",
+    "email-logo.svg",
+    "smriticare-logo.png",
+    "smriticare-logo.jpg",
+    "smriticare-logo.jpeg",
+    "smriticare-logo.webp",
+    "smriticare-logo.svg"
+  ];
+
+  for (const name of candidates) {
+    const fullPath = path.join(imageDir, name);
+    if (fs.existsSync(fullPath)) {
+      return {
+        filename: name,
+        path: fullPath,
+        cid: EMAIL_LOGO_CID
+      };
+    }
+  }
+
+  return null;
+}
+
+function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
+  const brandVisualMarkup = logoSrc
+    ? `<div class="brand-mark" style="width: 46px; height: 46px; border-radius: 999px; overflow: hidden; background-color: #ffffff; border: 2px solid rgba(255, 255, 255, 0.34);">
+         <img src="${logoSrc}" alt="SmritiCare logo" style="display: block; width: 100%; height: 100%; object-fit: cover;" />
+       </div>`
+    : `<div class="brand-mark" style="width: 46px; height: 46px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.22); color: #ffffff; font-size: 18px; font-weight: 700; text-align: center; line-height: 46px;">
+         SC
+       </div>`;
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark" />
+        <title>${title}</title>
+        <style>
+          @media (prefers-color-scheme: dark) {
+            body,
+            .bg-main {
+              background-color: #241a18 !important;
+            }
+
+            .card {
+              background-color: #2f211e !important;
+              border-color: #4b3730 !important;
+            }
+
+            .title {
+              color: #fff7f5 !important;
+            }
+
+            .muted {
+              color: #e6d2c9 !important;
+            }
+
+            .code-box {
+              background-color: #362522 !important;
+              border-color: #c27b8d !important;
+            }
+
+            .code-label {
+              color: #f7cdd6 !important;
+            }
+
+            .code-value {
+              color: #fff7f5 !important;
+            }
+
+            .info-box {
+              background-color: #4a2d2a !important;
+              border-left-color: #d86b86 !important;
+            }
+
+            .info-text {
+              color: #f8dce4 !important;
+            }
+
+            .footer {
+              color: #d0bcb2 !important;
+            }
+
+            .brand-mark {
+              background-color: #9d4a60 !important;
+            }
+
+            .brand-sub {
+              color: #f8dce4 !important;
+            }
+
+            .brand-chip {
+              background-color: #c46980 !important;
+              border-color: #e8a8b8 !important;
+              color: #fff0f4 !important;
+            }
+          }
+
+          [data-ogsc] .bg-main {
+            background-color: #241a18 !important;
+          }
+
+          [data-ogsc] .card {
+            background-color: #2f211e !important;
+            border-color: #4b3730 !important;
+          }
+
+          [data-ogsc] .title {
+            color: #fff7f5 !important;
+          }
+
+          [data-ogsc] .muted {
+            color: #e6d2c9 !important;
+          }
+
+          [data-ogsc] .code-box {
+            background-color: #362522 !important;
+            border-color: #c27b8d !important;
+          }
+
+          [data-ogsc] .code-label {
+            color: #f7cdd6 !important;
+          }
+
+          [data-ogsc] .code-value {
+            color: #fff7f5 !important;
+          }
+
+          [data-ogsc] .info-box {
+            background-color: #4a2d2a !important;
+            border-left-color: #d86b86 !important;
+          }
+
+          [data-ogsc] .info-text {
+            color: #f8dce4 !important;
+          }
+
+          [data-ogsc] .footer {
+            color: #d0bcb2 !important;
+          }
+
+          [data-ogsc] .brand-mark {
+            background-color: #9d4a60 !important;
+          }
+
+          [data-ogsc] .brand-sub {
+            color: #f8dce4 !important;
+          }
+
+          [data-ogsc] .brand-chip {
+            background-color: #c46980 !important;
+            border-color: #e8a8b8 !important;
+            color: #fff0f4 !important;
+          }
+        </style>
+      </head>
+      <body class="bg-main" style="margin: 0; padding: 0; background-color: #fdeff5; font-family: Arial, sans-serif;">
+        <table role="presentation" class="bg-main" style="width: 100%; border-collapse: collapse; background-color: #fdeff5; padding: 24px 0;">
+          <tr>
+            <td align="center">
+              <table role="presentation" class="card" style="width: 100%; max-width: 620px; border-collapse: collapse; background-color: #ffffff; border: 1px solid #eadfd4; border-radius: 14px; overflow: hidden;">
+                <tr>
+                  <td style="padding: 18px 24px; background: linear-gradient(135deg, #d86b86, #f3b0a8); color: #ffffff;">
+                    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td style="width: 54px; vertical-align: middle;">
+                          ${brandVisualMarkup}
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <p style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 0.2px;">SmritiCare</p>
+                          <p class="brand-sub" style="margin: 4px 0 0; font-size: 13px; color: #fff1f4;">Secure account notification</p>
+                        </td>
+                        <td style="width: 72px; vertical-align: middle;" align="right">
+                          <span class="brand-chip" style="display: inline-block; background: rgba(255, 255, 255, 0.24); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.36); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;">
+                            AUTH
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 24px 26px 8px;">
+                    <h2 class="title" style="margin: 0; color: #3d3a37; font-size: 22px;">${title}</h2>
+                    <p class="muted" style="margin: 10px 0 0; color: #5b5754; font-size: 15px; line-height: 1.55;">${subtitle}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 18px 26px 12px;">
+                    <div class="code-box" style="background-color: #fff6fa; border: 1px dashed #f4cdd6; border-radius: 12px; text-align: center; padding: 18px;">
+                      <p class="code-label" style="margin: 0 0 8px; color: #b85b72; font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 700;">Verification code</p>
+                      <p class="code-value" style="margin: 0; font-size: 34px; color: #3d3a37; letter-spacing: 8px; font-weight: 700;">${code}</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 0 26px 24px;">
+                    <div class="info-box" style="background-color: #fbeaec; border-left: 4px solid #d86b86; border-radius: 8px; padding: 12px;">
+                      <p class="info-text" style="margin: 0; color: #5b5754; font-size: 13px; line-height: 1.5;">
+                        This code is valid for <strong>5 minutes</strong>. ${note}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 0 26px 22px;">
+                    <p class="footer" style="margin: 0; color: #8c857d; font-size: 12px; line-height: 1.5;">
+                      You received this automated email from SmritiCare. Please do not reply to this message.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
 async function sendOTP(email, otp) {
   try {
+    const title = "Email Verification";
+    const subtitle = "Use the OTP below to verify your SmritiCare account and continue setup.";
+    const note = "If you did not request this, please ignore this email.";
+    const logoAttachment = getEmailLogoAttachment();
+    const logoSrc = logoAttachment ? `cid:${EMAIL_LOGO_CID}` : null;
+
     await transporter.sendMail({
       from: `"SmritiCare" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "SmritiCare - Email Verification",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #667eea;">SmritiCare Email Verification</h2>
-          <p>Your OTP code is:</p>
-          <h1 style="background: #f0f0f0; padding: 20px; text-align: center; letter-spacing: 5px;">${otp}</h1>
-          <p style="color: #666;">This code is valid for 5 minutes.</p>
-          <p style="color: #999; font-size: 12px;">If you didn't request this, please ignore this email.</p>
-        </div>
-      `
+      text: `SmritiCare Email Verification\n\nOTP: ${otp}\nThis code is valid for 5 minutes.\nIf you did not request this, please ignore this email.`,
+      html: buildCodeEmailTemplate({ title, subtitle, code: otp, note, logoSrc }),
+      attachments: logoAttachment ? [logoAttachment] : undefined
     });
     console.log(` OTP sent to ${email}`);
   } catch (err) {
     console.error(" Failed to send OTP email:", err);
     throw new Error("Failed to send verification email");
+  }
+}
+
+function generateOTP() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+async function sendPasswordResetCode(email, otp) {
+  try {
+    const title = "Password Reset Code";
+    const subtitle = "Use this OTP to securely reset your SmritiCare password.";
+    const note = "If you did not request a password reset, you can ignore this email.";
+    const logoAttachment = getEmailLogoAttachment();
+    const logoSrc = logoAttachment ? `cid:${EMAIL_LOGO_CID}` : null;
+
+    await transporter.sendMail({
+      from: `"SmritiCare" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "SmritiCare - Password Reset Code",
+      text: `SmritiCare Password Reset\n\nReset code: ${otp}\nThis code is valid for 5 minutes.\nIf you did not request this, you can ignore this email.`,
+      html: buildCodeEmailTemplate({ title, subtitle, code: otp, note, logoSrc }),
+      attachments: logoAttachment ? [logoAttachment] : undefined
+    });
+    console.log(` Password reset code sent to ${email}`);
+  } catch (err) {
+    console.error(" Failed to send password reset email:", err);
+    throw new Error("Failed to send reset code");
   }
 }
 
@@ -380,47 +641,6 @@ exports.resendOTP = async (req, res) => {
   }
 };
 
-// Redirect user to Google OAuth consent screen
-exports.connectGoogleCalendar = (req, res) => {
-  if (!req.session.user) return res.redirect("/auth/login");
-  const url = getAuthUrl(req.session.user.id);
-  res.redirect(url);
-};
-
-// Google redirects back here after user grants permission
-exports.googleCalendarCallback = async (req, res) => {
-  try {
-    const { code, state: userId } = req.query;
-
-    if (!code || !userId) return res.redirect("/caregiver/dashboard?calendarError=true");
-
-    const tokens = await exchangeCodeForTokens(code);
-
-    await User.findByIdAndUpdate(userId, {
-      googleTokens: {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expiry_date: tokens.expiry_date
-      },
-      googleCalendarConnected: true
-    });
-
-    // Update session
-    if (req.session.user && req.session.user.id === userId) {
-      req.session.user.googleCalendarConnected = true;
-      await req.session.save();
-    }
-
-    res.redirect("/caregiver/dashboard?calendarConnected=true");
-  } catch (err) {
-    console.error("Google Calendar callback error:", err);
-    res.redirect("/caregiver/dashboard?calendarError=true");
-  }
-};
-
-
-
-
 /* GOOGLE CALENDAR - Redirect to Google consent screen */
 exports.connectGoogleCalendar = (req, res) => {
   if (!req.session.user) return res.redirect("/auth/login");
@@ -475,5 +695,190 @@ exports.googleCalendarStatus = async (req, res) => {
   } catch (err) {
     console.error("Google Calendar status error:", err);
     res.status(500).json({ error: "Failed to check status" });
+  }
+};
+
+/* FORGOT PASSWORD - SEND RESET CODE */
+exports.requestPasswordReset = async (req, res) => {
+  try {
+    let { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    email = email.toLowerCase().trim();
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "No account found with this email" });
+    }
+
+    if (!user.isEmailVerified) {
+      return res.status(400).json({ error: "Please verify your email first" });
+    }
+
+    const otp = generateOTP();
+    user.otp = {
+      code: otp,
+      expiresAt: Date.now() + 5 * 60 * 1000
+    };
+    await user.save();
+
+    await sendPasswordResetCode(user.email, otp);
+
+    req.session.passwordReset = {
+      userId: user._id.toString(),
+      verified: false
+    };
+    await req.session.save();
+
+    return res.json({
+      success: true,
+      message: "Reset code sent to your email"
+    });
+  } catch (err) {
+    console.error("Password reset request error:", err);
+    return res.status(500).json({ error: "Failed to send reset code. Please try again." });
+  }
+};
+
+/* FORGOT PASSWORD - VERIFY CODE */
+exports.verifyPasswordResetCode = async (req, res) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return res.status(400).json({ error: "Reset code is required" });
+    }
+
+    const resetSession = req.session.passwordReset;
+    if (!resetSession || !resetSession.userId) {
+      return res.status(400).json({ error: "Reset session expired. Request a new code." });
+    }
+
+    const user = await User.findById(resetSession.userId);
+    if (!user) {
+      delete req.session.passwordReset;
+      await req.session.save();
+      return res.status(400).json({ error: "User not found. Request a new code." });
+    }
+
+    if (!user.otp || !user.otp.code) {
+      return res.status(400).json({ error: "No reset code found. Request a new code." });
+    }
+
+    if (user.otp.code !== String(code).trim()) {
+      return res.status(400).json({ error: "Invalid reset code" });
+    }
+
+    if (user.otp.expiresAt < Date.now()) {
+      return res.status(400).json({ error: "Reset code has expired. Request a new code." });
+    }
+
+    req.session.passwordReset.verified = true;
+    await req.session.save();
+
+    return res.json({
+      success: true,
+      message: "Code verified. You can now set a new password.",
+      redirect: "/auth/forgot-password/new-password"
+    });
+  } catch (err) {
+    console.error("Password reset code verification error:", err);
+    return res.status(500).json({ error: "Failed to verify reset code. Please try again." });
+  }
+};
+
+/* FORGOT PASSWORD - RESEND CODE */
+exports.resendPasswordResetCode = async (req, res) => {
+  try {
+    const resetSession = req.session.passwordReset;
+    if (!resetSession || !resetSession.userId) {
+      return res.status(400).json({ error: "Reset session expired. Request a new code." });
+    }
+
+    const user = await User.findById(resetSession.userId);
+    if (!user) {
+      delete req.session.passwordReset;
+      await req.session.save();
+      return res.status(400).json({ error: "User not found. Request a new code." });
+    }
+
+    const otp = generateOTP();
+    user.otp = {
+      code: otp,
+      expiresAt: Date.now() + 5 * 60 * 1000
+    };
+    await user.save();
+
+    await sendPasswordResetCode(user.email, otp);
+
+    req.session.passwordReset.verified = false;
+    await req.session.save();
+
+    return res.json({
+      success: true,
+      message: "New reset code sent to your email"
+    });
+  } catch (err) {
+    console.error("Password reset resend error:", err);
+    return res.status(500).json({ error: "Failed to resend reset code. Please try again." });
+  }
+};
+
+/* FORGOT PASSWORD - SET NEW PASSWORD */
+exports.resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "New password is required" });
+    }
+
+    const resetSession = req.session.passwordReset;
+    if (!resetSession || !resetSession.userId) {
+      return res.status(400).json({ error: "Reset session expired. Request a new code." });
+    }
+
+    if (!resetSession.verified) {
+      return res.status(400).json({ error: "Please verify the reset code first" });
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({ error: passwordValidation.message });
+    }
+
+    const user = await User.findById(resetSession.userId);
+    if (!user) {
+      delete req.session.passwordReset;
+      await req.session.save();
+      return res.status(400).json({ error: "User not found. Request a new code." });
+    }
+
+    const isSameAsCurrent = await bcrypt.compare(password, user.password);
+    if (isSameAsCurrent) {
+      return res.status(400).json({ error: "New password must be different from the current password" });
+    }
+
+    user.password = await bcrypt.hash(password, 12);
+    user.otp = undefined;
+    await user.save();
+
+    delete req.session.passwordReset;
+    await req.session.save();
+
+    return res.json({
+      success: true,
+      message: "Password reset successful. Please log in."
+    });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    return res.status(500).json({ error: "Failed to reset password. Please try again." });
   }
 };
