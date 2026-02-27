@@ -9,9 +9,6 @@ function getOAuthClient() {
   );
 }
 
-/**
- * Get an authenticated OAuth2 client for a user
- */
 function getAuthClientForUser(tokens) {
   const oauth2Client = getOAuthClient();
   oauth2Client.setCredentials(tokens);
@@ -19,15 +16,18 @@ function getAuthClientForUser(tokens) {
 }
 
 /**
- * Generate the Google OAuth URL for a user to connect their calendar
+ * Generate Google OAuth URL
+ * @param {string} caregiverId  - always the logged-in caregiver's DB id
+ * @param {string} target       - "caregiver" or "patient"
  */
-function getAuthUrl(userId) {
+function getAuthUrl(caregiverId, target = "caregiver") {
   const oauth2Client = getOAuthClient();
   return oauth2Client.generateAuthUrl({
     access_type: "offline",
-    prompt: "consent", // ensures refresh_token is always returned
+    prompt: "consent",  // always get refresh_token
     scope: ["https://www.googleapis.com/auth/calendar.events"],
-    state: userId // pass userId so we know who connected after redirect
+    // encode both pieces of info into state so callback knows what to do
+    state: JSON.stringify({ caregiverId, target })
   });
 }
 
@@ -41,39 +41,37 @@ async function exchangeCodeForTokens(code) {
 }
 
 /**
- * Build a Google Calendar event object from a reminder
+ * Build a Google Calendar event from a reminder
  */
 function buildCalendarEvent(reminder, caregiverName, patientName) {
   const [hours, minutes] = reminder.schedule.split(":").map(Number);
 
-  // Use today's date as the start, set to the reminder time
   const now = new Date();
   const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-  const endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 min duration
+  const endTime   = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 min
 
-  // Build recurrence rule
   const recurrenceMap = {
-    Daily: "RRULE:FREQ=DAILY",
-    Weekly: "RRULE:FREQ=WEEKLY",
+    Daily:   "RRULE:FREQ=DAILY",
+    Weekly:  "RRULE:FREQ=WEEKLY",
     Monthly: "RRULE:FREQ=MONTHLY",
-    Once: null
+    Once:    null
   };
   const recurrence = recurrenceMap[reminder.frequency];
 
   const event = {
     summary: `[${reminder.category}] ${reminder.message}`,
     description: [
-      `Reminder for: ${patientName}`,
-      `Set by caregiver: ${caregiverName}`,
-      `Category: ${reminder.category}`,
-      `Frequency: ${reminder.frequency}`,
-      `Time: ${reminder.schedule}`,
+      `Reminder for patient : ${patientName}`,
+      `Set by caregiver     : ${caregiverName}`,
+      `Category             : ${reminder.category}`,
+      `Frequency            : ${reminder.frequency}`,
+      `Time                 : ${reminder.schedule}`,
       ``,
       `Managed by SmritiCare`
     ].join("\n"),
     start: {
       dateTime: startTime.toISOString(),
-      timeZone: "Asia/Kolkata" // adjust to your timezone
+      timeZone: "Asia/Kolkata"
     },
     end: {
       dateTime: endTime.toISOString(),
@@ -88,57 +86,43 @@ function buildCalendarEvent(reminder, caregiverName, patientName) {
     }
   };
 
-  if (recurrence) {
-    event.recurrence = [recurrence];
-  }
+  if (recurrence) event.recurrence = [recurrence];
 
   return event;
 }
 
-/**
- * Create a Google Calendar event for a user
- * Returns the created event's Google Calendar ID
- */
 async function createCalendarEvent(userTokens, reminder, caregiverName, patientName) {
-  const auth = getAuthClientForUser(userTokens);
+  const auth     = getAuthClientForUser(userTokens);
   const calendar = google.calendar({ version: "v3", auth });
-
-  const event = buildCalendarEvent(reminder, caregiverName, patientName);
+  const event    = buildCalendarEvent(reminder, caregiverName, patientName);
 
   const response = await calendar.events.insert({
     calendarId: "primary",
     resource: event
   });
 
-  return response.data.id; // Google Calendar event ID
+  return response.data.id;
 }
 
-/**
- * Update an existing Google Calendar event
- */
 async function updateCalendarEvent(userTokens, googleEventId, reminder, caregiverName, patientName) {
-  const auth = getAuthClientForUser(userTokens);
+  const auth     = getAuthClientForUser(userTokens);
   const calendar = google.calendar({ version: "v3", auth });
-
-  const event = buildCalendarEvent(reminder, caregiverName, patientName);
+  const event    = buildCalendarEvent(reminder, caregiverName, patientName);
 
   await calendar.events.update({
     calendarId: "primary",
-    eventId: googleEventId,
-    resource: event
+    eventId:    googleEventId,
+    resource:   event
   });
 }
 
-/**
- * Delete a Google Calendar event
- */
 async function deleteCalendarEvent(userTokens, googleEventId) {
-  const auth = getAuthClientForUser(userTokens);
+  const auth     = getAuthClientForUser(userTokens);
   const calendar = google.calendar({ version: "v3", auth });
 
   await calendar.events.delete({
     calendarId: "primary",
-    eventId: googleEventId
+    eventId:    googleEventId
   });
 }
 
