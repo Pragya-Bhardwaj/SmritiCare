@@ -5,6 +5,7 @@
 
 // Load patient name and memories when page loads
 document.addEventListener("DOMContentLoaded", async () => {
+  setDashboardDate();
   await loadPatientName();
   await loadMemories();
 });
@@ -133,4 +134,19 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function setDashboardDate() {
+  const dateEl = document.getElementById("dashboardDate");
+  if (!dateEl) return;
+
+  const today = new Date();
+  const formatted = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+
+  dateEl.textContent = formatted;
 }

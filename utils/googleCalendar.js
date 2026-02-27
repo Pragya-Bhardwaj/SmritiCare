@@ -80,8 +80,7 @@ function buildCalendarEvent(reminder, caregiverName, patientName) {
     reminders: {
       useDefault: false,
       overrides: [
-        { method: "popup", minutes: 10 },
-        { method: "email", minutes: 30 }
+        { method: "popup", minutes: 10 }
       ]
     }
   };

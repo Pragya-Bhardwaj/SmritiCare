@@ -9,77 +9,80 @@
   <link rel="stylesheet" href="/css/caregiver.css">
 </head>
 <body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-logo">SmritiCare</div>
 
-<div class="app">
+      <nav>
+        <a href="/caregiver/dashboard">Dashboard</a>
+        <a href="/caregiver/memory">Memory Board</a>
+        <a href="/caregiver/reminders">Reminders</a>
+        <a href="/caregiver/medication">Medications</a>
+        <a href="/caregiver/location">Live Location</a>
+        <a href="/caregiver/selfcare">Self Care</a>
+        <a href="/caregiver/profile">Profile</a>
+        <a href="/auth/logout" class="logout-btn">Logout</a>
+      </nav>
+    </aside>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">SmritiCare</h2>
-
-    <nav>
-      <a href="/caregiver/dashboard">Dashboard</a>
-      <a href="/caregiver/memory">Memory Board</a>
-      <a href="/caregiver/reminders">Reminders</a>
-      <a href="/caregiver/medication">Medications</a>
-      <a href="/caregiver/location">Live Location</a>
-      <a href="/caregiver/selfcare">Self Care</a>
-      <a href="/caregiver/profile">Profile</a>
-      <a href="/auth/logout" class="logout-btn">Logout</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <div class="page-header">
-      <div>
-        <h1>Self Care</h1>
-        <p class="small">Because your well-being matters too</p>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Self Care</h1>
+          <p class="small">Because your well-being matters too</p>
+        </div>
+        <button type="button" class="primary-btn" onclick="openAddModal()">+ Add Tip for Patient</button>
       </div>
 
-      <button class="primary-btn" onclick="openAddModal()">＋ Add Tip</button>
+      <h2 class="section-title">Self-care Tips for You</h2>
+      <section class="selfcare-grid" id="caregiverTipsGrid">
+        <div class="card" style="text-align: center; color: #94a3b8;">
+          <p>Loading tips...</p>
+        </div>
+      </section>
+
+      <h2 class="section-title">Suggestions for Patient Tips</h2>
+      <section class="suggestion-grid" id="patientTipSuggestions">
+        <div class="card" style="text-align: center; color: #94a3b8;">
+          <p>Loading suggestions...</p>
+        </div>
+      </section>
+
+      <h2 class="section-title">Tips Shared With Patient</h2>
+      <section class="card-list" id="patientTipsList">
+        <div class="card" style="text-align: center; color: #94a3b8;">
+          <p>Loading patient tips...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="addTipModal">
+    <div class="modal-box">
+      <h3 id="tipModalTitle">Add Self-care Tip for Patient</h3>
+
+      <form id="addTipForm">
+        <input type="text" id="tipTitle" placeholder="Tip title" maxlength="120" required>
+        <textarea id="tipDescription" placeholder="Tip description" rows="4" maxlength="800" required></textarea>
+        <select id="tipCategory">
+          <option value="General">General</option>
+          <option value="Hydration">Hydration</option>
+          <option value="Sleep">Sleep</option>
+          <option value="Movement">Movement</option>
+          <option value="Nutrition">Nutrition</option>
+          <option value="Calm">Calm</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" onclick="closeAddModal()">Cancel</button>
+          <button type="submit" class="primary-btn" id="tipSaveBtn">Save Tip</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <!-- SAMPLE DATA -->
-    <section class="card-list" id="selfcareList">
-
-      <div class="card selfcare-card">
-        <strong class="title">🧘 Take a Breather</strong>
-        <p class="small desc">Pause for 2 minutes and take deep breaths.</p>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
-      </div>
-
-      <div class="card selfcare-card">
-        <strong class="title">💧 Stay Hydrated</strong>
-        <p class="small desc">Drink water regularly to stay energized.</p>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
-      </div>
-
-      <div class="card selfcare-card">
-        <strong class="title">😴 Rest is Care</strong>
-        <p class="small desc">Adequate sleep helps you care better.</p>
-
-        <div class="actions">
-          <button class="icon-btn" onclick="openEditModal(this)">✏️</button>
-          <button class="icon-btn" onclick="openDeleteModal(this)">🗑️</button>
-        </div>
-      </div>
-
-    </section>
-  </main>
-</div>
-
-<!-- ADD / EDIT MODAL -->
-
-<script src="/js/profileStatusChecker.js"></script>
-<script src="/js/caregiverDashboard.js"></script>
+  <script src="/js/profileStatusChecker.js"></script>
+  <script src="/js/caregiverDashboard.js"></script>
+  <script src="/js/caregiverSelfcare.js"></script>
 </body>
 </html>
