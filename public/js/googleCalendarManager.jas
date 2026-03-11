@@ -1,0 +1,400 @@
+// public/js/googleCalendarManager.js
+// Manages Google Calendar connection, status checking, and reconnection flows
+
+class GoogleCalendarManager {
+  constructor() {
+    this.statusCheckInterval = null;
+    this.lastStatus = null;
+  }
+
+  /**
+   * Initialize the manager and set up UI elements
+   */
+  init() {
+    this.setupEventListeners();
+    this.checkCalendarStatus();
+    this.startStatusPolling();
+  }
+
+  /**
+   * Set up click handlers for calendar buttons
+   */
+  setupEventListeners() {
+    // Connect button
+    const connectBtn = document.getElementById("connectCalendarBtn");
+    if (connectBtn) {
+      connectBtn.addEventListener("click", () => this.handleConnect());
+    }
+
+    // Disconnect button
+    const disconnectBtn = document.getElementById("disconnectCalendarBtn");
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener("click", () => this.handleDisconnect());
+    }
+
+    // Reconnect button (when revoked)
+    const reconnectBtn = document.getElementById("reconnectCalendarBtn");
+    if (reconnectBtn) {
+      reconnectBtn.addEventListener("click", () => this.handleConnect());
+    }
+  }
+
+  /**
+   * Check current calendar connection status
+   */
+  async checkCalendarStatus() {
+    try {
+      const response = await fetch("/reminder/calendar/status");
+      const data = await response.json();
+
+      if (data.success) {
+        this.lastStatus = data.status;
+        this.updateUI(data.status);
+        return data.status;
+      }
+    } catch (error) {
+      console.error("[CALENDAR] Status check failed:", error);
+    }
+
+    return null;
+  }
+
+  /**
+   * Poll for status changes every 30 seconds
+   */
+  startStatusPolling() {
+    this.statusCheckInterval = setInterval(() => {
+      this.checkCalendarStatus();
+    }, 30000); // Check every 30 seconds
+  }
+
+  /**
+   * Stop polling
+   */
+  stopStatusPolling() {
+    if (this.statusCheckInterval) {
+      clearInterval(this.statusCheckInterval);
+    }
+  }
+
+  /**
+   * Update UI based on calendar status
+   */
+  updateUI(status) {
+    const container = document.getElementById("calendarStatusContainer");
+    if (!container) return;
+
+    let html = "";
+
+    if (status.caregiverConnected) {
+      // Connected state
+      html = `
+        <div class="calendar-status-card connected">
+          <div class="status-header">
+            <span class="status-icon">✓</span>
+            <span class="status-text">Google Calendar Connected</span>
+          </div>
+          <div class="status-details">
+            <p>Your reminders are being synced to Google Calendar</p>
+            ${status.expiryDate ? `<p class="text-small">Next refresh: ${new Date(status.expiryDate).toLocaleString()}</p>` : ""}
+          </div>
+          <div class="status-actions">
+            <button id="disconnectCalendarBtn" class="btn btn-outline-secondary btn-sm">
+              Disconnect Calendar
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (status.tokenExpired || status.needsReauth) {
+      // Reconnection needed
+      html = `
+        <div class="calendar-status-card expired">
+          <div class="status-header">
+            <span class="status-icon">⚠️</span>
+            <span class="status-text">Calendar Connection Expired</span>
+          </div>
+          <div class="status-details">
+            <p>Your Google Calendar access has expired or been revoked.</p>
+            <p class="text-small">Please reconnect to resume syncing reminders to your calendar.</p>
+          </div>
+          <div class="status-actions">
+            <button id="reconnectCalendarBtn" class="btn btn-primary btn-sm">
+              Reconnect Google Calendar
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      // Not connected state
+      html = `
+        <div class="calendar-status-card disconnected">
+          <div class="status-header">
+            <span class="status-icon">○</span>
+            <span class="status-text">Google Calendar Not Connected</span>
+          </div>
+          <div class="status-details">
+            <p>Connect your Google Calendar to automatically sync reminders.</p>
+          </div>
+          <div class="status-actions">
+            <button id="connectCalendarBtn" class="btn btn-primary btn-sm">
+              Connect Google Calendar
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+    this.setupEventListeners(); // Re-attach event listeners
+  }
+
+  /**
+   * Handle connect button click
+   */
+  async handleConnect() {
+    try {
+      const btn = document.getElementById("connectCalendarBtn") || document.getElementById("reconnectCalendarBtn");
+      if (btn) btn.disabled = true;
+
+      this.showLoading("Redirecting to Google Sign-In...");
+
+      // Get auth URL from backend
+      const response = await fetch("/auth/google/calendar-url");
+      const data = await response.json();
+
+      if (data.success && data.authUrl) {
+        // Redirect to Google OAuth
+        window.location.href = data.authUrl;
+      } else {
+        this.showError("Failed to get authorization URL. Please try again.");
+        if (btn) btn.disabled = false;
+      }
+    } catch (error) {
+      console.error("[CALENDAR] Connect error:", error);
+      this.showError("Failed to connect calendar. Please try again.");
+      const btn = document.getElementById("connectCalendarBtn") || document.getElementById("reconnectCalendarBtn");
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  /**
+   * Handle disconnect button click
+   */
+  async handleDisconnect() {
+    const confirmed = confirm(
+      "Are you sure you want to disconnect Google Calendar?\n\n" +
+      "Reminders will no longer be synced to your calendar."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const btn = document.getElementById("disconnectCalendarBtn");
+      if (btn) btn.disabled = true;
+
+      this.showLoading("Disconnecting...");
+
+      const response = await fetch("/reminder/calendar/disconnect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        this.showSuccess("Google Calendar disconnected successfully");
+        setTimeout(() => {
+          this.checkCalendarStatus();
+        }, 1500);
+      } else {
+        this.showError("Failed to disconnect calendar. Please try again.");
+        if (btn) btn.disabled = false;
+      }
+    } catch (error) {
+      console.error("[CALENDAR] Disconnect error:", error);
+      this.showError("Failed to disconnect calendar. Please try again.");
+      const btn = document.getElementById("disconnectCalendarBtn");
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  /**
+   * Show loading message
+   */
+  showLoading(message = "Loading...") {
+    this.showNotification(message, "loading");
+  }
+
+  /**
+   * Show success message
+   */
+  showSuccess(message) {
+    this.showNotification(message, "success");
+  }
+
+  /**
+   * Show error message
+   */
+  showError(message) {
+    this.showNotification(message, "error");
+  }
+
+  /**
+   * Show notification toast
+   */
+  showNotification(message, type = "info") {
+    // Create or get notification container
+    let container = document.getElementById("notificationContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "notificationContainer";
+      container.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+      `;
+      document.body.appendChild(container);
+    }
+
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+    notification.style.cssText = `
+      padding: 16px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease-out;
+    `;
+
+    const colors = {
+      success: { bg: "#d4edda", text: "#155724", border: "#c3e6cb" },
+      error: { bg: "#f8d7da", text: "#721c24", border: "#f5c6cb" },
+      info: { bg: "#d1ecf1", text: "#0c5460", border: "#bee5eb" },
+      loading: { bg: "#e2e3e5", text: "#383d41", border: "#d6d8db" }
+    };
+
+    const color = colors[type] || colors.info;
+    notification.style.backgroundColor = color.bg;
+    notification.style.color = color.text;
+    notification.style.borderLeft = `4px solid ${color.border}`;
+
+    notification.textContent = message;
+    container.appendChild(notification);
+
+    // Auto remove after 4 seconds (except loading)
+    if (type !== "loading") {
+      setTimeout(() => {
+        notification.style.animation = "slideOut 0.3s ease-out";
+        setTimeout(() => notification.remove(), 300);
+      }, 4000);
+    }
+
+    return notification;
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    const calendarManager = new GoogleCalendarManager();
+    calendarManager.init();
+    // Make available globally for manual calls
+    window.calendarManager = calendarManager;
+  });
+} else {
+  const calendarManager = new GoogleCalendarManager();
+  calendarManager.init();
+  window.calendarManager = calendarManager;
+}
+
+// Add animations to stylesheet
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+
+  .calendar-status-card {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+  }
+
+  .calendar-status-card.connected {
+    background-color: #f0f9ff;
+    border-color: #4ade80;
+  }
+
+  .calendar-status-card.expired {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+  }
+
+  .calendar-status-card.disconnected {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+  }
+
+  .status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .status-icon {
+    font-size: 20px;
+  }
+
+  .status-details p {
+    margin: 4px 0;
+    font-size: 14px;
+  }
+
+  .text-small {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .status-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .notification {
+    word-wrap: break-word;
+    font-size: 14px;
+  }
+`;
+document.head.appendChild(style);

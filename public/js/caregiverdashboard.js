@@ -9,6 +9,36 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCaregiverName();
   setDashboardDate();
 
+  // Unsync Google Calendar button logic
+  const unsyncBtn = document.getElementById("unsyncCalendarBtn");
+  const unsyncStatus = document.getElementById("unsyncStatus");
+  if (unsyncBtn) {
+    unsyncBtn.addEventListener("click", async () => {
+      unsyncBtn.disabled = true;
+      unsyncStatus.style.display = "none";
+      try {
+        const res = await fetch("/api/reminders/calendar/disconnect", {
+          method: "POST",
+          credentials: "include"
+        });
+        const data = await res.json();
+        if (data.success) {
+          unsyncStatus.textContent = "Google Calendar disconnected.";
+          unsyncStatus.style.display = "inline";
+        } else {
+          unsyncStatus.textContent = data.message || "Failed to disconnect.";
+          unsyncStatus.style.display = "inline";
+          unsyncStatus.style.color = "red";
+        }
+      } catch (err) {
+        unsyncStatus.textContent = "Error disconnecting calendar.";
+        unsyncStatus.style.display = "inline";
+        unsyncStatus.style.color = "red";
+      }
+      unsyncBtn.disabled = false;
+    });
+  }
+
   const sidebarLinks = document.querySelectorAll(".sidebar nav a");
 
   if (!sidebarLinks.length) return;

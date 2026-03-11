@@ -5,16 +5,12 @@ const mongoose = require("mongoose");
 const path = require("path");
 const MongoStore = require("connect-mongo");
 
-
-
-
-
 const app = express();
 
 /* DATABASE CONNECTION */
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✓ MongoDB connected"))
+  .catch(err => console.error("✗ MongoDB connection error:", err));
 
 /* MIDDLEWARE */
 
@@ -85,10 +81,7 @@ app.use("/medication", medicationRoutes);
 app.use("/api/patient", patientApiRoutes);
 app.use("/selfcare", selfCareRoutes);
 app.use("/", profileRoutes);
-// Location routes
 app.use("/", locationRoutes);
-
-
 
 /* ROOT ROUTE */
 app.get("/", (req, res) => {
@@ -101,10 +94,21 @@ app.get("/", (req, res) => {
   }
   res.redirect("/auth/login");
 });
-// Mapbox config route
+
+/* MAPBOX CONFIG ROUTE */
 app.get("/api/config/mapbox", (req, res) => {
   res.json({ token: process.env.MAPBOX_ACCESS_TOKEN });
 });
+
+/* HEALTH CHECK ROUTE */
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development"
+  });
+});
+
 /* 404 HANDLER */
 app.use((req, res) => {
   res.status(404).send(`
@@ -116,17 +120,74 @@ app.use((req, res) => {
 
 /* ERROR HANDLER */
 app.use((err, req, res, next) => {
-  console.error(" Server error:", err);
+  console.error("[SERVER ERROR]", err);
+  
+  // Log different error types
+  if (err.code === "REFRESH_TOKEN_REVOKED") {
+    console.error("  → Google refresh token was revoked");
+  }
+  if (err.message.includes("invalid_grant")) {
+    console.error("  → Google OAuth invalid grant error");
+  }
+  
   res.status(500).send(`
     <h1>500 - Server Error</h1>
     <p>Something went wrong on our end.</p>
+    <p style="font-size: 12px; color: #666;">Error: ${err.message}</p>
     <a href="/">Go Home</a>
   `);
 });
 
 /* START SERVER */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`SmritiCare server running on http://localhost:${PORT}`);
-  startReminderNotificationService();
+const server = app.listen(PORT, () => {
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`SmritiCare Server Started`);
+  console.log(`${'='.repeat(60)}`);
+  console.log(`📍 Running on http://localhost:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Database: ${process.env.MONGO_URI ? 'Connected' : 'Not configured'}`);
+  console.log(`🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? 'Configured' : 'Not configured'}`);
+  console.log(`${'='.repeat(60)}\n`);
+
+  // Start reminder notification service
+  try {
+    startReminderNotificationService();
+    console.log("[NOTIFICATION] Reminder service started");
+  } catch (error) {
+    console.error("[NOTIFICATION] Failed to start service:", error.message);
+  }
 });
+
+/* GRACEFUL SHUTDOWN */
+process.on("SIGTERM", () => {
+  console.log("\n[SHUTDOWN] SIGTERM received, closing server gracefully...");
+  server.close(() => {
+    console.log("[SHUTDOWN] HTTP server closed");
+    mongoose.connection.close(false, () => {
+      console.log("[SHUTDOWN] MongoDB connection closed");
+      process.exit(0);
+    });
+  });
+});
+
+process.on("SIGINT", () => {
+  console.log("\n[SHUTDOWN] SIGINT received, closing server gracefully...");
+  server.close(() => {
+    console.log("[SHUTDOWN] HTTP server closed");
+    mongoose.connection.close(false, () => {
+      console.log("[SHUTDOWN] MongoDB connection closed");
+      process.exit(0);
+    });
+  });
+});
+
+/* UNHANDLED REJECTION HANDLER */
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[UNHANDLED REJECTION]", {
+    reason: reason.message || reason,
+    promise: promise
+  });
+});
+
+module.exports = app;

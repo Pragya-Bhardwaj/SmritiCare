@@ -611,9 +611,68 @@ function panToLocation() {
 
 // ============================================
 // EVENT LISTENERS
+// Set Safe Zone logic
+document.addEventListener('DOMContentLoaded', function() {
+  const setSafeZoneBtn = document.getElementById('setSafeZoneBtn');
+  if (setSafeZoneBtn) {
+    setSafeZoneBtn.addEventListener('click', async function() {
+      const address = document.getElementById('safeZoneAddress').value;
+      const radius = document.getElementById('safeZoneRadius').value;
+      let latitude = document.getElementById('safeZoneLatitude').value;
+      let longitude = document.getElementById('safeZoneLongitude').value;
+      const confirmation = document.getElementById('safeZoneConfirmation');
+      if (!latitude || !longitude) {
+        showError('Please select a location/address for the safe zone.');
+        confirmation.style.display = 'none';
+        return;
+      }
+      try {
+        const res = await fetch('/api/location/safe-zone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ address, radius, latitude, longitude })
+        });
+        const data = await res.json();
+        if (data.success) {
+          confirmation.style.display = 'block';
+          confirmation.textContent = 'Safezone set';
+          setTimeout(() => { confirmation.style.display = 'none'; }, 3000);
+        } else {
+          confirmation.style.display = 'none';
+          showError(data.message || 'Failed to set safe zone.');
+        }
+      } catch (err) {
+        confirmation.style.display = 'none';
+        showError('Error setting safe zone.');
+      }
+    });
+  }
+
+  // Display last location
+  const lastLocationInfo = document.getElementById('lastLocationInfo');
+  if (lastLocationInfo) {
+    fetch('/api/location/history?limit=1')
+      .then(res => res.json())
+      .then(data => {
+        if (data.locations && data.locations.length > 0) {
+          const loc = data.locations[data.locations.length - 1];
+          lastLocationInfo.textContent = `Lat: ${loc.latitude.toFixed(6)}, Lng: ${loc.longitude.toFixed(6)}, Time: ${new Date(loc.timestamp).toLocaleString()}`;
+        } else {
+          lastLocationInfo.textContent = 'No last location available.';
+        }
+      })
+      .catch(() => {
+        lastLocationInfo.textContent = 'Error loading last location.';
+      });
+  }
+});
 // ============================================
 
 document.addEventListener('DOMContentLoaded', initializeLocation);
+
+// Safe zone form logic
+// Safe zone form logic removed as requested
 
 // Refresh location when window regains focus
 window.addEventListener('focus', async () => {

@@ -45,18 +45,34 @@ async function exchangeCodeForTokens(code) {
  */
 function buildCalendarEvent(reminder, caregiverName, patientName) {
   const [hours, minutes] = reminder.schedule.split(":").map(Number);
-
+  let startTime, endTime, recurrence = null;
   const now = new Date();
-  const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-  const endTime   = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 min
 
-  const recurrenceMap = {
-    Daily:   "RRULE:FREQ=DAILY",
-    Weekly:  "RRULE:FREQ=WEEKLY",
-    Monthly: "RRULE:FREQ=MONTHLY",
-    Once:    null
-  };
-  const recurrence = recurrenceMap[reminder.frequency];
+  // Handle startTime based on frequency
+  if (reminder.frequency === "Once" && reminder.onceDate) {
+    // onceDate is YYYY-MM-DD
+    const [y, m, d] = reminder.onceDate.split("-").map(Number);
+    startTime = new Date(y, m - 1, d, hours, minutes, 0);
+  } else if (reminder.frequency === "Monthly" && reminder.monthDate) {
+    // monthDate is YYYY-MM-DD, use day
+    const [y, m, d] = reminder.monthDate.split("-").map(Number);
+    startTime = new Date(now.getFullYear(), now.getMonth(), d, hours, minutes, 0);
+    recurrence = `RRULE:FREQ=MONTHLY;BYMONTHDAY=${d}`;
+  } else if (reminder.frequency === "Yearly" && reminder.yearMonth && reminder.yearDate) {
+    // yearMonth is MM, yearDate is DD
+    startTime = new Date(now.getFullYear(), Number(reminder.yearMonth) - 1, Number(reminder.yearDate), hours, minutes, 0);
+    recurrence = `RRULE:FREQ=YEARLY;BYMONTH=${reminder.yearMonth};BYMONTHDAY=${reminder.yearDate}`;
+  } else if (reminder.frequency === "Weekly" && reminder.weekDay) {
+    // weekDay is string
+    startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+    const weekDayMap = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+    recurrence = `RRULE:FREQ=WEEKLY;BYDAY=${["SU","MO","TU","WE","TH","FR","SA"][weekDayMap[reminder.weekDay]]}`;
+  } else {
+    // Daily or fallback
+    startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+    recurrence = reminder.frequency === "Daily" ? "RRULE:FREQ=DAILY" : null;
+  }
+  endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 min
 
   const event = {
     summary: `[${reminder.category}] ${reminder.message}`,

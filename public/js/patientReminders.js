@@ -11,6 +11,67 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadReminders();
   setupCategoryTabs();
   startBrowserNotificationWatcher();
+  checkGoogleCalendarStatus();
+  handleCalendarUrlParams();
+// Google Calendar banner logic (same as caregiver)
+function handleCalendarUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("calendarConnected") === "true") {
+    showToast("✅ Google Calendar connected! Reminders will now sync automatically.", "success");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+  if (params.get("calendarError") === "true") {
+    showToast("❌ Failed to connect Google Calendar. Please try again.", "error");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
+async function checkGoogleCalendarStatus() {
+  try {
+    const res = await fetch("/auth/google/status", { credentials: "include" });
+    if (!res.ok) return;
+    const data = await res.json();
+    renderGcalBanner(data.googleCalendarConnected);
+  } catch (err) {
+    renderGcalBanner(false);
+  }
+}
+
+function renderGcalBanner(isConnected) {
+  const actionDiv  = document.getElementById("gcalAction");
+  const statusText = document.getElementById("gcalStatusText");
+  if (!actionDiv) return;
+  if (isConnected) {
+    statusText.textContent = "Reminders are syncing to your Google Calendar automatically";
+    actionDiv.innerHTML = `
+      <span class="gcal-connected-badge">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="10" fill="#22c55e"/>
+          <path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Connected
+      </span>`;
+  } else {
+    statusText.textContent = "Connect once to auto-sync all reminders to your Google Calendar";
+    actionDiv.innerHTML = `
+      <a href="/auth/google/connect?target=patient" class="gcal-connect-btn">
+        <svg width="16" height="16" viewBox="0 0 48 48">
+          <path fill="#4285F4" d="M43.6 20H24v8h11.3C33.5 32.5 29.2 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.2 2.8l5.7-5.7C33.8 7.1 29.1 5 24 5 13.5 5 5 13.5 5 24s8.5 19 19 19c10.9 0 18.5-7.6 18.5-18.5 0-1.2-.1-2.4-.4-3.5z"/>
+        </svg>
+        Connect Google Calendar
+      </a>`;
+  }
+}
+
+function showToast(message, type = "success") {
+  const toast = document.querySelector(".gcal-toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `gcal-toast ${type} show`;
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 4000);
+}
 });
 
 /* LOAD REMINDERS FROM SERVER */
@@ -163,7 +224,7 @@ function toDateKey(date) {
 
 /* RENDER REMINDERS */
 function renderReminders() {
-  const list = document.querySelector('.reminders-list');
+  const list = document.getElementById('remindersList');
   if (!list) return;
 
   // Filter by category if needed
@@ -172,23 +233,67 @@ function renderReminders() {
     filtered = allReminders.filter(r => r.category === currentCategory);
   }
 
-  if (filtered.length === 0) {
-    list.innerHTML = `
-      <div class="card" style="text-align: center; padding: 40px; color: #999;">
-        <p>No reminders yet</p>
-      </div>
-    `;
-    return;
+  // Segregate reminders by category
+  const categories = ['Medicine', 'Meal', 'Appointment', 'Hygiene', 'Other'];
+  let html = '';
+  if (currentCategory === 'All') {
+    categories.forEach(cat => {
+      const catReminders = allReminders.filter(r => r.category === cat);
+      if (catReminders.length > 0) {
+        html += `<div class="reminder-category-title">${cat}</div>`;
+        html += catReminders.map(reminder => `
+          <div class="card reminder-card ${reminder.isCompleted ? 'done' : ''}" data-id="${reminder._id}" data-status="${reminder.isCompleted ? 'done' : 'pending'}">
+            <div class="reminder-content">
+              <h3>${escapeHtml(reminder.message)}</h3>
+              <p>${formatTime(reminder.schedule)} • ${reminder.frequency}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+    });
+    if (!html) {
+      html = `<div class="card" style="text-align: center; padding: 40px; color: #999;"><p>No reminders yet</p></div>`;
+    }
+  } else {
+    if (filtered.length === 0) {
+      html = `<div class="card" style="text-align: center; padding: 40px; color: #999;"><p>No reminders yet</p></div>`;
+    } else {
+      html = filtered.map(reminder => `
+        <div class="card reminder-card ${reminder.isCompleted ? 'done' : ''}" data-id="${reminder._id}" data-status="${reminder.isCompleted ? 'done' : 'pending'}">
+          <div class="reminder-content">
+            <h3>${escapeHtml(reminder.message)}</h3>
+            <p>${formatTime(reminder.schedule)} • ${reminder.frequency}</p>
+          </div>
+        </div>
+      `).join('');
+    }
   }
-
-  list.innerHTML = filtered.map(reminder => `
-    <div class="card reminder-card ${reminder.isCompleted ? 'done' : ''}" data-id="${reminder._id}" data-status="${reminder.isCompleted ? 'done' : 'pending'}">
-      <div class="reminder-content">
-        <h3>${escapeHtml(reminder.message)}</h3>
-        <p>${formatTime(reminder.schedule)} • ${reminder.frequency}</p>
-      </div>
-    </div>
-  `).join('');
+  list.innerHTML = html;
+// Setup sync button for patient
+function setupSyncButton() {
+  const btn = document.getElementById('syncCalendarBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Syncing...';
+    try {
+      // Call backend to trigger calendar sync for patient
+      const res = await fetch('/reminder/api/reminders/calendar/auth-url', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to get calendar auth URL');
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Unable to sync calendar.');
+      }
+    } catch (err) {
+      alert('Sync failed.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sync Google Calendar';
+    }
+  });
+}
 
 }
 

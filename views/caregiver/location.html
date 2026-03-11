@@ -415,59 +415,30 @@
         <div id="geocoder"></div>
 
         <form id="safeZoneForm">
-
-          <div class="safe-zone-form">
-            <div class="form-group">
-              <label for="safeZoneName">Zone Name</label>
-              <input type="text" id="safeZoneName" placeholder="e.g., Home" required>
-            </div>
-
-            <div class="form-group">
-              <label for="safeZoneRadius">Radius (meters)</label>
-              <select id="safeZoneRadius">
-                <option value="100">100m</option>
-                <option value="250">250m</option>
-                <option value="500" selected>500m</option>
-                <option value="1000">1 km</option>
-                <option value="2000">2 km</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="safeZoneAddress">Address</label>
-              <input type="text" id="safeZoneAddress" placeholder="Enter or search address above" required>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="savedSafeZones">Select Saved Safe Zone</label>
-              <select id="savedSafeZones">
-                <option value="">-- Select a saved safe zone --</option>
-              </select>
-            </div>
-
-            <input type="hidden" id="safeZoneLatitude">
-            <input type="hidden" id="safeZoneLongitude">
+  <div id="safeZoneConfirmation" style="display:none; color:#065f46; font-weight:600; margin-top:8px;">Safezone set</div>
+        <div class="safe-zone-form">
+          <div class="form-group">
+            <label for="safeZoneAddress">Enter Safe Zone Location</label>
+            <input type="text" id="safeZoneAddress" placeholder="Enter address or location" required>
           </div>
-
-          <div class="location-controls">
-            <button type="submit" class="btn btn-primary" id="saveSafeZoneBtn">
-              💾 Save Safe Zone
-            </button>
-            <button type="button" class="btn btn-danger" id="deleteSafeZoneBtn" style="display: none;">
-              🗑️ Delete Safe Zone
-            </button>
+          <div class="form-group">
+            <label for="safeZoneRadius">Radius (meters)</label>
+            <select id="safeZoneRadius">
+              <option value="100">100m</option>
+              <option value="250">250m</option>
+              <option value="500" selected>500m</option>
+              <option value="1000">1 km</option>
+              <option value="2000">2 km</option>
+            </select>
           </div>
-        </form>
-
-        <!-- Current Safe Zone Display -->
-        <div id="safeZoneDisplay" style="display: none;" class="safe-zone-display">
-          <h4>✅ Active Safe Zone</h4>
-          <p><span class="label">Name:</span> <span id="displayZoneName"></span></p>
-          <p><span class="label">Address:</span> <span id="displayZoneAddress"></span></p>
-          <p><span class="label">Radius:</span> <span id="displayZoneRadius"></span></p>
-          <p style="font-size: 13px; margin-top: 12px; color: #64748b;">
-            📧 Email alerts will be sent if patient moves outside this zone (cooldown: 30 minutes between alerts)
-          </p>
+          <input type="hidden" id="safeZoneLatitude">
+          <input type="hidden" id="safeZoneLongitude">
+          <button type="button" class="btn btn-primary" id="setSafeZoneBtn">Set Safe Zone</button>
+          <div id="safeZoneConfirmation" style="display:none; color:#065f46; font-weight:600; margin-top:8px;">Safezone set</div>
+        </div>
+        <div class="last-location-section" style="margin-top: 24px;">
+          <h3>🕒 Last Location</h3>
+          <p id="lastLocationInfo">Loading last location...</p>
         </div>
       </div>
 

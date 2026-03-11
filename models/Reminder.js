@@ -25,8 +25,29 @@ const reminderSchema = new mongoose.Schema({
   },
   frequency: {
     type: String,
-    enum: ["Daily", "Weekly", "Monthly", "Once"],
+    enum: ["Daily", "Weekly", "Monthly", "Yearly", "Once"],
     default: "Daily"
+  },
+  weekDay: {
+    type: String,
+    enum: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    default: null
+  },
+  monthDate: {
+    type: String,
+    default: null
+  },
+  yearMonth: {
+    type: String,
+    default: null
+  },
+  yearDate: {
+    type: String,
+    default: null
+  },
+  onceDate: {
+    type: String,
+    default: null
   },
   category: {
     type: String,
