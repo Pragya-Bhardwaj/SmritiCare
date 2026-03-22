@@ -517,6 +517,27 @@ exports.setSafeZone = async (req, res) => {
       });
     }
 
+    const parsedLat = parseFloat(latitude);
+    const parsedLng = parseFloat(longitude);
+    const parsedRadius = parseInt(radius) || 500;
+
+    // Check the patient's current location against the new zone
+    const currentLocation = await Location.findOne({ userId: patientId })
+      .sort({ timestamp: -1 })
+      .lean();
+
+    let patientIsOutside = false;
+    let distanceOutside = 0;
+
+    if (currentLocation) {
+      const [locLng, locLat] = currentLocation.coordinates.coordinates;
+      const distanceFromCenter = calculateDistance(parsedLat, parsedLng, locLat, locLng);
+      patientIsOutside = distanceFromCenter > parsedRadius;
+      if (patientIsOutside) {
+        distanceOutside = distanceFromCenter - parsedRadius;
+      }
+    }
+
     const safeZoneData = {
       patientId,
       caregiverId: req.session.user.id,
@@ -524,10 +545,13 @@ exports.setSafeZone = async (req, res) => {
       address: address.trim(),
       coordinates: {
         type: 'Point',
-        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+        coordinates: [parsedLng, parsedLat]
       },
-      radius: radius || 500,
-      isActive: true
+      radius: parsedRadius,
+      isActive: true,
+      // Clear lastAlertSent so future alerts work normally.
+      // If patient is already outside we'll send an alert now and stamp it below.
+      lastAlertSent: null
     };
 
     // Update or create safe zone
@@ -536,6 +560,22 @@ exports.setSafeZone = async (req, res) => {
       safeZoneData,
       { upsert: true, new: true }
     );
+
+    // If patient is already outside the new zone, send an alert immediately
+    if (patientIsOutside) {
+      try {
+        const caregiver = await User.findById(req.session.user.id);
+        const patient   = await User.findById(patientId);
+        if (caregiver && patient && caregiver.email) {
+          await sendSafeZoneAlert(caregiver, patient, distanceOutside, safeZone);
+          safeZone.lastAlertSent = new Date();
+          await safeZone.save();
+          console.log(`📧 Immediate safe zone alert sent — patient was already outside when zone was set`);
+        }
+      } catch (alertErr) {
+        console.error("❌ Failed to send immediate safe zone alert:", alertErr);
+      }
+    }
 
     console.log(`✅ Safe zone set for patient ${patientId}`);
 

@@ -407,22 +407,21 @@
           <h2>🛡️ Safe Zone Configuration</h2>
         </div>
 
-        <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
-          Set a safe zone for your patient. You'll receive email alerts when they move more than 500 meters from this location.
+        <p style="color: #64748b; margin-bottom: 16px; font-size: 14px;">
+          Set a safe zone for your patient. You'll receive email alerts when they leave this area.
         </p>
 
-        <!-- Address Search -->
+        <!-- Mapbox Geocoder — populates lat/lng automatically -->
         <div id="geocoder"></div>
 
-        <form id="safeZoneForm">
-  <div id="safeZoneConfirmation" style="display:none; color:#065f46; font-weight:600; margin-top:8px;">Safezone set</div>
-        <div class="safe-zone-form">
+        <div class="safe-zone-form" style="margin-top: 14px;">
           <div class="form-group">
-            <label for="safeZoneAddress">Enter Safe Zone Location</label>
-            <input type="text" id="safeZoneAddress" placeholder="Enter address or location" required>
+            <label for="safeZoneAddress">Address</label>
+            <input type="text" id="safeZoneAddress" placeholder="Address will fill from search above" readonly
+              style="background:#f8fafc; cursor:default;">
           </div>
           <div class="form-group">
-            <label for="safeZoneRadius">Radius (meters)</label>
+            <label for="safeZoneRadius">Alert Radius</label>
             <select id="safeZoneRadius">
               <option value="100">100m</option>
               <option value="250">250m</option>
@@ -431,14 +430,27 @@
               <option value="2000">2 km</option>
             </select>
           </div>
-          <input type="hidden" id="safeZoneLatitude">
-          <input type="hidden" id="safeZoneLongitude">
-          <button type="button" class="btn btn-primary" id="setSafeZoneBtn">Set Safe Zone</button>
-          <div id="safeZoneConfirmation" style="display:none; color:#065f46; font-weight:600; margin-top:8px;">Safezone set</div>
         </div>
-        <div class="last-location-section" style="margin-top: 24px;">
-          <h3>🕒 Last Location</h3>
-          <p id="lastLocationInfo">Loading last location...</p>
+
+        <input type="hidden" id="safeZoneLatitude">
+        <input type="hidden" id="safeZoneLongitude">
+
+        <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" id="setSafeZoneBtn">Set Safe Zone</button>
+          <span id="safeZoneConfirmation" style="display:none; color:#065f46; font-weight:600; font-size:14px;">✅ Safe zone saved</span>
+          <span id="safeZoneError" style="display:none; color:#b91c1c; font-weight:600; font-size:14px;"></span>
+        </div>
+
+        <!-- Current safe zone display -->
+        <div id="currentSafeZone" style="display:none; margin-top: 18px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px;">
+          <p style="margin:0 0 4px; font-size:13px; font-weight:700; color:#065f46;">📍 Current Safe Zone</p>
+          <p id="currentSafeZoneText" style="margin:0; font-size:14px; color:#334155;"></p>
+        </div>
+
+        <!-- Last known location -->
+        <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+          <p style="margin:0 0 6px; font-size:13px; font-weight:700; color:#334155;">🕒 Last Known Location</p>
+          <p id="lastLocationInfo" style="margin:0; font-size:13px; color:#64748b;">Loading…</p>
         </div>
       </div>
 
@@ -493,54 +505,210 @@
   <script src="/js/caregiverDashboard.js"></script>
   <script src="/js/caregiverLocation.js"></script>
   <script>
-    // --- Safe Zone Search & Selection Logic ---
-    // This assumes an endpoint /caregiver/safezones returns [{_id, name, address, radius, latitude, longitude}]
-    document.addEventListener('DOMContentLoaded', function() {
-      const savedSafeZonesSelect = document.getElementById('savedSafeZones');
-      const nameInput = document.getElementById('safeZoneName');
-      const addressInput = document.getElementById('safeZoneAddress');
-      const radiusSelect = document.getElementById('safeZoneRadius');
-      const latInput = document.getElementById('safeZoneLatitude');
-      const lngInput = document.getElementById('safeZoneLongitude');
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-      // Fetch saved safe zones from server
-      fetch('/caregiver/safezones')
-        .then(res => res.json())
-        .then(zones => {
-          if (Array.isArray(zones)) {
-            zones.forEach(zone => {
-              const opt = document.createElement('option');
-              opt.value = zone._id;
-              opt.textContent = `${zone.name} (${zone.address})`;
-              opt.dataset.address = zone.address;
-              opt.dataset.name = zone.name;
-              opt.dataset.radius = zone.radius;
-              opt.dataset.latitude = zone.latitude;
-              opt.dataset.longitude = zone.longitude;
-              savedSafeZonesSelect.appendChild(opt);
-            });
+    function waitForMap(cb, attempts) {
+      attempts = attempts || 0;
+      if (typeof map !== 'undefined' && map && map.isStyleLoaded()) {
+        cb();
+      } else if (attempts < 60) {
+        setTimeout(() => waitForMap(cb, attempts + 1), 300);
+      }
+    }
+
+    function drawSafeZoneCircle(lat, lng, radiusMeters) {
+      radiusMeters = parseFloat(radiusMeters);
+      ['safe-zone-fill', 'safe-zone-stroke'].forEach(id => {
+        if (map.getLayer(id)) map.removeLayer(id);
+      });
+      if (map.getSource('safe-zone')) map.removeSource('safe-zone');
+
+      map.addSource('safe-zone', {
+        type: 'geojson',
+        data: { type: 'Feature', geometry: { type: 'Point', coordinates: [lng, lat] } }
+      });
+      map.addLayer({
+        id: 'safe-zone-fill', type: 'circle', source: 'safe-zone',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, radiusMeters / 200, 16, radiusMeters / 8],
+          'circle-color': '#10b981', 'circle-opacity': 0.15
+        }
+      });
+      map.addLayer({
+        id: 'safe-zone-stroke', type: 'circle', source: 'safe-zone',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, radiusMeters / 200, 16, radiusMeters / 8],
+          'circle-color': 'transparent',
+          'circle-stroke-width': 2, 'circle-stroke-color': '#10b981', 'circle-stroke-opacity': 0.9
+        }
+      });
+    }
+
+    function showSafeZoneDisplay(address, radius) {
+      const display = document.getElementById('currentSafeZone');
+      const text    = document.getElementById('currentSafeZoneText');
+      if (display && text) {
+        display.style.display = 'block';
+        text.textContent = address + '  •  Radius: ' + radius + 'm';
+      }
+    }
+
+    // ── On page load ─────────────────────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // 1. Load existing safe zone
+      fetch('/api/location/safe-zone', { credentials: 'include' })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.safeZone) return;
+          const sz = data.safeZone;
+          document.getElementById('safeZoneAddress').value  = sz.address  || '';
+          document.getElementById('safeZoneLatitude').value  = sz.latitude  || '';
+          document.getElementById('safeZoneLongitude').value = sz.longitude || '';
+          document.getElementById('safeZoneRadius').value    = sz.radius    || '500';
+          showSafeZoneDisplay(sz.address, sz.radius);
+          waitForMap(() => drawSafeZoneCircle(sz.latitude, sz.longitude, sz.radius));
+        })
+        .catch(() => {});
+
+      // 2. Load last location with reverse geocoding
+      fetch('/api/location/history?limit=1', { credentials: 'include' })
+        .then(r => r.json())
+        .then(async data => {
+          const el = document.getElementById('lastLocationInfo');
+          if (!el) return;
+          if (!data.locations || data.locations.length === 0) {
+            el.textContent = 'No location data available yet.';
+            return;
           }
+          const loc = data.locations[data.locations.length - 1];
+          const time = new Date(loc.timestamp).toLocaleString();
+          const coords = loc.latitude.toFixed(6) + ', ' + loc.longitude.toFixed(6);
+
+          // Show coords immediately while reverse geocode loads
+          el.textContent = coords + ' — ' + time;
+
+          // Reverse geocode using Mapbox
+          try {
+            const tokenRes = await fetch('/api/config/mapbox', { credentials: 'include' });
+            const { token } = await tokenRes.json();
+            if (!token) return;
+
+            const geoRes = await fetch(
+              'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
+              loc.longitude + ',' + loc.latitude +
+              '.json?types=place,locality,neighborhood,address&limit=1&access_token=' + token
+            );
+            const geoData = await geoRes.json();
+            const placeName = geoData.features && geoData.features[0]
+              ? geoData.features[0].place_name
+              : null;
+
+            if (placeName) {
+              el.innerHTML =
+                '<span style="font-weight:600;color:#1e293b;">' + placeName + '</span>' +
+                '<br><span style="font-size:12px;color:#94a3b8;">' + coords + ' — ' + time + '</span>';
+            }
+          } catch (_) {
+            // Reverse geocode failed — coords already shown, nothing to do
+          }
+        })
+        .catch(() => {
+          const el = document.getElementById('lastLocationInfo');
+          if (el) el.textContent = 'Could not load last location.';
         });
 
-      // When a saved zone is selected, fill the form
-      savedSafeZonesSelect.addEventListener('change', function() {
-        const selected = savedSafeZonesSelect.options[savedSafeZonesSelect.selectedIndex];
-        if (selected && selected.value) {
-          nameInput.value = selected.dataset.name || '';
-          addressInput.value = selected.dataset.address || '';
-          radiusSelect.value = selected.dataset.radius || '500';
-          latInput.value = selected.dataset.latitude || '';
-          lngInput.value = selected.dataset.longitude || '';
-        } else {
-          nameInput.value = '';
-          addressInput.value = '';
-          radiusSelect.value = '500';
-          latInput.value = '';
-          lngInput.value = '';
+      // 3. Wire geocoder once map token is ready
+      fetch('/api/config/mapbox', { credentials: 'include' })
+        .then(r => r.json())
+        .then(({ token }) => {
+          if (!token || typeof MapboxGeocoder === 'undefined') return;
+          // Attach geocoder to the map after map initialises
+          waitForMap(() => {
+            const geocoder = new MapboxGeocoder({
+              accessToken: token,
+              mapboxgl: mapboxgl,
+              placeholder: 'Search for an address…',
+              types: 'address,place,poi',
+              marker: false
+            });
+            // Render the geocoder widget into our container
+            document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+
+            geocoder.on('result', function (e) {
+              const [lng, lat] = e.result.geometry.coordinates;
+              document.getElementById('safeZoneLatitude').value  = lat;
+              document.getElementById('safeZoneLongitude').value = lng;
+              document.getElementById('safeZoneAddress').value   = e.result.place_name || '';
+              document.getElementById('safeZoneError').style.display = 'none';
+            });
+
+            geocoder.on('clear', function () {
+              document.getElementById('safeZoneLatitude').value  = '';
+              document.getElementById('safeZoneLongitude').value = '';
+              document.getElementById('safeZoneAddress').value   = '';
+            });
+          });
+        })
+        .catch(() => {});
+
+      // 4. Safe zone save button
+      const btn = document.getElementById('setSafeZoneBtn');
+      if (!btn) return;
+
+      btn.addEventListener('click', async function () {
+        const address   = document.getElementById('safeZoneAddress').value.trim();
+        const radius    = document.getElementById('safeZoneRadius').value;
+        const latitude  = document.getElementById('safeZoneLatitude').value;
+        const longitude = document.getElementById('safeZoneLongitude').value;
+        const confirmEl = document.getElementById('safeZoneConfirmation');
+        const errorEl   = document.getElementById('safeZoneError');
+
+        confirmEl.style.display = 'none';
+        errorEl.style.display   = 'none';
+
+        if (!latitude || !longitude) {
+          errorEl.textContent    = 'Please search and select an address first.';
+          errorEl.style.display  = 'inline';
+          return;
+        }
+        if (!address) {
+          errorEl.textContent   = 'Address is required.';
+          errorEl.style.display = 'inline';
+          return;
+        }
+
+        btn.disabled    = true;
+        btn.textContent = 'Saving…';
+
+        try {
+          const res = await fetch('/api/location/safe-zone', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ address, radius, latitude, longitude })
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            confirmEl.style.display = 'inline';
+            setTimeout(() => { confirmEl.style.display = 'none'; }, 3000);
+            showSafeZoneDisplay(address, radius);
+            waitForMap(() => drawSafeZoneCircle(parseFloat(latitude), parseFloat(longitude), parseInt(radius)));
+          } else {
+            errorEl.textContent   = data.message || 'Failed to set safe zone.';
+            errorEl.style.display = 'inline';
+          }
+        } catch (err) {
+          errorEl.textContent   = 'Network error. Please try again.';
+          errorEl.style.display = 'inline';
+        } finally {
+          btn.disabled    = false;
+          btn.textContent = 'Set Safe Zone';
         }
       });
     });
   </script>
 </body>
 </html>
-

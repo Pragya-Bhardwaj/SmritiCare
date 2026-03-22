@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       unsyncBtn.disabled = true;
       unsyncStatus.style.display = "none";
       try {
-        const res = await fetch("/api/reminders/calendar/disconnect", {
+        const res = await fetch("/reminder/api/reminders/calendar/disconnect", {
           method: "POST",
           credentials: "include"
         });
