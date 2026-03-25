@@ -37,6 +37,18 @@ body,
 .auth-wrapper {
   min-height: 100vh;
   background: var(--auth-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  background: var(--auth-panel);
+  border-radius: 18px;
+  box-shadow: var(--auth-shadow);
+  padding: 32px 24px;
 }
 
 .auth-layout {
@@ -518,6 +530,33 @@ form {
   }
 
   .forgot-page .forgot-actions {
+
+  }
+}
+
+/* Login and signup: hide hero image, center form */
+.login-page .auth-hero-panel,
+.signup-page .auth-hero-panel {
+  display: none;
+}
+
+.login-page .auth-layout,
+.signup-page .auth-layout {
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.login-page .auth-form-panel,
+.signup-page .auth-form-panel {
+  width: min(520px, 100%);
+  max-width: 560px;
+  box-shadow: var(--auth-shadow);
+  border-radius: 18px;
+  padding: 32px 24px;
+}
+
     flex-direction: column;
   }
 }
