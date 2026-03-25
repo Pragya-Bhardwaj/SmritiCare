@@ -1,3 +1,11 @@
+// Show/hide extra fields based on frequency (global scope for modal)
+function handleFrequencyChange() {
+  const freq = document.getElementById("reminderClassification").value;
+  document.getElementById("weeklyOptions").style.display = freq === "Weekly" ? "block" : "none";
+  document.getElementById("monthlyOptions").style.display = freq === "Monthly" ? "block" : "none";
+  document.getElementById("yearlyOptions").style.display = freq === "Yearly" ? "block" : "none";
+  document.getElementById("onceOptions").style.display = freq === "Once" ? "block" : "none";
+}
 // public/js/caregiverReminders.js
 let selectedReminderId = null;
 let isEdit = false;
@@ -13,6 +21,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   startBrowserNotificationWatcher();
   checkGoogleCalendarStatus();
   handleCalendarUrlParams();
+
+  // Unsync Google Calendar button logic
+  const unsyncBtn = document.getElementById("unsyncCalendarBtn");
+  const unsyncStatus = document.getElementById("unsyncStatus");
+  if (unsyncBtn) {
+    unsyncBtn.addEventListener("click", async () => {
+      unsyncBtn.disabled = true;
+      unsyncStatus.style.display = "none";
+      try {
+        const res = await fetch("/reminder/api/reminders/calendar/disconnect", {
+          method: "POST",
+          credentials: "include"
+        });
+        const data = await res.json();
+        if (data.success) {
+          unsyncStatus.textContent = "Google Calendar disconnected.";
+          unsyncStatus.style.display = "inline";
+          checkGoogleCalendarStatus();
+        } else {
+          unsyncStatus.textContent = data.message || "Failed to disconnect.";
+          unsyncStatus.style.display = "inline";
+          unsyncStatus.style.color = "red";
+        }
+      } catch (err) {
+        unsyncStatus.textContent = "Error disconnecting calendar.";
+        unsyncStatus.style.display = "inline";
+        unsyncStatus.style.color = "red";
+      }
+      unsyncBtn.disabled = false;
+    });
+  }
 });
 
 /* ─────────────────────────────────────────
@@ -303,6 +342,17 @@ function openAddModal() {
   document.getElementById("reminderClassification").value = "Daily";
   document.getElementById("reminderType").value = "Medicine";
 
+  // Reset all extra fields
+  document.getElementById("weeklyOptions").style.display = "none";
+  document.getElementById("monthlyOptions").style.display = "none";
+  document.getElementById("yearlyOptions").style.display = "none";
+  document.getElementById("onceOptions").style.display = "none";
+  document.getElementById("reminderWeekDay").value = "Monday";
+  document.getElementById("reminderMonthDate").value = "";
+  document.getElementById("reminderYearMonth").value = "01";
+  document.getElementById("reminderYearDate").value = "1";
+  document.getElementById("reminderOnceDate").value = "";
+
   document.getElementById("reminderModal").classList.remove("hidden");
 }
 
@@ -329,7 +379,32 @@ function openEditModal(reminderId) {
   document.getElementById("reminderClassification").value = reminder.frequency || "Daily";
   document.getElementById("reminderType").value = reminder.category || "Other";
 
+  // Show/hide extra fields based on frequency
+  handleFrequencyChange();
+  // Set extra fields if present (for edit)
+  if (reminder.frequency === "Weekly" && reminder.weekDay) {
+    document.getElementById("reminderWeekDay").value = reminder.weekDay;
+  }
+  if (reminder.frequency === "Monthly" && reminder.monthDate) {
+    document.getElementById("reminderMonthDate").value = reminder.monthDate;
+  }
+  if (reminder.frequency === "Yearly" && reminder.yearMonth && reminder.yearDate) {
+    document.getElementById("reminderYearMonth").value = reminder.yearMonth;
+    document.getElementById("reminderYearDate").value = reminder.yearDate;
+  }
+  if (reminder.frequency === "Once" && reminder.onceDate) {
+    document.getElementById("reminderOnceDate").value = reminder.onceDate;
+  }
+
   document.getElementById("reminderModal").classList.remove("hidden");
+// Show/hide extra fields based on frequency
+function handleFrequencyChange() {
+  const freq = document.getElementById("reminderClassification").value;
+  document.getElementById("weeklyOptions").style.display = freq === "Weekly" ? "block" : "none";
+  document.getElementById("monthlyOptions").style.display = freq === "Monthly" ? "block" : "none";
+  document.getElementById("yearlyOptions").style.display = freq === "Yearly" ? "block" : "none";
+  document.getElementById("onceOptions").style.display = freq === "Once" ? "block" : "none";
+}
 }
 
 function openDeleteModal(reminderId) {
@@ -356,6 +431,13 @@ async function saveReminder() {
   const frequency  = document.getElementById('reminderClassification').value;
   const category   = document.getElementById('reminderType').value;
 
+  // Extra fields
+  const weekDay    = document.getElementById("reminderWeekDay").value;
+  const monthDate  = document.getElementById("reminderMonthDate").value;
+  const yearMonth  = document.getElementById("reminderYearMonth").value;
+  const yearDate   = document.getElementById("reminderYearDate").value;
+  const onceDate   = document.getElementById("reminderOnceDate").value;
+
   if (!title) {
     alert("Please enter reminder title");
     return;
@@ -367,7 +449,15 @@ async function saveReminder() {
   if (ampm === 'AM' && hh === 12) hh = 0;
   const schedule = `${String(hh).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
+  // Build payload
   const payload = { message: title, schedule, frequency, category };
+  if (frequency === "Weekly") payload.weekDay = weekDay;
+  if (frequency === "Monthly") payload.monthDate = monthDate;
+  if (frequency === "Yearly") {
+    payload.yearMonth = yearMonth;
+    payload.yearDate = yearDate;
+  }
+  if (frequency === "Once") payload.onceDate = onceDate;
 
   try {
     if (isEdit) {

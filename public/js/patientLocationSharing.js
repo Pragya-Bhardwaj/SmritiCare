@@ -77,10 +77,14 @@ async function checkLocationPermission() {
 
 /**
  * Show popup notification for enabling location sharing
- * Non-dismissible - user must make a choice
- * No timer - stays until user interacts
+ * Only shown on patient dashboard
  */
 function showLocationEnablePopup() {
+  // Only show on patient dashboard
+  if (!window.location.pathname.includes('/patient/dashboard')) {
+    return;
+  }
+
   if (popupShown) return;
   popupShown = true;
 
@@ -121,92 +125,48 @@ function showLocationEnablePopup() {
 
       .popup-content {
         background: white;
-        border-radius: 20px;
-        padding: 40px;
-        max-width: 480px;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 420px;
         width: 90%;
         box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
         animation: slideUp 0.5s ease-out;
         text-align: center;
-        position: relative;
       }
 
       .popup-icon {
-        font-size: 72px;
-        margin-bottom: 24px;
+        font-size: 64px;
+        margin-bottom: 16px;
         display: block;
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.05); opacity: 0.8; }
       }
 
       .popup-title {
-        font-size: 26px;
+        font-size: 22px;
         font-weight: 700;
         color: #1e293b;
-        margin: 0 0 16px 0;
-        line-height: 1.3;
+        margin: 0 0 12px 0;
       }
 
       .popup-subtitle {
-        font-size: 15px;
+        font-size: 14px;
         color: #64748b;
-        line-height: 1.7;
-        margin: 0 0 28px 0;
-      }
-
-      .popup-features {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-left: 5px solid #667eea;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 28px;
-        text-align: left;
-      }
-
-      .popup-features-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0 0 16px 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .feature-item {
-        font-size: 14px;
-        color: #334155;
-        margin: 12px 0;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
         line-height: 1.6;
-      }
-
-      .feature-item::before {
-        content: "✓";
-        color: #10b981;
-        font-weight: bold;
-        font-size: 18px;
-        flex-shrink: 0;
+        margin: 0 0 24px 0;
       }
 
       .popup-actions {
         display: flex;
-        gap: 14px;
+        gap: 12px;
         flex-direction: column;
       }
 
       .popup-btn {
-        padding: 16px 28px;
+        padding: 14px 24px;
         border: none;
-        border-radius: 12px;
+        border-radius: 10px;
         font-weight: 600;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 15px;
         transition: all 0.3s;
         font-family: inherit;
       }
@@ -222,10 +182,6 @@ function showLocationEnablePopup() {
         box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
       }
 
-      .btn-enable:active {
-        transform: translateY(0);
-      }
-
       .btn-not-now {
         background: #f1f5f9;
         color: #64748b;
@@ -234,34 +190,15 @@ function showLocationEnablePopup() {
 
       .btn-not-now:hover {
         background: #e2e8f0;
-        border-color: #cbd5e1;
-      }
-
-      .popup-footer {
-        font-size: 13px;
-        color: #94a3b8;
-        margin-top: 20px;
-        line-height: 1.6;
-        padding-top: 20px;
-        border-top: 1px solid #e2e8f0;
-      }
-
-      .popup-footer strong {
-        color: #64748b;
       }
 
       @media (max-width: 480px) {
         .popup-content {
-          padding: 32px 24px;
+          padding: 24px;
         }
 
         .popup-title {
-          font-size: 22px;
-        }
-
-        .popup-btn {
-          padding: 14px 24px;
-          font-size: 15px;
+          font-size: 20px;
         }
       }
     </style>
@@ -269,32 +206,19 @@ function showLocationEnablePopup() {
     <div class="popup-content">
       <span class="popup-icon">📍</span>
       
-      <h2 class="popup-title" id="popup-title">Enable Location Sharing?</h2>
+      <h2 class="popup-title" id="popup-title">Enable Location Sharing</h2>
       
       <p class="popup-subtitle">
-        Help your caregiver keep you safe by sharing your real-time location. This allows them to find you quickly in case of emergency.
+        Share your location with your caregiver for safety and quick help in case of emergency.
       </p>
-
-      <div class="popup-features">
-        <div class="popup-features-title">🔒 How It Helps:</div>
-        <div class="feature-item">High-accuracy real-time tracking every 15 seconds</div>
-        <div class="feature-item">Detailed location history for the last 24 hours</div>
-        <div class="feature-item">Only visible to your linked caregiver</div>
-        <div class="feature-item">Encrypted and secure - your privacy is protected</div>
-        <div class="feature-item">You can pause sharing anytime from your profile</div>
-      </div>
 
       <div class="popup-actions">
         <button class="popup-btn btn-enable" onclick="enableLocationFromPopup()">
-          🟢 Enable Location Sharing
+          ✓ Enable Location
         </button>
         <button class="popup-btn btn-not-now" onclick="dismissLocationPopup()">
           Not Now
         </button>
-      </div>
-
-      <div class="popup-footer">
-        <strong>📌 Important:</strong> This popup and the banner at the top will keep appearing until you enable location sharing. Your caregiver needs this to ensure your safety.
       </div>
     </div>
   `;

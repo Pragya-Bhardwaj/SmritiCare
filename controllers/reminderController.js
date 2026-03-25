@@ -1,3 +1,49 @@
+// Calendar sync stub handlers to fix router error
+exports.getCalendarAuthUrl = (req, res) => {
+  res.status(501).json({ error: "Not implemented", message: "getCalendarAuthUrl not implemented" });
+};
+
+exports.handleCalendarCallback = (req, res) => {
+  res.status(501).json({ error: "Not implemented", message: "handleCalendarCallback not implemented" });
+};
+
+exports.getCalendarStatus = (req, res) => {
+  res.status(501).json({ error: "Not implemented", message: "getCalendarStatus not implemented" });
+};
+
+exports.disconnectCalendar = (req, res) => {
+  // Only caregivers can disconnect their calendar
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Unauthorized", message: "Please log in" });
+  }
+  if (req.session.user.role !== "caregiver") {
+    return res.status(403).json({ error: "Forbidden", message: "Only caregivers can disconnect calendar" });
+  }
+  User.findByIdAndUpdate(
+    req.session.user.id,
+    {
+      $set: {
+        googleTokens: {
+          access_token: null,
+          refresh_token: null,
+          expiry_date: null,
+          token_type: null,
+          scope: null
+        },
+        googleCalendarConnected: false,
+        googleTokensExpired: false
+      }
+    },
+    { new: true }
+  )
+    .then(() => {
+      res.json({ success: true, message: "Google Calendar disconnected" });
+    })
+    .catch((err) => {
+      console.error("Disconnect calendar error:", err);
+      res.status(500).json({ error: "Server error", message: "Failed to disconnect calendar" });
+    });
+}
 // controllers/reminderController.js
 const Reminder = require("../models/Reminder");
 const User = require("../models/User");
@@ -64,7 +110,7 @@ exports.addReminder = async (req, res) => {
       return res.status(400).json({ error: "Not linked", message: "You must be linked to a patient first" });
     }
 
-    const { message, schedule, frequency, category } = req.body;
+    const { message, schedule, frequency, category, weekDay, monthDate, yearMonth, yearDate, onceDate } = req.body;
 
     if (!message || message.trim() === "") {
       return res.status(400).json({ error: "Validation error", message: "Reminder message is required" });
@@ -86,7 +132,12 @@ exports.addReminder = async (req, res) => {
       schedule: schedule.trim(),
       frequency: frequency || "Daily",
       category: category || "Other",
-      isCompleted: false
+      isCompleted: false,
+      weekDay: weekDay || null,
+      monthDate: monthDate || null,
+      yearMonth: yearMonth || null,
+      yearDate: yearDate || null,
+      onceDate: onceDate || null
     });
 
     // Fetch both users to check Google Calendar connection
@@ -169,7 +220,7 @@ exports.getReminders = async (req, res) => {
 exports.updateReminder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { message, schedule, frequency, category, isCompleted } = req.body;
+    const { message, schedule, frequency, category, isCompleted, weekDay, monthDate, yearMonth, yearDate, onceDate } = req.body;
 
     if (!req.session.user) {
       return res.status(401).json({ error: "Unauthorized", message: "Please log in" });
@@ -190,6 +241,11 @@ exports.updateReminder = async (req, res) => {
       if (Object.prototype.hasOwnProperty.call(req.body, 'schedule'))  reminder.schedule  = schedule ? schedule.trim() : '';
       if (Object.prototype.hasOwnProperty.call(req.body, 'frequency')) reminder.frequency = frequency || "Daily";
       if (Object.prototype.hasOwnProperty.call(req.body, 'category'))  reminder.category  = category || "Other";
+      if (Object.prototype.hasOwnProperty.call(req.body, 'weekDay'))   reminder.weekDay   = weekDay || null;
+      if (Object.prototype.hasOwnProperty.call(req.body, 'monthDate')) reminder.monthDate = monthDate || null;
+      if (Object.prototype.hasOwnProperty.call(req.body, 'yearMonth')) reminder.yearMonth = yearMonth || null;
+      if (Object.prototype.hasOwnProperty.call(req.body, 'yearDate'))  reminder.yearDate  = yearDate || null;
+      if (Object.prototype.hasOwnProperty.call(req.body, 'onceDate'))  reminder.onceDate  = onceDate || null;
 
     } else if (req.session.user.role === "patient") {
       // Patients can only mark as complete/incomplete

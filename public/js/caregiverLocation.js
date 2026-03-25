@@ -611,9 +611,17 @@ function panToLocation() {
 
 // ============================================
 // EVENT LISTENERS
+document.addEventListener('DOMContentLoaded', function() {
+  // Safe zone button is handled by the inline script in location.html
+  // which replaces this button's listener after map initialisation.
+  // This block intentionally left minimal to avoid conflicts.
+});
 // ============================================
 
 document.addEventListener('DOMContentLoaded', initializeLocation);
+
+// Safe zone form logic
+// Safe zone form logic removed as requested
 
 // Refresh location when window regains focus
 window.addEventListener('focus', async () => {

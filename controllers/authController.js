@@ -651,24 +651,47 @@ exports.connectGoogleCalendar = (req, res) => {
 /* GOOGLE CALENDAR - Google redirects back here after user approves */
 exports.googleCalendarCallback = async (req, res) => {
   try {
-    const { code, state: userId } = req.query;
+    // FIX: Get userId from SESSION (where user is logged in), not from URL state
+    if (!req.session.user || !req.session.user.id) {
+      console.error("[AUTH] No session user found in callback");
+      return res.redirect("/auth/login?error=session_expired");
+    }
 
-    if (!code || !userId) {
+    const userId = req.session.user.id;  // ← FIX: Use session ID, not state!
+    const { code, state } = req.query;
+
+    if (!code) {
       return res.redirect("/caregiver/reminders?calendarError=true");
     }
 
+    console.log("[AUTH] Processing calendar callback");
+    console.log("  User ID from session:", userId);
+    console.log("  Has authorization code:", !!code);
+
+    // Exchange code for tokens
     const tokens = await exchangeCodeForTokens(code);
 
+    if (!tokens || !tokens.refresh_token) {
+      console.error("[AUTH] Failed to get tokens or refresh_token");
+      return res.redirect("/caregiver/reminders?calendarError=true");
+    }
+
+    // Save tokens using the CORRECT userId from session
     await User.findByIdAndUpdate(userId, {
       googleTokens: {
         access_token:  tokens.access_token,
         refresh_token: tokens.refresh_token,
-        expiry_date:   tokens.expiry_date
+        expiry_date:   tokens.expiry_date,
+        token_type:    tokens.token_type,
+        scope:         tokens.scope
       },
-      googleCalendarConnected: true
+      googleCalendarConnected: true,
+      googleTokensExpired: false
     });
 
-    // Keep session in sync
+    console.log("[AUTH] ✓ Google Calendar connected successfully for user:", userId);
+
+    // Update session
     if (req.session.user && req.session.user.id === userId) {
       req.session.user.googleCalendarConnected = true;
       await req.session.save();
@@ -677,7 +700,7 @@ exports.googleCalendarCallback = async (req, res) => {
     res.redirect("/caregiver/reminders?calendarConnected=true");
 
   } catch (err) {
-    console.error("Google Calendar callback error:", err);
+    console.error("[AUTH] Google Calendar callback error:", err.message);
     res.redirect("/caregiver/reminders?calendarError=true");
   }
 };

@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCaregiverName();
   setDashboardDate();
 
+  // Unsync Google Calendar button logic removed
+
   const sidebarLinks = document.querySelectorAll(".sidebar nav a");
 
   if (!sidebarLinks.length) return;

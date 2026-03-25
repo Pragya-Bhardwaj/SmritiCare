@@ -166,12 +166,11 @@
             <span id="gcalStatusText">Connect to auto-sync reminders to your Google Calendar</span>
           </div>
         </div>
-
-        <!-- This div swaps between connect button and connected badge -->
         <div id="gcalAction">
-          <!-- Filled dynamically by JS based on connection status -->
           <span style="font-size:13px; color:#94a3b8;">Checking...</span>
         </div>
+        <button class="gcal-connect-btn" id="unsyncCalendarBtn" style="margin-left:16px;">Unsync Google Calendar</button>
+        <span id="unsyncStatus" style="display:none;margin-left:1em;color:green;"></span>
       </div>
 
       <!-- REMINDERS LIST -->
@@ -201,7 +200,7 @@
           <option>09</option><option>10</option><option>11</option><option>12</option>
         </select>
         <select id="reminderMinute">
-          <option>00</option><option>15</option><option>30</option><option>45</option>
+          <option>00</option><option>05</option><option>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>35</option><option>40</option><option>45</option><option>50</option><option>55</option>
         </select>
         <select id="reminderAmPm">
           <option>AM</option><option>PM</option>
@@ -211,12 +210,60 @@
       <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
         Frequency
       </label>
-      <select id="reminderClassification">
+      <select id="reminderClassification" onchange="handleFrequencyChange()">
         <option value="Daily">Daily</option>
         <option value="Weekly">Weekly</option>
         <option value="Monthly">Monthly</option>
+        <option value="Yearly">Yearly</option>
         <option value="Once">Once</option>
       </select>
+
+      <!-- Weekly: Day of week dropdown -->
+      <div id="weeklyOptions" style="display:none; margin-top:8px;">
+        <label style="font-size:13px; color:#334155;">Select Day of Week</label>
+        <select id="reminderWeekDay">
+          <option value="Sunday">Sunday</option>
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+        </select>
+      </div>
+
+      <!-- Monthly: Date picker -->
+      <div id="monthlyOptions" style="display:none; margin-top:8px;">
+        <label style="font-size:13px; color:#334155;">Select Date</label>
+        <input type="date" id="reminderMonthDate">
+      </div>
+
+      <!-- Yearly: Month and date picker -->
+      <div id="yearlyOptions" style="display:none; margin-top:8px;">
+        <label style="font-size:13px; color:#334155;">Select Month</label>
+        <select id="reminderYearMonth">
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+        <label style="font-size:13px; color:#334155; margin-left:8px;">Select Date</label>
+        <input type="number" id="reminderYearDate" min="1" max="31" style="width:60px;">
+      </div>
+
+      <!-- Once: Calendar picker -->
+      <div id="onceOptions" style="display:none; margin-top:8px;">
+        <label style="font-size:13px; color:#334155;">Select Date</label>
+        <input type="date" id="reminderOnceDate">
+      </div>
 
       <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 14px;">
         Category

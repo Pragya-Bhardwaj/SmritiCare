@@ -187,98 +187,38 @@
 
       <div class="location-container">
 
-        <!-- PAGE HEADER -->
-        <div style="margin-bottom: 30px;">
-          <h1>Location Sharing</h1>
-          <p class="sub">Share your location with your caregiver for added safety</p>
-        </div>
+  <!-- PAGE HEADER -->
+  <div style="margin-bottom: 24px;">
+    <h1>Location Sharing</h1>
+    <p class="sub">Your caregiver can see your location to keep you safe</p>
+  </div>
 
-        <!-- STATUS -->
-        <div class="location-status active" id="locationStatus">
-          <div class="status-icon">📍</div>
-          <div class="status-text">
-            <h3 id="statusTitle">Location Sharing Active</h3>
-            <p id="statusMessage">Your caregiver can see your live location and location history</p>
-          </div>
-        </div>
+  <!-- STATUS -->
+  <div class="location-status active" id="locationStatus">
+    <div class="status-icon">📍</div>
+    <div class="status-text">
+      <h3 id="statusTitle">Location Sharing Active</h3>
+      <p id="statusMessage">Your caregiver can see your current location</p>
+    </div>
+  </div>
 
-        <!-- MAIN CARD -->
-        <div class="location-card">
-          <h2>Your Location Safety</h2>
-          
-          <div class="feature-list">
-            <div class="feature-item">
-              <h4>🔴 Real-Time Tracking</h4>
-              <p>Your caregiver can view your current location on a live map updated every 30 seconds.</p>
-            </div>
+  <!-- MAIN CARD -->
+  <div class="location-card">
+    <div class="controls">
+      <button class="btn-toggle btn-disable" id="pauseBtn" onclick="pauseTracking()">
+        ⏸️ Pause Sharing
+      </button>
+      <button class="btn-toggle btn-enable" id="resumeBtn" onclick="resumeTracking()" style="display: none;">
+        ▶️ Resume Sharing
+      </button>
+    </div>
 
-            <div class="feature-item">
-              <h4>📊 Location History</h4>
-              <p>Your caregiver can see the places you've visited in the last 24 hours as a path on the map.</p>
-            </div>
+    <div class="info-box" style="margin-top: 16px;">
+      <strong>ℹ️</strong> Only your linked caregiver can see your location. You can pause sharing anytime using the button above.
+    </div>
+  </div>
 
-            <div class="feature-item">
-              <h4>📡 Accurate Location</h4>
-              <p>Location updates include GPS accuracy information to ensure precision.</p>
-            </div>
-
-            <div class="feature-item">
-              <h4>🔋 Battery Efficient</h4>
-              <p>Smart location tracking that minimizes battery drain by updating only when you move.</p>
-            </div>
-
-            <div class="feature-item">
-              <h4>🛡️ Privacy Protected</h4>
-              <p>Only your linked caregiver can see your location. Your data is encrypted and secure.</p>
-            </div>
-
-            <div class="feature-item">
-              <h4>⏸️ Easy Control</h4>
-              <p>You can pause location sharing anytime. It resumes automatically when the app is opened.</p>
-            </div>
-          </div>
-
-          <!-- CONTROLS -->
-          <div class="controls">
-            <button class="btn-toggle btn-disable" id="pauseBtn" onclick="pauseTracking()">
-              ⏸️ Pause Sharing
-            </button>
-            <button class="btn-toggle btn-enable" id="resumeBtn" onclick="resumeTracking()" style="display: none;">
-              ▶️ Resume Sharing
-            </button>
-          </div>
-
-          <!-- INFO -->
-          <div class="info-box">
-            <strong>ℹ️ Note:</strong> Location sharing runs in the background on all pages. The banner at the top of your screen will remind you when it's active. Make sure to keep location permission enabled in your phone's settings for best results.
-          </div>
-        </div>
-
-        <!-- PRIVACY SECTION -->
-        <div class="location-card privacy-section">
-          <h3>🛡️ Your Privacy & Security</h3>
-          
-          <p><strong>How your location is protected:</strong></p>
-          <ul>
-            <li><strong>Encrypted transmission:</strong> All location data is sent over secure HTTPS connections</li>
-            <li><strong>Limited access:</strong> Only your linked caregiver can view your location</li>
-            <li><strong>Data retention:</strong> Location history is automatically deleted after 7 days</li>
-            <li><strong>Your control:</strong> You can pause sharing or stop it completely anytime</li>
-            <li><strong>Accurate location:</strong> Only precise GPS coordinates are stored, not address details</li>
-          </ul>
-
-          <p style="margin-top: 16px;"><strong>How your caregiver uses this:</strong></p>
-          <ul>
-            <li>To ensure your safety and well-being</li>
-            <li>To quickly find you in case of emergency</li>
-            <li>To understand your daily routine and movement patterns</li>
-            <li>To provide better care and support</li>
-          </ul>
-
-          <p style="margin-top: 16px; font-size: 13px; color: #6b7280;">
-            <strong>Question?</strong> Contact your caregiver if you have any concerns about location sharing.
-          </p>
-        </div>
+</div>
 
       </div>
 
