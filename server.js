@@ -4,13 +4,12 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const path = require("path");
 const MongoStore = require("connect-mongo");
+const connectDB = require("./config/db");
 
 const app = express();
 
 /* DATABASE CONNECTION */
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✓ MongoDB connected"))
-  .catch(err => console.error("✗ MongoDB connection error:", err));
+connectDB();
 
 /* MIDDLEWARE */
 
