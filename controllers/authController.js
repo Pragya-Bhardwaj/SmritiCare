@@ -5,8 +5,12 @@ const CaregiverProfile = require("../models/CaregiverProfile");
 const InviteCode = require("../models/InviteCode");
 const nodemailer = require("nodemailer");
 const { getAuthUrl, exchangeCodeForTokens } = require("../utils/googleCalendar");
-const fs = require("fs");
-const path = require("path");
+const {
+  EMAIL_LOGO_CID,
+  getEmailLogoAttachment,
+  escapeHtml,
+  buildEmailLayout
+} = require("../utils/emailTheme");
 
 /* MAIL SETUP */
 const transporter = nodemailer.createTransport({
@@ -17,274 +21,57 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const EMAIL_LOGO_CID = "smriticare-logo";
-
-function getEmailLogoAttachment() {
-  const imageDir = path.join(__dirname, "../public/images");
-  const candidates = [
-    "email-logo.png",
-    "email-logo.jpg",
-    "email-logo.jpeg",
-    "email-logo.webp",
-    "email-logo.svg",
-    "smriticare-logo.png",
-    "smriticare-logo.jpg",
-    "smriticare-logo.jpeg",
-    "smriticare-logo.webp",
-    "smriticare-logo.svg"
-  ];
-
-  for (const name of candidates) {
-    const fullPath = path.join(imageDir, name);
-    if (fs.existsSync(fullPath)) {
-      return {
-        filename: name,
-        path: fullPath,
-        cid: EMAIL_LOGO_CID
-      };
-    }
-  }
-
-  return null;
-}
+const DEFAULT_SITE_URL = `http://localhost:${process.env.PORT || 3000}`;
+const SITE_URL = (process.env.APP_BASE_URL || process.env.APP_URL || DEFAULT_SITE_URL).trim();
 
 function buildCodeEmailTemplate({ title, subtitle, code, note, logoSrc }) {
-  const brandVisualMarkup = logoSrc
-    ? `<div class="brand-mark" style="width: 56px; height: 56px; border-radius: 18px; overflow: hidden; background-color: rgba(255, 255, 255, 0.92); padding: 10px; box-sizing: border-box; box-shadow: 0 12px 28px rgba(57, 72, 118, 0.14);">
-         <img src="${logoSrc}" alt="SmritiCare logo" style="display: block; width: 100%; height: 100%; object-fit: contain;" />
-       </div>`
-    : `<div class="brand-mark" style="width: 56px; height: 56px; border-radius: 18px; background-color: rgba(255, 255, 255, 0.88); color: #171b33; font-size: 20px; font-weight: 800; text-align: center; line-height: 56px; box-shadow: 0 12px 28px rgba(57, 72, 118, 0.14);">
-         SC
-       </div>`;
-
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="color-scheme" content="light dark" />
-        <meta name="supported-color-schemes" content="light dark" />
-        <title>${title}</title>
-        <style>
-          @media (prefers-color-scheme: dark) {
-            body,
-            .bg-main {
-              background-color: #11192b !important;
-            }
-
-            .card {
-              background: #18213a !important;
-              border-color: #2d3c60 !important;
-            }
-
-            .title {
-              color: #f4f7ff !important;
-            }
-
-            .muted {
-              color: #c1cbe4 !important;
-            }
-
-            .code-box {
-              background: #202c4a !important;
-              border-color: #3a4f7a !important;
-            }
-
-            .code-label {
-              color: #9fb2dc !important;
-            }
-
-            .code-value {
-              color: #ffffff !important;
-            }
-
-            .info-box {
-              background-color: #1f2944 !important;
-              border-left-color: #88c7ff !important;
-            }
-
-            .info-text {
-              color: #dbe4fb !important;
-            }
-
-            .footer {
-              color: #9daad0 !important;
-            }
-
-            .brand-mark {
-              background-color: rgba(255, 255, 255, 0.92) !important;
-            }
-
-            .brand-sub {
-              color: #b7c5e8 !important;
-            }
-
-            .brand-chip {
-              background-color: #dfe6fb !important;
-              border-color: #dfe6fb !important;
-              color: #171b33 !important;
-            }
-
-            .hero-panel {
-              background: #1d2741 !important;
-              border-color: #314064 !important;
-            }
-
-            .eyebrow {
-              color: #98aacd !important;
-            }
-
-            .cta-surface {
-              background-color: #f4f7ff !important;
-            }
-
-            .cta-label {
-              color: #171b33 !important;
-            }
-          }
-
-          [data-ogsc] .bg-main {
-            background-color: #11192b !important;
-          }
-
-          [data-ogsc] .card {
-            background: #18213a !important;
-            border-color: #2d3c60 !important;
-          }
-
-          [data-ogsc] .title {
-            color: #f4f7ff !important;
-          }
-
-          [data-ogsc] .muted {
-            color: #c1cbe4 !important;
-          }
-
-          [data-ogsc] .code-box {
-            background: #202c4a !important;
-            border-color: #3a4f7a !important;
-          }
-
-          [data-ogsc] .code-label {
-            color: #9fb2dc !important;
-          }
-
-          [data-ogsc] .code-value {
-            color: #ffffff !important;
-          }
-
-          [data-ogsc] .info-box {
-            background-color: #1f2944 !important;
-            border-left-color: #88c7ff !important;
-          }
-
-          [data-ogsc] .info-text {
-            color: #dbe4fb !important;
-          }
-
-          [data-ogsc] .footer {
-            color: #9daad0 !important;
-          }
-
-          [data-ogsc] .brand-mark {
-            background-color: rgba(255, 255, 255, 0.92) !important;
-          }
-
-          [data-ogsc] .brand-sub {
-            color: #b7c5e8 !important;
-          }
-
-          [data-ogsc] .brand-chip {
-            background-color: #dfe6fb !important;
-            border-color: #dfe6fb !important;
-            color: #171b33 !important;
-          }
-
-          [data-ogsc] .hero-panel {
-            background: #1d2741 !important;
-            border-color: #314064 !important;
-          }
-
-          [data-ogsc] .eyebrow {
-            color: #98aacd !important;
-          }
-
-          [data-ogsc] .cta-surface {
-            background-color: #f4f7ff !important;
-          }
-
-          [data-ogsc] .cta-label {
-            color: #171b33 !important;
-          }
-        </style>
-      </head>
-      <body class="bg-main" style="margin: 0; padding: 0; background-color: #dbe3fb; font-family: 'Segoe UI', Arial, sans-serif;">
-        <table role="presentation" class="bg-main" style="width: 100%; border-collapse: collapse; background-color: #dbe3fb; padding: 28px 14px;">
-          <tr>
-            <td align="center">
-              <table role="presentation" class="card" style="width: 100%; max-width: 680px; border-collapse: collapse; background: linear-gradient(135deg, #fcfdff 0%, #eef3ff 56%, #fff8ea 100%); border: 1px solid #e5ebf7; border-radius: 32px; overflow: hidden; box-shadow: 0 26px 70px rgba(63, 78, 122, 0.18);">
-                <tr>
-                  <td style="padding: 28px 32px 18px;">
-                    <table role="presentation" style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                        <td style="width: 72px; vertical-align: middle;">
-                          ${brandVisualMarkup}
-                        </td>
-                        <td style="vertical-align: middle;">
-                          <p style="margin: 0; color: #1d2340; font-size: 23px; font-weight: 800; letter-spacing: -0.03em;">SmritiCare</p>
-                          <p class="brand-sub" style="margin: 5px 0 0; font-size: 14px; color: #7280a0;">Secure access for your care workspace</p>
-                        </td>
-                        <td style="width: 132px; vertical-align: middle;" align="right">
-                          <span class="brand-chip" style="display: inline-block; background: #171b33; color: #ffffff; border: 1px solid #171b33; border-radius: 999px; padding: 10px 16px; font-size: 11px; font-weight: 800; letter-spacing: 0.12em;">
-                            SECURE ACCESS
-                          </span>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 0 32px 18px;">
-                    <div class="hero-panel" style="background: rgba(255, 255, 255, 0.72); border: 1px solid #e5ebf7; border-radius: 30px; padding: 28px;">
-                      <p class="eyebrow" style="margin: 0 0 16px; color: #6d7ca1; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;">Personalized care begins here</p>
-                      <h2 class="title" style="margin: 0; color: #1d2340; font-size: 36px; line-height: 1.05; letter-spacing: -0.06em;">${title}</h2>
-                      <p class="muted" style="margin: 14px 0 0; color: #66738f; font-size: 16px; line-height: 1.65;">${subtitle}</p>
-                      <div class="code-box" style="margin-top: 24px; background: linear-gradient(180deg, #ffffff 0%, #eff4ff 100%); border: 1px solid #d6e1fb; border-radius: 24px; text-align: center; padding: 22px 18px;">
-                        <p class="code-label" style="margin: 0 0 10px; color: #6d7ca1; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 800;">Verification code</p>
-                        <p class="code-value" style="margin: 0; font-size: 38px; color: #171b33; letter-spacing: 0.28em; font-weight: 800;">${code}</p>
-                      </div>
-                      <div class="info-box" style="margin-top: 18px; background-color: #f3f7ff; border-left: 4px solid #88c7ff; border-radius: 16px; padding: 14px 16px;">
-                        <p class="info-text" style="margin: 0; color: #56627f; font-size: 14px; line-height: 1.6;">
-                          This code stays active for <strong>5 minutes</strong>. ${note}
-                        </p>
-                      </div>
-                      <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 18px;">
-                        <tr>
-                          <td align="center" style="padding: 0;">
-                            <div class="cta-surface" style="display: inline-block; background-color: #171b33; border-radius: 999px; padding: 13px 22px;">
-                              <span class="cta-label" style="color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;">Return to SmritiCare to continue</span>
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 0 32px 32px;">
-                    <p class="footer" style="margin: 0; color: #7f8ba5; font-size: 12px; line-height: 1.6;">
-                      You received this secure account email from SmritiCare. Please do not reply to this message.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </body>
-    </html>
+  const safeCode = escapeHtml(code);
+  const safeNote = escapeHtml(note);
+  const bodyHtml = `
+    <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 24px;">
+      <tr>
+        <td style="padding: 0;">
+          <div class="email-soft-card" style="background: linear-gradient(180deg, #ffffff 0%, #eff4ff 100%); border: 1px solid #d6e1fb; border-radius: 26px; text-align: center; padding: 24px 18px;">
+            <p class="email-label" style="margin: 0 0 10px; color: #6d7ca1; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800;">One-time code</p>
+            <p class="email-strong" style="margin: 0; color: #171b33; font-size: 42px; line-height: 1; letter-spacing: 0.26em; font-weight: 800;">${safeCode}</p>
+            <p class="email-meta" style="margin: 12px 0 0; color: #7b89a5; font-size: 13px; line-height: 1.6;">Valid for 5 minutes</p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 14px 0 0;">
+          <div class="email-soft-card" style="background: rgba(255, 255, 255, 0.82); border: 1px solid #e4eaf8; border-radius: 22px; padding: 16px 18px;">
+            <p class="email-copy" style="margin: 0; color: #55617f; font-size: 14px; line-height: 1.7;">
+              Enter this code in the open SmritiCare window to continue securely.
+            </p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 14px 0 0;">
+          <div class="email-note" style="background: #f4f7ff; border: 1px solid #d8e4ff; border-left: 4px solid #88c7ff; border-radius: 20px; padding: 14px 16px;">
+            <p class="email-copy" style="margin: 0; color: #55617f; font-size: 14px; line-height: 1.7;">
+              ${safeNote}
+            </p>
+          </div>
+        </td>
+      </tr>
+    </table>
   `;
+
+  return buildEmailLayout({
+    title,
+    previewText: `${title} - ${code}`,
+    badge: "Secure Access",
+    eyebrow: "Verification code",
+    intro: subtitle,
+    bodyHtml,
+    ctaLabel: "Open SmritiCare",
+    ctaHref: SITE_URL,
+    footerText: "You received this secure account email from SmritiCare.",
+    footerMeta: "Please do not reply to this automated message.",
+    logoSrc
+  });
 }
 
 async function sendOTP(email, otp) {

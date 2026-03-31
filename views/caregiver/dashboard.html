@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<div class="app">
+<div class="app caregiver-dashboard">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -29,36 +29,172 @@
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main class="main">
+  <main class="main caregiver-dashboard-main">
 
-    <header class="topbar">
+    <header class="topbar caregiver-topbar">
       <div class="user">
         <div>
           <strong>Caregiver</strong>
           <p id="caregiverName">Loading...</p>
         </div>
       </div>
-      <div class="date-display">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-          <path d="M16 2v4M8 2v4M3 10h18"></path>
-        </svg>
-        <span id="dashboardDate">Loading date...</span>
+
+      <div class="caregiver-topbar-actions">
+        <a href="/caregiver/profile" class="secondary-btn caregiver-profile-link caregiver-dashboard-btn caregiver-dashboard-btn--soft">
+          <span class="caregiver-btn-label">Review profile</span>
+          <span class="caregiver-btn-icon" aria-hidden="true">-&gt;</span>
+        </a>
+
+        <div class="date-display">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <path d="M16 2v4M8 2v4M3 10h18"></path>
+          </svg>
+          <span id="dashboardDate">Loading date...</span>
+        </div>
       </div>
     </header>
 
-    <section class="welcome">
-      <div>
-        <p class="small">Welcome</p>
-        <h1>You are doing a wonderful job.</h1>
-        <p class="sub"><span class="inline-heart">♥</span>One step at a time.</p>
-          <!-- Unsync Google Calendar button removed -->
+    <section class="welcome caregiver-welcome">
+      <div class="caregiver-welcome-copy">
+        <p class="small caregiver-welcome-kicker">Care coordination for today</p>
+        <h1>You are doing a wonderful job supporting the people who count on you.</h1>
+        <p class="sub"><span class="inline-heart">&hearts;</span>One calm step at a time. Your reminders, medication, memory, and location tools are ready when you need them.</p>
+
+        <div class="caregiver-welcome-actions">
+          <a href="/caregiver/reminders" class="primary-btn caregiver-dashboard-btn caregiver-dashboard-btn--primary">
+            <span class="caregiver-btn-label">Open reminders</span>
+            <span class="caregiver-btn-icon" aria-hidden="true">-&gt;</span>
+          </a>
+          <a href="/caregiver/location" class="secondary-btn caregiver-dashboard-btn caregiver-dashboard-btn--soft">
+            <span class="caregiver-btn-label">See live location</span>
+            <span class="caregiver-btn-icon" aria-hidden="true">-&gt;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="caregiver-welcome-panel">
+        <p class="caregiver-panel-label">Today's priorities</p>
+
+        <div class="caregiver-focus-list">
+          <a href="/caregiver/reminders" class="caregiver-focus-item">
+            <span class="caregiver-focus-icon">01</span>
+            <span class="caregiver-focus-copy">
+              <strong>Review today's plan</strong>
+              <small>Start with routines, appointments, and the most time-sensitive tasks.</small>
+            </span>
+          </a>
+
+          <a href="/caregiver/memory" class="caregiver-focus-item">
+            <span class="caregiver-focus-icon">02</span>
+            <span class="caregiver-focus-copy">
+              <strong>Keep familiar anchors close</strong>
+              <small>Use memory prompts to support calm conversation and recognition.</small>
+            </span>
+          </a>
+
+          <a href="/caregiver/selfcare" class="caregiver-focus-item">
+            <span class="caregiver-focus-icon">03</span>
+            <span class="caregiver-focus-copy">
+              <strong>Leave space for yourself</strong>
+              <small>Take one short pause so care feels steadier and more sustainable.</small>
+            </span>
+          </a>
+        </div>
       </div>
     </section>
 
-    <section class="card quote-card">
-      “Remember to take care of yourself. Your well-being matters just as much as those you care for.”
+    <section class="caregiver-overview-grid" aria-label="Caregiver dashboard shortcuts">
+      <a href="/caregiver/reminders" class="card caregiver-feature-card">
+        <p class="caregiver-card-kicker">Stay organized</p>
+        <h3>Reminder center</h3>
+        <p>Manage schedules, recurring routines, and daily support prompts.</p>
+        <span class="caregiver-feature-meta">Open reminders</span>
+      </a>
+
+      <a href="/caregiver/medication" class="card caregiver-feature-card">
+        <p class="caregiver-card-kicker">Medication support</p>
+        <h3>Treatment tracking</h3>
+        <p>Review medicines, doses, and timing from one clear place.</p>
+        <span class="caregiver-feature-meta">View medications</span>
+      </a>
+
+      <a href="/caregiver/memory" class="card caregiver-feature-card">
+        <p class="caregiver-card-kicker">Familiar moments</p>
+        <h3>Memory board</h3>
+        <p>Add helpful memories that make everyday conversations easier.</p>
+        <span class="caregiver-feature-meta">Open memory board</span>
+      </a>
+
+      <a href="/caregiver/selfcare" class="card caregiver-feature-card">
+        <p class="caregiver-card-kicker">Protect your energy</p>
+        <h3>Self care corner</h3>
+        <p>Reset with simple practices that help you stay grounded while caregiving.</p>
+        <span class="caregiver-feature-meta">Open self care</span>
+      </a>
     </section>
+
+    <div class="caregiver-content-grid">
+      <div class="caregiver-main-stack">
+        <section class="card quote-card caregiver-quote-card">
+          <p class="caregiver-card-kicker">Gentle reminder</p>
+          <p class="caregiver-quote-text">"Remember to take care of yourself. Your well-being matters just as much as those you care for."</p>
+        </section>
+
+        <section class="card caregiver-guidance-card">
+          <p class="caregiver-card-kicker">Steady support</p>
+          <h3>Small habits that can make the day feel lighter</h3>
+          <p class="sub">When caregiving feels crowded, a few simple anchors can help everything feel more manageable.</p>
+
+          <div class="caregiver-guidance-list">
+            <div class="caregiver-guidance-item">
+              <strong>Keep the next step visible</strong>
+              <span>Focus on one clear priority before moving on to the next task.</span>
+            </div>
+
+            <div class="caregiver-guidance-item">
+              <strong>Use familiar cues often</strong>
+              <span>Short reminders, routine wording, and memory prompts can lower stress.</span>
+            </div>
+
+            <div class="caregiver-guidance-item">
+              <strong>Let progress be enough</strong>
+              <span>A calmer interaction or one completed task is still meaningful progress.</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="caregiver-side-stack">
+        <section class="card caregiver-support-card">
+          <p class="caregiver-card-kicker">Helpful tools</p>
+          <h3>Use the right space for the right moment</h3>
+
+          <div class="caregiver-support-list">
+            <a href="/caregiver/location" class="caregiver-support-item">
+              <strong>Live location for quick reassurance</strong>
+              <span>Check recent movement when plans change or you need a faster safety check.</span>
+            </a>
+
+            <a href="/caregiver/memory" class="caregiver-support-item">
+              <strong>Memory board for familiar connection</strong>
+              <span>Open people, places, and prompts that help conversations feel easier.</span>
+            </a>
+
+            <a href="/caregiver/selfcare" class="caregiver-support-item">
+              <strong>Self care for your own reset</strong>
+              <span>Take a short pause with practical ideas designed for caregiver balance.</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="card caregiver-balance-card">
+          <p class="caregiver-card-kicker">Small wins matter</p>
+          <h3>Support is easier to sustain when the day feels less crowded</h3>
+          <p>A calm dashboard, one clear next step, and a little room for your own well-being can make caregiving feel more manageable.</p>
+        </section>
+      </aside>
+    </div>
 
   </main>
 </div>

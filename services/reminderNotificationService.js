@@ -1,11 +1,15 @@
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
-const fs = require("fs");
-const path = require("path");
+const {
+  EMAIL_LOGO_CID,
+  getEmailLogoAttachment,
+  escapeHtml,
+  buildEmailLayout
+} = require("../utils/emailTheme");
 
 const CHECK_INTERVAL_MS = 5 * 60 * 60 * 1000;
 const DEFAULT_SITE_URL = `http://localhost:${process.env.PORT || 3000}`;
-const SITE_URL = (process.env.APP_BASE_URL || DEFAULT_SITE_URL).trim();
+const SITE_URL = (process.env.APP_BASE_URL || process.env.APP_URL || DEFAULT_SITE_URL).trim().replace(/\/$/, "");
 
 const emailConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
@@ -21,7 +25,6 @@ const transporter = emailConfigured
 
 let intervalRef = null;
 let inFlight = false;
-const EMAIL_LOGO_CID = "smriticare-logo";
 const ENGAGEMENT_MESSAGES = [
   {
     title: "Just a quick check-in from us 💛",
@@ -64,35 +67,6 @@ const ENGAGEMENT_MESSAGES = [
     body: "Tap below and open SmritiCare."
   }
 ];
-
-function getEmailLogoAttachment() {
-  const imageDir = path.join(__dirname, "../public/images");
-  const candidates = [
-    "email-logo.png",
-    "email-logo.jpg",
-    "email-logo.jpeg",
-    "email-logo.webp",
-    "email-logo.svg",
-    "smriticare-logo.png",
-    "smriticare-logo.jpg",
-    "smriticare-logo.jpeg",
-    "smriticare-logo.webp",
-    "smriticare-logo.svg"
-  ];
-
-  for (const name of candidates) {
-    const fullPath = path.join(imageDir, name);
-    if (fs.existsSync(fullPath)) {
-      return {
-        filename: name,
-        path: fullPath,
-        cid: EMAIL_LOGO_CID
-      };
-    }
-  }
-
-  return null;
-}
 
 function pickRandomMessage() {
   const index = Math.floor(Math.random() * ENGAGEMENT_MESSAGES.length);

@@ -21,20 +21,43 @@ function renderPatientDashboardReminders(reminders) {
   const container = document.createElement("section");
   container.className = "card reminders-card";
   container.innerHTML = `
-    <h2 class="section-title">Today's Reminders</h2>
+    <div class="dashboard-reminders-head">
+      <div class="dashboard-reminders-copy">
+        <p class="patient-card-kicker">Daily routine</p>
+        <h2 class="section-title">Today's Reminders</h2>
+        <p>Keep track of your day with a clear view of your scheduled reminders.</p>
+      </div>
+      <a href="/patient/reminders" class="secondary-btn dashboard-reminders-link patient-dashboard-btn patient-dashboard-btn--soft">
+        <span class="patient-btn-label">Open reminders</span>
+        <span class="patient-btn-icon" aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
     <div class="dashboard-reminders-list">
-      ${reminders.length === 0 ? '<div style="color:#999;padding:20px;">No reminders for today</div>' : reminders.map(rem => `
+      ${reminders.length === 0 ? '<div class="reminders-empty">No reminders for today</div>' : reminders.map(rem => `
         <div class="reminder-item">
-          <strong>${escapeHtml(rem.message)}</strong>
-          <span>${formatTime(rem.schedule)} • ${rem.frequency}</span>
+          <div class="reminder-time">${formatTime(rem.schedule)}</div>
+          <div class="reminder-copy">
+            <strong>${escapeHtml(rem.message || "Reminder")}</strong>
+            <span>${escapeHtml(formatFrequency(rem.frequency))}</span>
+          </div>
+          <span class="reminder-frequency">${escapeHtml(formatFrequency(rem.frequency))}</span>
         </div>
-      `).join('')}
+      `).join("")}
     </div>
   `;
-  // Insert after welcome section
+
+  const mount = document.getElementById("dashboardReminderMount");
+  if (mount) {
+    mount.replaceChildren(container);
+    return;
+  }
+
+  // Fallback for older markup
   const main = document.querySelector(".main");
-  const welcome = main.querySelector(".welcome");
-  if (welcome) welcome.insertAdjacentElement("afterend", container);
+  const welcome = main && main.querySelector(".welcome");
+  if (welcome) {
+    welcome.insertAdjacentElement("afterend", container);
+  }
 }
 
 function formatTime(time) {
@@ -44,13 +67,23 @@ function formatTime(time) {
   const h = parseInt(parts[0], 10);
   const m = parseInt(parts[1], 10);
   if (isNaN(h) || isNaN(m)) return time;
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  const hh = ((h % 12) === 0) ? 12 : (h % 12);
-  return `${String(hh).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`;
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hh = (h % 12) === 0 ? 12 : (h % 12);
+  return `${String(hh).padStart(2, "0")}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+function formatFrequency(frequency) {
+  if (!frequency) return "Routine";
+
+  return String(frequency)
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }

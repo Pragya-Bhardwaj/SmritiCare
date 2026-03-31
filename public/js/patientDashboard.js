@@ -13,52 +13,52 @@ document.addEventListener("DOMContentLoaded", async () => {
 /* Load and display patient's name */
 async function loadPatientName() {
   try {
-    const res = await fetch("/api/profile", { 
-      credentials: "include" 
+    const res = await fetch("/api/profile", {
+      credentials: "include"
     });
-    
+
     if (!res.ok) {
       console.warn("Failed to fetch profile");
       return;
     }
-    
+
     const data = await res.json();
-    
+
     if (data.user && data.user.name) {
       // Display the patient's name in the topbar
       const patientP = document.getElementById("patientName");
       if (patientP) patientP.textContent = data.user.name;
 
       // Ensure the strong title remains 'Patient'
-      const strongEl = document.querySelector('.user div strong');
-      if (strongEl) strongEl.textContent = 'Patient';
+      const strongEl = document.querySelector(".user div strong");
+      if (strongEl) strongEl.textContent = "Patient";
     }
   } catch (err) {
     console.error("Error loading patient name:", err);
   }
 }
 
-/*Load and display memory board (first 3 memories) */
+/* Load and display memory board (first 3 memories) */
 async function loadMemories() {
   try {
-    const res = await fetch("/memory/api/memories", { 
-      credentials: "include" 
+    const res = await fetch("/memory/api/memories", {
+      credentials: "include"
     });
-    
+
     if (!res.ok) {
       throw new Error("Failed to fetch memories");
     }
 
     const data = await res.json();
     const memories = data.memories || [];
-    
+
     const grid = document.getElementById("memoryGrid");
-    
+
     // Show message if no memories exist
     if (!memories.length) {
       grid.innerHTML = `
         <div class="no-memories">
-          <div class="no-memories-icon">Box</div>
+          <div class="no-memories-icon">&#128230;</div>
           <p>No memories added yet</p>
           <p style="font-size: 12px; margin-top: 8px;">Your caregiver will add important memories for you</p>
         </div>
@@ -68,44 +68,51 @@ async function loadMemories() {
 
     // Show only first 3 memories on dashboard
     const displayMemories = memories.slice(0, 3);
-    
-    grid.innerHTML = displayMemories.map(memory => {
+
+    grid.innerHTML = displayMemories.map((memory) => {
+      const title = (memory.title || "Memory").trim();
+
       // Create initials from title if no image
-      const initials = memory.title.split(' ')
-        .map(word => word[0])
-        .join('')
+      const initials = title.split(/\s+/)
+        .map((word) => word[0])
+        .join("")
         .toUpperCase()
-        .slice(0, 2);
+        .slice(0, 2) || "SC";
 
       return `
         <div class="memory-item" onclick="window.location.href='/patient/memory'">
-          <div class="memory-image ${memory.imageUrl ? 'has-image' : ''}" 
-               ${memory.imageUrl ? `style="background-image: url('${memory.imageUrl}')"` : ''}>
-            ${!memory.imageUrl ? initials : ''}
+          <div class="memory-image ${memory.imageUrl ? "has-image" : ""}"
+               ${memory.imageUrl ? `style="background-image: url('${memory.imageUrl}')"` : ""}>
+            ${!memory.imageUrl ? initials : ""}
           </div>
           <div class="memory-content">
-            <h3 class="memory-title">${escapeHtml(memory.title)}</h3>
+            <div class="dashboard-memory-meta">
+              <span class="memory-chip">Memory</span>
+              <span class="memory-cta">Open board</span>
+            </div>
+            <h3 class="memory-title">${escapeHtml(title)}</h3>
             ${memory.description ? `
               <p class="memory-description">${escapeHtml(memory.description)}</p>
-            ` : ''}
+            ` : ""}
 
-            ${memory.audioUrl ? `
-              <div class="memory-audio">
+            <div class="memory-footer">
+              <span class="memory-cta">${memory.audioUrl ? "Audio available" : "Tap to revisit"}</span>
+              ${memory.audioUrl ? `
                 <button class="audio-btn" onclick="event.stopPropagation(); playAudio('${memory.audioUrl}')">
-                  <span>▶</span> Play Audio
+                  <span>&#9654;</span> Play Audio
                 </button>
-              </div>
-            ` : ''}
+              ` : ""}
+            </div>
           </div>
         </div>
       `;
-    }).join('');
+    }).join("");
 
   } catch (err) {
     console.error("Error loading memories:", err);
     document.getElementById("memoryGrid").innerHTML = `
       <div class="no-memories">
-        <div class="no-memories-icon">!</div>
+        <div class="no-memories-icon">&#9888;</div>
         <p>Failed to load memories</p>
         <p style="font-size: 12px; margin-top: 8px;">Please try refreshing the page</p>
       </div>
@@ -119,7 +126,7 @@ async function loadMemories() {
  */
 function playAudio(url) {
   const audio = new Audio(url);
-  audio.play().catch(err => {
+  audio.play().catch((err) => {
     console.error("Audio playback failed:", err);
     alert("Could not play audio. Please check your browser settings.");
   });
@@ -131,7 +138,7 @@ function playAudio(url) {
  * @returns {string} - Escaped HTML
  */
 function escapeHtml(text) {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
