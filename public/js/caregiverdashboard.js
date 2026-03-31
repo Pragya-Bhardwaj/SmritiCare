@@ -10,6 +10,21 @@ document.addEventListener("DOMContentLoaded", () => {
   setDashboardDate();
 
   // Unsync Google Calendar button logic removed
+  const notesInput = document.getElementById("caregiverNotes");
+  if (notesInput) {
+    try {
+      const savedNotes = localStorage.getItem("caregiverDashboardNotes");
+      if (savedNotes) {
+        notesInput.value = savedNotes;
+      }
+
+      notesInput.addEventListener("input", () => {
+        localStorage.setItem("caregiverDashboardNotes", notesInput.value);
+      });
+    } catch (err) {
+      // Ignore storage errors (private mode or blocked storage)
+    }
+  }
 
   const sidebarLinks = document.querySelectorAll(".sidebar nav a");
 

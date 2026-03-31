@@ -25,12 +25,7 @@ function renderPatientDashboardReminders(reminders) {
       <div class="dashboard-reminders-copy">
         <p class="patient-card-kicker">Daily routine</p>
         <h2 class="section-title">Today's Reminders</h2>
-        <p>Keep track of your day with a clear view of your scheduled reminders.</p>
       </div>
-      <a href="/patient/reminders" class="secondary-btn dashboard-reminders-link patient-dashboard-btn patient-dashboard-btn--soft">
-        <span class="patient-btn-label">Open reminders</span>
-        <span class="patient-btn-icon" aria-hidden="true">-&gt;</span>
-      </a>
     </div>
     <div class="dashboard-reminders-list">
       ${reminders.length === 0 ? '<div class="reminders-empty">No reminders for today</div>' : reminders.map(rem => `
