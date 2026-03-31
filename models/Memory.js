@@ -42,6 +42,12 @@ const memorySchema = new mongoose.Schema({
   audioPublicId: {
     type: String
   },
+  videoUrl: {
+    type: String
+  },
+  videoPublicId: {
+    type: String
+  },
   tags: [{
     type: String
   }]

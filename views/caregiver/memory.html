@@ -49,6 +49,20 @@
   </main>
 </div>
 
+<div class="modal hidden" id="memoryDetailModal">
+  <div class="modal-box memory-detail-modal-box">
+    <div class="memory-detail-head">
+      <div>
+        <h3 id="memoryDetailTitle">Memory</h3>
+        <p class="small" id="memoryDetailMeta"></p>
+      </div>
+      <button type="button" class="secondary-btn" onclick="closeMemoryDetailModal()">Close</button>
+    </div>
+
+    <div id="memoryDetailBody" class="memory-detail-body"></div>
+  </div>
+</div>
+
 <!-- ADD / EDIT MODAL -->
 <div class="modal hidden" id="memoryModal">
   <div class="modal-box">
@@ -57,28 +71,47 @@
     <form id="memoryForm" enctype="multipart/form-data">
       <input type="hidden" id="memoryId">
       <input type="text" id="memoryTitle" name="title" placeholder="Title" required>
-      <input type="text" id="memoryRelation" name="relation" placeholder="Relation (e.g., Daughter, Son)">
+      <input type="text" id="memoryRelation" name="relation" placeholder="Memory type, person, place, or event (e.g., Mother, Home, Wedding)">
       <input type="text" id="memoryDesc" name="description" placeholder="Short description">
       <textarea id="memoryNotes" name="notes" placeholder="Notes or story" rows="3"></textarea>
 
+      <div class="media-choice-group">
+        <span class="small">Visual media</span>
+        <div class="media-choice-toggle" role="group" aria-label="Choose visual media type">
+          <label class="media-choice-option">
+            <input type="radio" name="visualMediaType" value="image" checked>
+            <span>Image</span>
+          </label>
+          <label class="media-choice-option">
+            <input type="radio" name="visualMediaType" value="video">
+            <span>Video</span>
+          </label>
+        </div>
+      </div>
+
       <div class="file-row">
-        <label class="file-input-label">Image
+        <label class="file-input-label visual-upload-option" data-visual-upload="image">Image
           <input type="file" id="memoryImage" name="image" accept="image/*">
         </label>
 
-        <label class="file-input-label">Audio
+        <label class="file-input-label" data-audio-upload>Audio
           <input type="file" id="memoryAudio" name="audio" accept="audio/*">
+        </label>
+
+        <label class="file-input-label visual-upload-option hidden" data-visual-upload="video">Video
+          <input type="file" id="memoryVideo" name="video" accept="video/*">
         </label>
       </div>
 
       <div id="mediaPreview" class="media-preview">
         <img id="previewImage" class="preview-image" src="" alt="" style="display:none; max-width:100%; border-radius:8px; margin-top:8px;" />
         <audio id="previewAudio" controls style="display:none; width:100%; margin-top:8px;"></audio>
+        <video id="previewVideo" controls style="display:none; width:100%; margin-top:8px;"></video>
       </div>
 
       <div class="modal-actions">
         <button type="button" class="secondary-btn" onclick="closeMemoryModal()">Cancel</button>
-        <button type="submit" class="primary-btn">Save</button>
+        <button type="submit" class="primary-btn" id="memorySaveBtn">Save</button>
       </div>
     </form>
   </div>

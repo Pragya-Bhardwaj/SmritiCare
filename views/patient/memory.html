@@ -39,6 +39,20 @@
 
 </div>
 
+<div class="modal hidden" id="memoryDetailModal">
+  <div class="modal-box memory-detail-modal-box">
+    <div class="memory-detail-head">
+      <div>
+        <h3 id="memoryDetailTitle">Memory</h3>
+        <p class="small" id="memoryDetailMeta"></p>
+      </div>
+      <button type="button" class="secondary-btn" onclick="closeMemoryDetailModal()">Close</button>
+    </div>
+
+    <div id="memoryDetailBody" class="memory-detail-body"></div>
+  </div>
+</div>
+
 
 <!-- IMPORTANT: Load location tracking on ALL patient pages -->
 <script src="/js/patientLocationSharing.js"></script>

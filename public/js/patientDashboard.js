@@ -79,12 +79,26 @@ async function loadMemories() {
         .toUpperCase()
         .slice(0, 2) || "SC";
 
+      let mediaMarkup = `
+        <div class="memory-image ${memory.imageUrl ? "has-image" : ""}"
+             ${memory.imageUrl ? `style="background-image: url('${escapeAttribute(memory.imageUrl)}')"` : ""}>
+          ${!memory.imageUrl ? initials : ""}
+        </div>
+      `;
+
+      if (!memory.imageUrl && memory.videoUrl) {
+        mediaMarkup = `
+          <div class="memory-image has-video" onclick="event.stopPropagation()">
+            <video controls preload="metadata">
+              <source src="${escapeAttribute(memory.videoUrl)}" />
+            </video>
+          </div>
+        `;
+      }
+
       return `
         <div class="memory-item" onclick="window.location.href='/patient/memory'">
-          <div class="memory-image ${memory.imageUrl ? "has-image" : ""}"
-               ${memory.imageUrl ? `style="background-image: url('${memory.imageUrl}')"` : ""}>
-            ${!memory.imageUrl ? initials : ""}
-          </div>
+          ${mediaMarkup}
           <div class="memory-content">
             <div class="dashboard-memory-meta">
               <span class="memory-chip">Memory</span>
@@ -98,9 +112,9 @@ async function loadMemories() {
             <div class="memory-footer">
               <span class="memory-cta">${memory.audioUrl ? "Audio available" : "Tap to revisit"}</span>
               ${memory.audioUrl ? `
-                <button class="audio-btn" onclick="event.stopPropagation(); playAudio('${memory.audioUrl}')">
-                  <span>&#9654;</span> Play Audio
-                </button>
+                <div class="memory-audio-inline" onclick="event.stopPropagation()">
+                  <audio controls preload="none" src="${escapeAttribute(memory.audioUrl)}"></audio>
+                </div>
               ` : ""}
             </div>
           </div>
@@ -121,18 +135,6 @@ async function loadMemories() {
 }
 
 /**
- * Play audio from memory
- * @param {string} url - Audio file URL
- */
-function playAudio(url) {
-  const audio = new Audio(url);
-  audio.play().catch((err) => {
-    console.error("Audio playback failed:", err);
-    alert("Could not play audio. Please check your browser settings.");
-  });
-}
-
-/**
  * Escape HTML to prevent XSS attacks
  * @param {string} text - Text to escape
  * @returns {string} - Escaped HTML
@@ -141,6 +143,10 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+function escapeAttribute(text) {
+  return escapeHtml(text || "");
 }
 
 function setDashboardDate() {

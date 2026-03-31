@@ -1,130 +1,183 @@
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const fs = require("fs");
+const os = require("os");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
 const memoryController = require("../controllers/memoryController");
 
-// Use memory storage to get buffer
 const storage = multer.memoryStorage();
 
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  storage,
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    // Accept images
-    if (file.fieldname === 'image') {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed for image field'));
-      }
+    if (file.fieldname === "image") {
+      return file.mimetype.startsWith("image/")
+        ? cb(null, true)
+        : cb(new Error("Only image files are allowed for image field"));
     }
-    // Accept audio
-    else if (file.fieldname === 'audio') {
-      if (file.mimetype.startsWith('audio/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only audio files are allowed for audio field'));
-      }
-    } else {
-      cb(null, true);
+
+    if (file.fieldname === "audio") {
+      return file.mimetype.startsWith("audio/")
+        ? cb(null, true)
+        : cb(new Error("Only audio files are allowed for audio field"));
     }
+
+    if (file.fieldname === "video") {
+      return file.mimetype.startsWith("video/")
+        ? cb(null, true)
+        : cb(new Error("Only video files are allowed for video field"));
+    }
+
+    cb(null, true);
   }
 });
 
-// Middleware to handle Cloudinary uploads
+async function uploadToCloudinary(file, options) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+
+    uploadStream.end(file.buffer);
+  });
+}
+
+async function uploadVideoToCloudinary(file) {
+  const ext = path.extname(file.originalname || "") || ".mp4";
+  const safeBase = path
+    .basename(file.originalname || "memory-video", ext)
+    .replace(/[^a-zA-Z0-9-_]/g, "-")
+    .slice(0, 60) || "memory-video";
+  const tempPath = path.join(os.tmpdir(), `${Date.now()}-${safeBase}${ext}`);
+
+  await fs.promises.writeFile(tempPath, file.buffer);
+
+  try {
+    return await cloudinary.uploader.upload(tempPath, {
+      folder: "smriticare/memories/video",
+      resource_type: "video"
+    });
+  } finally {
+    await fs.promises.unlink(tempPath).catch(() => {});
+  }
+}
+
 const handleCloudinaryUploads = async (req, res, next) => {
   try {
-    console.log('📤 Processing Cloudinary uploads...');
-    console.log('Files received:', req.files ? Object.keys(req.files) : 'none');
+    req.uploadWarnings = [];
 
-    if (req.files) {
-      // Handle image upload
-      if (req.files.image && req.files.image[0]) {
-        console.log('📷 Uploading image to Cloudinary...');
-        const imageFile = req.files.image[0];
-        
-        const result = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'smriticare/memories/images',
-              resource_type: 'image',
-              transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto' }]
-            },
-            (error, result) => {
-              if (error) {
-                console.error('❌ Image upload error:', error);
-                reject(error);
-              } else {
-                console.log('✅ Image uploaded:', result.secure_url);
-                resolve(result);
-              }
-            }
-          );
-          uploadStream.end(imageFile.buffer);
+    if (req.files?.image?.[0]) {
+      try {
+        const result = await uploadToCloudinary(req.files.image[0], {
+          folder: "smriticare/memories/images",
+          resource_type: "image",
+          transformation: [{ width: 1200, height: 900, crop: "limit", quality: "auto" }]
         });
 
         req.body.imageUrl = result.secure_url;
         req.body.imagePublicId = result.public_id;
+      } catch (error) {
+        console.error("Image upload error:", error.message);
+        req.uploadWarnings.push("Image upload failed, but the memory was still saved.");
       }
+    }
 
-      // Handle audio upload
-      if (req.files.audio && req.files.audio[0]) {
-        console.log('🎵 Uploading audio to Cloudinary...');
-        const audioFile = req.files.audio[0];
-        
-        const result = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'smriticare/memories/audio',
-              resource_type: 'video', // Cloudinary uses 'video' for audio
-              format: 'mp3'
-            },
-            (error, result) => {
-              if (error) {
-                console.error('❌ Audio upload error:', error);
-                reject(error);
-              } else {
-                console.log('✅ Audio uploaded:', result.secure_url);
-                resolve(result);
-              }
-            }
-          );
-          uploadStream.end(audioFile.buffer);
+    if (req.files?.audio?.[0]) {
+      try {
+        const result = await uploadToCloudinary(req.files.audio[0], {
+          folder: "smriticare/memories/audio",
+          resource_type: "video",
+          format: "mp3"
         });
 
         req.body.audioUrl = result.secure_url;
         req.body.audioPublicId = result.public_id;
+      } catch (error) {
+        console.error("Audio upload error:", error.message);
+        req.uploadWarnings.push("Audio upload failed, but the memory was still saved.");
       }
     }
 
-    console.log('✅ Cloudinary uploads complete');
+    if (req.files?.video?.[0]) {
+      try {
+        const result = await uploadVideoToCloudinary(req.files.video[0]);
+
+        req.body.videoUrl = result.secure_url;
+        req.body.videoPublicId = result.public_id;
+      } catch (error) {
+        console.error("Video upload error:", error.message);
+        return res.status(400).json({
+          error: "Video upload failed",
+          message: error.message || "Cloudinary could not upload the selected video."
+        });
+      }
+    }
+
     next();
   } catch (error) {
-    console.error('❌ Cloudinary upload error:', error);
-    res.status(500).json({ 
-      error: 'Failed to upload media files',
-      details: error.message 
+    console.error("Cloudinary upload error:", error);
+    res.status(500).json({
+      error: "Failed to upload media files",
+      message: error.message
     });
   }
 };
 
-// API Routes
 router.get("/api/memories", memoryController.getMemories);
-router.post("/api/memories", 
-  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]), 
-  handleCloudinaryUploads, 
+router.post(
+  "/api/memories",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "audio", maxCount: 1 },
+    { name: "video", maxCount: 1 }
+  ]),
+  handleCloudinaryUploads,
   memoryController.addMemory
 );
-router.put("/api/memories/:id", 
-  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]), 
-  handleCloudinaryUploads, 
+router.put(
+  "/api/memories/:id",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "audio", maxCount: 1 },
+    { name: "video", maxCount: 1 }
+  ]),
+  handleCloudinaryUploads,
   memoryController.updateMemory
 );
 router.delete("/api/memories/:id", memoryController.deleteMemory);
 
-// Page Routes
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        error: "Upload too large",
+        message: "Each memory file must be 100MB or smaller."
+      });
+    }
+
+    return res.status(400).json({
+      error: "Upload error",
+      message: err.message
+    });
+  }
+
+  if (err) {
+    return res.status(400).json({
+      error: "Upload error",
+      message: err.message || "Failed to process uploaded file."
+    });
+  }
+
+  next();
+});
+
 router.get("/patient/memory", (req, res) => {
   res.sendFile(path.join(__dirname, "../views/patient/memory.html"));
 });

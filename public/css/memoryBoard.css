@@ -46,6 +46,18 @@
   background-size: cover;
 }
 
+.memory-image.has-video {
+  padding: 0;
+  background: #111827;
+}
+
+.memory-image.has-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .memory-content {
   padding: 16px;
   display: grid;
@@ -82,6 +94,72 @@
   margin-top: 4px;
   padding-top: 10px;
   border-top: 1px dashed rgba(140, 155, 201, 0.2);
+}
+
+.memory-audio audio,
+.memory-audio-inline audio,
+.memory-video video {
+  width: 100%;
+  display: block;
+}
+
+.memory-video {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(140, 155, 201, 0.2);
+}
+
+.memory-audio-inline {
+  min-width: min(260px, 100%);
+  max-width: 100%;
+}
+
+.memory-detail-modal-box {
+  width: min(920px, calc(100vw - 32px));
+  max-height: min(88vh, 920px);
+  overflow: auto;
+}
+
+.memory-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.memory-detail-head h3,
+.memory-detail-head p {
+  margin: 0;
+}
+
+.memory-detail-body {
+  display: grid;
+  gap: 16px;
+}
+
+.memory-detail-gallery {
+  display: grid;
+  gap: 14px;
+}
+
+.memory-detail-media {
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(244, 247, 255, 0.86);
+  border: 1px solid rgba(140, 155, 201, 0.16);
+}
+
+.memory-detail-media img,
+.memory-detail-media video,
+.memory-detail-media audio {
+  width: 100%;
+  display: block;
+}
+
+.memory-detail-copy {
+  display: grid;
+  gap: 10px;
 }
 
 .audio-btn {
@@ -122,6 +200,52 @@
   gap: 10px;
 }
 
+.media-choice-group {
+  display: grid;
+  gap: 8px;
+}
+
+.media-choice-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.media-choice-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.media-choice-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.media-choice-option span {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(140, 155, 201, 0.2);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--text-body);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.media-choice-option input:checked + span {
+  background: linear-gradient(135deg, #1f2344 0%, #171b33 100%);
+  border-color: transparent;
+  color: #ffffff;
+}
+
 .file-input-label {
   display: inline-flex;
   align-items: center;
@@ -150,7 +274,8 @@
 }
 
 .media-preview img,
-.media-preview audio {
+.media-preview audio,
+.media-preview video {
   width: 100%;
   border-radius: 12px;
 }

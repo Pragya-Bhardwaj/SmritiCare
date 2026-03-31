@@ -67,12 +67,6 @@
             </svg>
           </button>
         </div>
-        <div class="strength-wrap">
-          <small id="loginStrength" class="strength">Not checked</small>
-          <div class="strength-bar">
-            <span id="loginStrengthBar"></span>
-          </div>
-        </div>
         <p class="error" id="passwordError"></p>
       </div>
 
@@ -86,51 +80,6 @@
 </div>
 
 <script>
-function getPasswordScore(password) {
-  let score = 0;
-  if (password.length >= 6) score++;
-  if (/[A-Z]/.test(password)) score++;
-  if (/[0-9]/.test(password)) score++;
-  if (/[@$!%*?&#]/.test(password)) score++;
-  return score;
-}
-
-function updateLoginPasswordStrength(password) {
-  const label = document.getElementById("loginStrength");
-  const bar = document.getElementById("loginStrengthBar");
-
-  if (!password) {
-    label.innerText = "Not checked";
-    label.className = "strength";
-    bar.className = "";
-    bar.style.width = "0%";
-    return;
-  }
-
-  const score = getPasswordScore(password);
-
-  if (score <= 1) {
-    label.innerText = "Weak";
-    label.className = "strength weak";
-    bar.className = "weak";
-    bar.style.width = "25%";
-    return;
-  }
-
-  if (score <= 3) {
-    label.innerText = "Medium";
-    label.className = "strength medium";
-    bar.className = "medium";
-    bar.style.width = "60%";
-    return;
-  }
-
-  label.innerText = "Strong";
-  label.className = "strength strong";
-  bar.className = "strong";
-  bar.style.width = "100%";
-}
-
 function setupPasswordToggle(toggleButton) {
   toggleButton.addEventListener("click", () => {
     const input = document.getElementById(toggleButton.dataset.target);
@@ -192,12 +141,7 @@ async function login(e) {
   }
 }
 
-document.getElementById("password").addEventListener("input", (event) => {
-  updateLoginPasswordStrength(event.target.value);
-});
-
 document.querySelectorAll(".password-toggle").forEach(setupPasswordToggle);
-updateLoginPasswordStrength("");
 </script>
 
 </body>

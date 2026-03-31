@@ -1,5 +1,24 @@
 const Memory = require("../models/Memory");
 const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
+const path = require("path");
+
+async function deleteLocalVideo(publicId) {
+  if (!publicId || !publicId.startsWith("local:")) {
+    return;
+  }
+
+  const filename = publicId.slice("local:".length);
+  const absolutePath = path.join(__dirname, "../public/uploads/memories/video", filename);
+
+  try {
+    await fs.promises.unlink(absolutePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 /**
  * Add a new memory
  * Only caregivers can add memories for their linked patient
@@ -27,7 +46,18 @@ exports.addMemory = async (req, res) => {
       });
     }
 
-    const { title, description, relation, notes, imageUrl, imagePublicId, audioUrl, audioPublicId } = req.body;
+    const {
+      title,
+      description,
+      relation,
+      notes,
+      imageUrl,
+      imagePublicId,
+      audioUrl,
+      audioPublicId,
+      videoUrl,
+      videoPublicId
+    } = req.body;
 
     if (!title || title.trim() === "") {
       return res.status(400).json({ 
@@ -46,7 +76,9 @@ exports.addMemory = async (req, res) => {
       imageUrl,
       imagePublicId,
       audioUrl,
-      audioPublicId
+      audioPublicId,
+      videoUrl,
+      videoPublicId
     });
 
     await memory.populate([
@@ -56,7 +88,8 @@ exports.addMemory = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      memory
+      memory,
+      warnings: req.uploadWarnings || []
     });
 
   } catch (err) {
@@ -143,7 +176,18 @@ exports.getMemories = async (req, res) => {
 exports.updateMemory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, relation, notes, imageUrl, imagePublicId, audioUrl, audioPublicId } = req.body;
+    const {
+      title,
+      description,
+      relation,
+      notes,
+      imageUrl,
+      imagePublicId,
+      audioUrl,
+      audioPublicId,
+      videoUrl,
+      videoPublicId
+    } = req.body;
 
     if (!req.session.user || req.session.user.role !== "caregiver") {
       return res.status(401).json({ 
@@ -185,6 +229,18 @@ exports.updateMemory = async (req, res) => {
       }
     }
 
+    if (videoUrl && memory.videoPublicId && videoPublicId !== memory.videoPublicId) {
+      try {
+        if (memory.videoPublicId.startsWith("local:")) {
+          await deleteLocalVideo(memory.videoPublicId);
+        } else {
+          await cloudinary.uploader.destroy(memory.videoPublicId, { resource_type: 'video' });
+        }
+      } catch (err) {
+        console.error("Failed to delete old video:", err);
+      }
+    }
+
     // Update fields
     if (title !== undefined) memory.title = title.trim();
     if (description !== undefined) memory.description = description.trim();
@@ -198,6 +254,10 @@ exports.updateMemory = async (req, res) => {
       memory.audioUrl = audioUrl;
       memory.audioPublicId = audioPublicId;
     }
+    if (videoUrl !== undefined) {
+      memory.videoUrl = videoUrl;
+      memory.videoPublicId = videoPublicId;
+    }
 
     await memory.save();
 
@@ -208,7 +268,8 @@ exports.updateMemory = async (req, res) => {
 
     res.json({
       success: true,
-      memory
+      memory,
+      warnings: req.uploadWarnings || []
     });
 
   } catch (err) {
@@ -258,6 +319,13 @@ exports.deleteMemory = async (req, res) => {
       }
       if (memory.audioPublicId) {
         await cloudinary.uploader.destroy(memory.audioPublicId, { resource_type: 'video' });
+      }
+      if (memory.videoPublicId) {
+        if (memory.videoPublicId.startsWith("local:")) {
+          await deleteLocalVideo(memory.videoPublicId);
+        } else {
+          await cloudinary.uploader.destroy(memory.videoPublicId, { resource_type: 'video' });
+        }
       }
     } catch (cloudinaryError) {
       console.error("Cloudinary deletion error:", cloudinaryError);
