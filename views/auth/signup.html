@@ -7,137 +7,114 @@
 </head>
 <body class="signup-page">
 
-<div class="auth-wrapper">
-  <main class="auth-dashboard-shell">
-    <header class="auth-dashboard-header">
-      <a class="dashboard-brand" href="/" aria-label="SmritiCare home">
-        <span class="dashboard-brand-mark">
-          <img class="dashboard-brand-logo" src="/favicon.ico" alt="SmritiCare logo">
-        </span>
-        <span class="dashboard-brand-copy">
-          <strong>SmritiCare Hub</strong>
-          <span>Create your care companion space</span>
-        </span>
-      </a>
+<div class="auth-wrapper auth-simple-wrapper">
+  <section class="auth-panel auth-form-panel auth-simple-card" aria-label="Sign up form">
+    <a class="auth-simple-brandline" href="/" aria-label="SmritiCare home">
+      <span class="dashboard-brand-mark auth-simple-mark">
+        <img class="dashboard-brand-logo" src="/favicon.ico" alt="SmritiCare logo">
+      </span>
+      <span class="auth-simple-brandcopy">
+        <strong>SmritiCare</strong>
+        <span>Calm care workspace</span>
+      </span>
+    </a>
 
-      <p class="dashboard-header-note">Bring every care detail into one calm flow</p>
+    <nav class="auth-simple-nav" aria-label="Authentication pages">
+      <a class="auth-simple-nav-link" href="/auth/login">Login</a>
+      <a class="auth-simple-nav-link is-active" href="/auth/signup">Sign Up</a>
+      <a class="auth-simple-nav-link" href="/auth/forgot-password">Forgot Password</a>
+    </nav>
 
-      <a class="dashboard-header-cta" href="/auth/login">Sign in</a>
-    </header>
-
-    <div class="auth-dashboard-body">
-      <section class="dashboard-copy">
-        <p class="dashboard-eyebrow">Personalized care begins here</p>
-        <h1 class="dashboard-title">
-          <span class="dashboard-title-soft">Create your account.</span>
-          Build a softer, smarter routine for caregiving.
-        </h1>
-        <p class="dashboard-description">
-          Join SmritiCare to organize reminders, memory support, caregiver
-          collaboration, and patient updates inside a visual space that feels calm
-          from the first click.
-        </p>
-      </section>
-
-      <section class="auth-form-shell auth-dashboard-card" aria-label="Sign up form">
-        <div class="form-shell-top">
-          <span class="form-shell-badge">New Account</span>
-          <h2 class="auth-title">Create Account</h2>
-          <p class="auth-subtitle">Join SmritiCare and shape your care workspace in minutes.</p>
-        </div>
-
-        <form onsubmit="signup(event)" class="signup-form">
-          <div class="form-group">
-            <label class="field-label" for="name">Full Name</label>
-            <div class="input-field auth-dashboard-input">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="8" r="3.5"></circle>
-                  <path d="M4 20c1.6-3.4 5-5 8-5s6.4 1.6 8 5"></path>
-                </svg>
-              </span>
-              <input id="name" autocomplete="name" placeholder="Enter your full name" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="field-label" for="email">Email Address</label>
-            <div class="input-field auth-dashboard-input">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                  <path d="m3 7 9 6 9-6"></path>
-                </svg>
-              </span>
-              <input id="email" type="email" autocomplete="email" placeholder="Enter your email" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="field-label" for="password">Password</label>
-            <div class="input-field auth-dashboard-input">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="11" width="16" height="9" rx="2"></rect>
-                  <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
-                </svg>
-              </span>
-              <input id="password" type="password" autocomplete="new-password" placeholder="Enter your password" required>
-              <button
-                type="button"
-                class="input-suffix input-suffix-btn password-toggle"
-                data-target="password"
-                aria-label="Show password"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path class="eye-off-line" d="M4 20 20 4"></path>
-                </svg>
-              </button>
-            </div>
-            <div class="strength-wrap">
-              <small id="signupStrength" class="strength">Not checked</small>
-              <div class="strength-bar">
-                <span id="signupStrengthBar"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="field-label" for="role">I am a</label>
-            <div class="input-field auth-dashboard-input select-field">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="8" r="3.5"></circle>
-                  <path d="M4 20c1.6-3.4 5-5 8-5s6.4 1.6 8 5"></path>
-                </svg>
-              </span>
-              <select id="role" required>
-                <option value="">Select role</option>
-                <option value="caregiver">Caregiver</option>
-                <option value="patient">Patient</option>
-              </select>
-              <span class="input-suffix" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m6 9 6 6 6-6"></path>
-                </svg>
-              </span>
-            </div>
-          </div>
-
-          <p class="error" id="error"></p>
-
-          <button type="submit" class="auth-btn auth-dashboard-btn signup-btn" id="signupBtn">Create Account</button>
-        </form>
-
-        <div class="auth-link auth-dashboard-link">
-          Already have an account?
-          <a href="/auth/login">Sign In</a>
-        </div>
-      </section>
+    <div class="auth-simple-header">
+      <h1 class="auth-title auth-simple-title">Sign Up</h1>
+      <p class="auth-subtitle auth-simple-subtitle">Create your SmritiCare account.</p>
     </div>
-  </main>
+
+    <form onsubmit="signup(event)" class="signup-form">
+      <div class="form-group">
+        <label class="field-label" for="name">Full Name</label>
+        <div class="input-field auth-dashboard-input">
+          <span class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.5"></circle>
+              <path d="M4 20c1.6-3.4 5-5 8-5s6.4 1.6 8 5"></path>
+            </svg>
+          </span>
+          <input id="name" autocomplete="name" placeholder="Enter your full name" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="field-label" for="email">Email Address</label>
+        <div class="input-field auth-dashboard-input">
+          <span class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+              <path d="m3 7 9 6 9-6"></path>
+            </svg>
+          </span>
+          <input id="email" type="email" autocomplete="email" placeholder="Enter your email" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="field-label" for="password">Password</label>
+        <div class="input-field auth-dashboard-input">
+          <span class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="11" width="16" height="9" rx="2"></rect>
+              <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+            </svg>
+          </span>
+          <input id="password" type="password" autocomplete="new-password" placeholder="Enter your password" required>
+          <button
+            type="button"
+            class="input-suffix input-suffix-btn password-toggle"
+            data-target="password"
+            aria-label="Show password"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <path class="eye-off-line" d="M4 20 20 4"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="strength-wrap">
+          <small id="signupStrength" class="strength">Not checked</small>
+          <div class="strength-bar">
+            <span id="signupStrengthBar"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="field-label" for="role">I am a</label>
+        <div class="input-field auth-dashboard-input select-field">
+          <span class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.5"></circle>
+              <path d="M4 20c1.6-3.4 5-5 8-5s6.4 1.6 8 5"></path>
+            </svg>
+          </span>
+          <select id="role" required>
+            <option value="">Select role</option>
+            <option value="caregiver">Caregiver</option>
+            <option value="patient">Patient</option>
+          </select>
+          <span class="input-suffix" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <p class="error" id="error"></p>
+
+      <button type="submit" class="auth-btn auth-dashboard-btn signup-btn" id="signupBtn">Create Account</button>
+    </form>
+  </section>
 </div>
 
 <script>

@@ -299,7 +299,7 @@ function buildClickEmail({ logoSrc, siteUrl, message }) {
                           ${brandVisualMarkup}
                         </td>
                         <td style="vertical-align: middle;">
-                          <p style="margin: 0; color: #1d2340; font-size: 23px; font-weight: 800; letter-spacing: -0.03em;">SmritiCare Hub</p>
+                          <p style="margin: 0; color: #1d2340; font-size: 23px; font-weight: 800; letter-spacing: -0.03em;">SmritiCare</p>
                           <p class="brand-sub" style="margin: 5px 0 0; font-size: 14px; color: #7280a0;">Bring every care detail into one calm flow</p>
                         </td>
                         <td style="width: 132px; vertical-align: middle;" align="right">
