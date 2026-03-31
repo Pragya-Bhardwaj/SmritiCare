@@ -4,27 +4,26 @@
 .suggestion-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .selfcare {
-  border-left: 4px solid var(--brand-600);
+  border-left: 4px solid var(--brand-500);
 }
 
-.selfcare h3 {
+.selfcare h3,
+.suggestion-card h3 {
   margin-bottom: 8px;
 }
 
-.selfcare p {
-  line-height: 1.55;
-}
-
 .suggestion-card {
-  border-top: 3px solid var(--brand-300);
+  border-top: 3px solid var(--brand-500);
 }
 
-.suggestion-card .suggestion-meta {
+.suggestion-card .suggestion-meta,
+.patient-tip-card .tip-meta {
   margin-top: 8px;
+  color: var(--text-muted);
 }
 
 .suggestion-card .suggestion-btn {
@@ -34,11 +33,7 @@
 .patient-tip-card {
   display: grid;
   gap: 8px;
-  border-left: 4px solid var(--brand-300);
-}
-
-.patient-tip-card .tip-meta {
-  color: var(--text-muted);
+  border-left: 4px solid rgba(255, 231, 184, 0.88);
 }
 
 .patient-tip-card .actions {
@@ -58,12 +53,11 @@
 
 .reminder-card,
 .medication-card {
-  border-left: 4px solid var(--brand-600);
+  border-left: 4px solid var(--brand-500);
 }
 
 .medication-card {
-  background: var(--surface-tint);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .medication-card::before {
@@ -71,8 +65,11 @@
 }
 
 .reminder-card .meta,
-.medication-card .meta {
+.medication-card .meta,
+.notes,
+.desc {
   margin-top: 6px;
+  color: var(--text-muted);
 }
 
 .classification,
@@ -80,58 +77,46 @@
 .dose {
   display: inline-flex;
   align-items: center;
-  padding: 3px 8px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: #fde9e6;
-  color: #b75d74;
-  font-size: 0.74rem;
-  font-weight: 700;
+  background: rgba(136, 199, 255, 0.16);
+  color: var(--brand-700);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   margin-right: 4px;
 }
 
 .rtype {
-  background: #fbe0d5;
-  color: #a85c34;
-}
-
-.notes,
-.desc {
-  margin-top: 5px;
-  color: var(--text-muted);
+  background: rgba(255, 231, 184, 0.38);
+  color: #9d6931;
 }
 
 .page-header .primary-btn {
   align-self: center;
 }
 
-/* Modal input labels rendered inline in HTML */
 .modal-box label {
   color: var(--text-strong);
   font-size: 0.86rem;
   font-weight: 700;
 }
 
-/* Location page cards */
 .location-grid {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
 }
 
 .map-card {
-  min-height: 300px;
+  min-height: 320px;
   display: grid;
   place-content: center;
   text-align: center;
   background:
-    linear-gradient(180deg, rgba(139, 92, 246, 0.16), rgba(139, 92, 246, 0)),
-    repeating-linear-gradient(
-      45deg,
-      rgba(139, 92, 246, 0.1) 0,
-      rgba(139, 92, 246, 0.1) 10px,
-      rgba(167, 139, 250, 0.1) 10px,
-      rgba(167, 139, 250, 0.1) 20px
-    );
+    radial-gradient(circle at top right, rgba(255, 231, 184, 0.5), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(228, 237, 255, 0.9));
   border: 1px dashed var(--border-strong);
 }
 
@@ -160,8 +145,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--brand-700);
-  box-shadow: 0 0 0 6px rgba(216, 107, 134, 0.2);
+  background: var(--brand-600);
+  box-shadow: 0 0 0 6px rgba(136, 199, 255, 0.18);
 }
 
 @media (max-width: 980px) {

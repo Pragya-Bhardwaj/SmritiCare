@@ -7,69 +7,106 @@
 </head>
 <body class="signup-page">
 
-<div class="auth-wrapper signup-wrapper">
-  <div class="auth-layout reverse">
-    <section class="auth-panel auth-form-panel">
-      <div class="auth-panel-inner">
-        <h1 class="auth-title">Create Account</h1>
-        <p class="auth-subtitle">Join Smriti Care today</p>
+<div class="auth-wrapper">
+  <main class="auth-dashboard-shell">
+    <header class="auth-dashboard-header">
+      <a class="dashboard-brand" href="/" aria-label="SmritiCare home">
+        <span class="dashboard-brand-mark">
+          <img class="dashboard-brand-logo" src="/favicon.ico" alt="SmritiCare logo">
+        </span>
+        <span class="dashboard-brand-copy">
+          <strong>SmritiCare Hub</strong>
+          <span>Create your care companion space</span>
+        </span>
+      </a>
+
+      <p class="dashboard-header-note">Bring every care detail into one calm flow</p>
+
+      <a class="dashboard-header-cta" href="/auth/login">Sign in</a>
+    </header>
+
+    <div class="auth-dashboard-body">
+      <section class="dashboard-copy">
+        <p class="dashboard-eyebrow">Personalized care begins here</p>
+        <h1 class="dashboard-title">
+          <span class="dashboard-title-soft">Create your account.</span>
+          Build a softer, smarter routine for caregiving.
+        </h1>
+        <p class="dashboard-description">
+          Join SmritiCare to organize reminders, memory support, caregiver
+          collaboration, and patient updates inside a visual space that feels calm
+          from the first click.
+        </p>
+      </section>
+
+      <section class="auth-form-shell auth-dashboard-card" aria-label="Sign up form">
+        <div class="form-shell-top">
+          <span class="form-shell-badge">New Account</span>
+          <h2 class="auth-title">Create Account</h2>
+          <p class="auth-subtitle">Join SmritiCare and shape your care workspace in minutes.</p>
+        </div>
 
         <form onsubmit="signup(event)" class="signup-form">
           <div class="form-group">
             <label class="field-label" for="name">Full Name</label>
-            <div class="input-field">
+            <div class="input-field auth-dashboard-input">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="8" r="3.5"></circle>
                   <path d="M4 20c1.6-3.4 5-5 8-5s6.4 1.6 8 5"></path>
                 </svg>
               </span>
-              <input id="name" placeholder="Enter your full name" required>
+              <input id="name" autocomplete="name" placeholder="Enter your full name" required>
             </div>
           </div>
 
           <div class="form-group">
             <label class="field-label" for="email">Email Address</label>
-            <div class="input-field">
+            <div class="input-field auth-dashboard-input">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="5" width="18" height="14" rx="2"></rect>
                   <path d="m3 7 9 6 9-6"></path>
                 </svg>
               </span>
-              <input id="email" type="email" placeholder="Enter your email" required>
+              <input id="email" type="email" autocomplete="email" placeholder="Enter your email" required>
             </div>
           </div>
 
           <div class="form-group">
             <label class="field-label" for="password">Password</label>
-            <div class="input-field">
+            <div class="input-field auth-dashboard-input">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="4" y="11" width="16" height="9" rx="2"></rect>
                   <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
                 </svg>
               </span>
-              <input id="password" type="password" placeholder="Create a password" required>
-              <span class="input-suffix" aria-hidden="true">
+              <input id="password" type="password" autocomplete="new-password" placeholder="Enter your password" required>
+              <button
+                type="button"
+                class="input-suffix input-suffix-btn password-toggle"
+                data-target="password"
+                aria-label="Show password"
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
+                  <path class="eye-off-line" d="M4 20 20 4"></path>
                 </svg>
-              </span>
+              </button>
             </div>
             <div class="strength-wrap">
-              <small id="strength" class="strength">Weak</small>
+              <small id="signupStrength" class="strength">Not checked</small>
               <div class="strength-bar">
-                <span id="strengthBar"></span>
+                <span id="signupStrengthBar"></span>
               </div>
             </div>
-            <p class="form-helper">At least 6 characters with uppercase, numbers, and special characters.</p>
           </div>
 
           <div class="form-group">
             <label class="field-label" for="role">I am a</label>
-            <div class="input-field select-field">
+            <div class="input-field auth-dashboard-input select-field">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="8" r="3.5"></circle>
@@ -91,32 +128,76 @@
 
           <p class="error" id="error"></p>
 
-          <button class="auth-btn signup-btn" id="signupBtn">Create Account</button>
+          <button type="submit" class="auth-btn auth-dashboard-btn signup-btn" id="signupBtn">Create Account</button>
         </form>
 
-        <div class="auth-link">
+        <div class="auth-link auth-dashboard-link">
           Already have an account?
           <a href="/auth/login">Sign In</a>
         </div>
-      </div>
-    </section>
-
-    <section class="auth-panel auth-hero-panel">
-      <div class="auth-hero-inner">
-        <div class="hero-image">
-          <img src="/images/signup-hero.png" alt="Smriti Care community" onerror="this.onerror=null;this.src='/images/brain.jpg';">
-        </div>
-        <h2 class="hero-title">Your Memory Matters</h2>
-        <p class="hero-text">
-          Join Smriti Care to access personalized support and resources for dementia care.
-        </p>
-      </div>
-    </section>
-  </div>
+      </section>
+    </div>
+  </main>
 </div>
 
 <script>
 const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
+
+function getPasswordScore(password) {
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[@$!%*?&#]/.test(password)) score++;
+  return score;
+}
+
+function updateSignupPasswordStrength(password) {
+  const label = document.getElementById("signupStrength");
+  const bar = document.getElementById("signupStrengthBar");
+
+  if (!password) {
+    label.innerText = "Not checked";
+    label.className = "strength";
+    bar.className = "";
+    bar.style.width = "0%";
+    return;
+  }
+
+  const score = getPasswordScore(password);
+
+  if (score <= 1) {
+    label.innerText = "Weak";
+    label.className = "strength weak";
+    bar.className = "weak";
+    bar.style.width = "25%";
+    return;
+  }
+
+  if (score <= 3) {
+    label.innerText = "Medium";
+    label.className = "strength medium";
+    bar.className = "medium";
+    bar.style.width = "60%";
+    return;
+  }
+
+  label.innerText = "Strong";
+  label.className = "strength strong";
+  bar.className = "strong";
+  bar.style.width = "100%";
+}
+
+function setupPasswordToggle(toggleButton) {
+  toggleButton.addEventListener("click", () => {
+    const input = document.getElementById(toggleButton.dataset.target);
+    const showing = input.type === "text";
+
+    input.type = showing ? "password" : "text";
+    toggleButton.classList.toggle("is-visible", !showing);
+    toggleButton.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+  });
+}
 
 async function signup(e) {
   e.preventDefault();
@@ -141,7 +222,6 @@ async function signup(e) {
   }
 
   const passwordRules = getPasswordRuleResults(password);
-  checkStrength(password);
 
   if (!passwordRules.valid) {
     error.innerText = `Password warning: ${passwordRules.message}`;
@@ -182,41 +262,6 @@ async function signup(e) {
   }
 }
 
-/* PASSWORD STRENGTH */
-
-function checkStrength(pwd) {
-  let s = 0;
-  if (pwd.length >= 6) s++;
-  if (/[A-Z]/.test(pwd)) s++;
-  if (/[0-9]/.test(pwd)) s++;
-  if (/[@$!%*?&#]/.test(pwd)) s++;
-
-  const txt = document.getElementById("strength");
-  const bar = document.getElementById("strengthBar");
-
-  if (s <= 1) {
-    txt.innerText = "Weak";
-    txt.className = "strength weak";
-    bar.className = "weak";
-    bar.style.width = "25%";
-    return "Weak";
-  }
-
-  if (s === 2) {
-    txt.innerText = "Medium";
-    txt.className = "strength medium";
-    bar.className = "medium";
-    bar.style.width = "55%";
-    return "Medium";
-  }
-
-  txt.innerText = "Strong";
-  txt.className = "strength strong";
-  bar.className = "strong";
-  bar.style.width = "100%";
-  return "Strong";
-}
-
 function getPasswordRuleResults(pwd) {
   const missing = [];
 
@@ -238,10 +283,12 @@ function getPasswordRuleResults(pwd) {
   return { valid: false, message: `add ${first}, and ${last}.` };
 }
 
-document.getElementById("strength").innerText = "Not checked";
-document.getElementById("strength").className = "strength";
-document.getElementById("strengthBar").style.width = "0%";
-document.getElementById("strengthBar").className = "";
+document.getElementById("password").addEventListener("input", (event) => {
+  updateSignupPasswordStrength(event.target.value);
+});
+
+document.querySelectorAll(".password-toggle").forEach(setupPasswordToggle);
+updateSignupPasswordStrength("");
 </script>
 
 </body>

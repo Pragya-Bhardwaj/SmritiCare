@@ -1,56 +1,64 @@
 /* Patient-specific UI refinements */
 
 .main > .sub {
-  margin-top: 6px;
-  margin-bottom: 18px;
+  margin-top: 8px;
+  margin-bottom: 20px;
 }
 
 .filter-tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .tab {
-  border: 1px solid var(--border);
-  background: #fdf1ee;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(140, 155, 201, 0.16);
+  background: rgba(255, 255, 255, 0.74);
   color: var(--text-body);
   border-radius: 999px;
-  padding: 8px 14px;
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    transform var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-med) var(--ease-standard),
+    border-color var(--dur-med) var(--ease-standard),
+    color var(--dur-med) var(--ease-standard);
 }
 
 .tab:hover {
-  border-color: var(--brand-300);
-  color: var(--brand-700);
+  transform: translateY(-1px);
+  color: var(--text-strong);
+  border-color: rgba(92, 107, 158, 0.22);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .tab.active {
   color: #ffffff;
-  background: linear-gradient(135deg, var(--brand-700), #f3b0a8);
   border-color: transparent;
+  background: linear-gradient(135deg, #1f2344 0%, #171b33 100%);
+  box-shadow: 0 14px 24px rgba(26, 31, 58, 0.16);
 }
 
 .reminders-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .reminder-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   border-left: 4px solid var(--brand-500);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .reminder-card.done {
-  border-left-color: var(--brand-500);
-  opacity: 1;
+  border-left-color: #82cfac;
 }
 
 .reminder-content h3 {
@@ -72,7 +80,7 @@
 .reminder-toggle {
   width: 22px;
   height: 22px;
-  accent-color: var(--brand-500);
+  accent-color: var(--brand-600);
   cursor: pointer;
 }
 
@@ -86,9 +94,9 @@
 
 .medication-table {
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 28px;
   overflow: hidden;
-  background: var(--surface-tint);
+  background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-soft);
 }
 
@@ -97,22 +105,24 @@
   display: grid;
   grid-template-columns: 2.1fr 1fr 1fr 2fr;
   gap: 14px;
-  padding: 14px 18px;
+  padding: 16px 18px;
 }
 
 .table-header {
-  background: #f1cfe0;
+  background: linear-gradient(135deg, rgba(219, 234, 255, 0.8), rgba(255, 244, 221, 0.7));
   color: var(--text-strong);
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border-bottom: 1px solid var(--border);
 }
 
 .table-row {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--text-body);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(140, 155, 201, 0.16);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .table-row:last-child {
@@ -128,15 +138,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 10px;
+  padding: 5px 10px;
   border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.75rem;
+  font-weight: 800;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .badge-blue {
-  background: #fde9e6;
-  color: #b75d74;
+  background: rgba(136, 199, 255, 0.18);
+  color: var(--brand-700);
 }
 
 .badge-pending {
@@ -157,8 +169,9 @@
 .info-item {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(140, 155, 201, 0.16);
 }
 
 .info-item:last-child {
@@ -167,13 +180,13 @@
 
 .label {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 0.88rem;
 }
 
 .value {
   color: var(--text-strong);
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 920px) {
@@ -185,18 +198,6 @@
 
   .table-header {
     display: none;
-  }
-
-  .table-row {
-    padding: 14px;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
   }
 }
 

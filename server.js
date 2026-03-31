@@ -31,8 +31,8 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS in production
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24,
       sameSite: "lax"
     }
   })
@@ -85,12 +85,13 @@ app.use("/", locationRoutes);
 /* ROOT ROUTE */
 app.get("/", (req, res) => {
   if (req.session.user) {
-    // Redirect logged-in users to their dashboard
-    const redirect = req.session.user.role === "patient" 
-      ? "/patient/dashboard" 
-      : "/caregiver/dashboard";
+    const redirect =
+      req.session.user.role === "patient"
+        ? "/patient/dashboard"
+        : "/caregiver/dashboard";
     return res.redirect(redirect);
   }
+
   res.redirect("/auth/login");
 });
 
@@ -120,15 +121,14 @@ app.use((req, res) => {
 /* ERROR HANDLER */
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR]", err);
-  
-  // Log different error types
+
   if (err.code === "REFRESH_TOKEN_REVOKED") {
-    console.error("  → Google refresh token was revoked");
+    console.error("  -> Google refresh token was revoked");
   }
-  if (err.message.includes("invalid_grant")) {
-    console.error("  → Google OAuth invalid grant error");
+  if (err.message && err.message.includes("invalid_grant")) {
+    console.error("  -> Google OAuth invalid grant error");
   }
-  
+
   res.status(500).send(`
     <h1>500 - Server Error</h1>
     <p>Something went wrong on our end.</p>
@@ -138,18 +138,19 @@ app.use((err, req, res, next) => {
 });
 
 /* START SERVER */
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const server = app.listen(PORT, () => {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`SmritiCare Server Started`);
-  console.log(`${'='.repeat(60)}`);
-  console.log(`📍 Running on http://localhost:${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📊 Database: ${process.env.MONGO_URI ? 'Connected' : 'Not configured'}`);
-  console.log(`🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? 'Configured' : 'Not configured'}`);
-  console.log(`${'='.repeat(60)}\n`);
+  console.log(`\n${"=".repeat(60)}`);
+  console.log("SmritiCare Server Started");
+  console.log(`${"=".repeat(60)}`);
+  console.log(`Running on http://localhost:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`Database: ${process.env.MONGO_URI ? "Connected" : "Not configured"}`);
+  console.log(
+    `Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? "Configured" : "Not configured"}`
+  );
+  console.log(`${"=".repeat(60)}\n`);
 
-  // Start reminder notification service
   try {
     startReminderNotificationService();
     console.log("[NOTIFICATION] Reminder service started");
@@ -159,8 +160,8 @@ const server = app.listen(PORT, () => {
 });
 
 /* GRACEFUL SHUTDOWN */
-process.on("SIGTERM", () => {
-  console.log("\n[SHUTDOWN] SIGTERM received, closing server gracefully...");
+function shutdown(signal) {
+  console.log(`\n[SHUTDOWN] ${signal} received, closing server gracefully...`);
   server.close(() => {
     console.log("[SHUTDOWN] HTTP server closed");
     mongoose.connection.close(false, () => {
@@ -168,24 +169,21 @@ process.on("SIGTERM", () => {
       process.exit(0);
     });
   });
+}
+
+process.on("SIGTERM", () => {
+  shutdown("SIGTERM");
 });
 
 process.on("SIGINT", () => {
-  console.log("\n[SHUTDOWN] SIGINT received, closing server gracefully...");
-  server.close(() => {
-    console.log("[SHUTDOWN] HTTP server closed");
-    mongoose.connection.close(false, () => {
-      console.log("[SHUTDOWN] MongoDB connection closed");
-      process.exit(0);
-    });
-  });
+  shutdown("SIGINT");
 });
 
 /* UNHANDLED REJECTION HANDLER */
 process.on("unhandledRejection", (reason, promise) => {
   console.error("[UNHANDLED REJECTION]", {
     reason: reason.message || reason,
-    promise: promise
+    promise
   });
 });
 

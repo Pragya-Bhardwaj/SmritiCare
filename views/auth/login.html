@@ -7,44 +7,87 @@
 </head>
 <body class="login-page">
 
-<div class="auth-wrapper login-wrapper">
-  <div class="auth-layout">
-    <section class="auth-panel auth-form-panel">
-      <div class="auth-panel-inner">
-        <h1 class="auth-title">Welcome Back</h1>
-        <p class="auth-subtitle">Sign in to Smriti Care</p>
+<div class="auth-wrapper">
+  <main class="auth-dashboard-shell">
+    <header class="auth-dashboard-header">
+      <a class="dashboard-brand" href="/" aria-label="SmritiCare home">
+        <span class="dashboard-brand-mark">
+          <img class="dashboard-brand-logo" src="/favicon.ico" alt="SmritiCare logo">
+        </span>
+        <span class="dashboard-brand-copy">
+          <strong>SmritiCare Hub</strong>
+          <span>Create your care companion space</span>
+        </span>
+      </a>
+
+      <p class="dashboard-header-note">Bring every care detail into one calm flow</p>
+
+      <a class="dashboard-header-cta" href="/auth/signup">Create account</a>
+    </header>
+
+    <div class="auth-dashboard-body">
+      <section class="dashboard-copy">
+        <p class="dashboard-eyebrow">Personalized care continues here</p>
+        <h1 class="dashboard-title">
+          <span class="dashboard-title-soft">Welcome back.</span>
+          Sign in and return to a softer, smarter routine for caregiving.
+        </h1>
+        <p class="dashboard-description">
+          Access reminders, memory support, caregiver updates, and patient care tools
+          inside one calm workspace built to keep every daily detail easy to follow.
+        </p>
+      </section>
+
+      <section class="auth-form-shell auth-dashboard-card" aria-label="Login form">
+        <div class="form-shell-top">
+          <span class="form-shell-badge">Welcome Back</span>
+          <h2 class="auth-title">Sign In</h2>
+          <p class="auth-subtitle">Continue to your SmritiCare dashboard.</p>
+        </div>
 
         <form onsubmit="login(event)" class="login-form">
           <div class="form-group">
             <label class="field-label" for="email">Email Address</label>
-            <div class="input-field">
+            <div class="input-field auth-dashboard-input">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="5" width="18" height="14" rx="2"></rect>
                   <path d="m3 7 9 6 9-6"></path>
                 </svg>
               </span>
-              <input id="email" type="email" placeholder="Enter your email" required>
+              <input id="email" type="email" autocomplete="email" placeholder="Enter your email" required>
             </div>
             <p class="error" id="emailError"></p>
           </div>
 
           <div class="form-group">
             <label class="field-label" for="password">Password</label>
-            <div class="input-field">
+            <div class="input-field auth-dashboard-input">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="4" y="11" width="16" height="9" rx="2"></rect>
                   <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
                 </svg>
               </span>
-              <input id="password" type="password" placeholder="Enter your password" required>
-              <span class="input-suffix" aria-hidden="true">
+              <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+              <button
+                type="button"
+                class="input-suffix input-suffix-btn password-toggle"
+                data-target="password"
+                aria-label="Show password"
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
+                  <path class="eye-off-line" d="M4 20 20 4"></path>
                 </svg>
-              </span>
+              </button>
+            </div>
+            <div class="strength-wrap">
+              <small id="loginStrength" class="strength">Not checked</small>
+              <div class="strength-bar">
+                <span id="loginStrengthBar"></span>
+              </div>
             </div>
             <p class="error" id="passwordError"></p>
           </div>
@@ -53,32 +96,74 @@
             <a href="/auth/forgot-password" class="forgot-link-anchor">Forgot Password?</a>
           </div>
 
-          <button class="auth-btn login-btn" id="loginBtn">Sign In</button>
+          <button type="submit" class="auth-btn auth-dashboard-btn login-btn" id="loginBtn">Sign In</button>
         </form>
 
-        <div class="divider"><span>or</span></div>
-
-        <div class="auth-link">
+        <div class="auth-link auth-dashboard-link">
           Don't have an account? <a href="/auth/signup">Create Account</a>
         </div>
-      </div>
-    </section>
-
-    <section class="auth-panel auth-hero-panel">
-      <div class="auth-hero-inner">
-        <div class="hero-image">
-          <img src="/images/login-hero.png" alt="Caregiver helping patient" onerror="this.onerror=null;this.src='/images/brain.jpg';">
-        </div>
-        <h2 class="hero-title">Caring with Compassion</h2>
-        <p class="hero-text">
-          Providing personalized dementia care with dignity, respect, and understanding.
-        </p>
-      </div>
-    </section>
-  </div>
+      </section>
+    </div>
+  </main>
 </div>
 
 <script>
+function getPasswordScore(password) {
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[@$!%*?&#]/.test(password)) score++;
+  return score;
+}
+
+function updateLoginPasswordStrength(password) {
+  const label = document.getElementById("loginStrength");
+  const bar = document.getElementById("loginStrengthBar");
+
+  if (!password) {
+    label.innerText = "Not checked";
+    label.className = "strength";
+    bar.className = "";
+    bar.style.width = "0%";
+    return;
+  }
+
+  const score = getPasswordScore(password);
+
+  if (score <= 1) {
+    label.innerText = "Weak";
+    label.className = "strength weak";
+    bar.className = "weak";
+    bar.style.width = "25%";
+    return;
+  }
+
+  if (score <= 3) {
+    label.innerText = "Medium";
+    label.className = "strength medium";
+    bar.className = "medium";
+    bar.style.width = "60%";
+    return;
+  }
+
+  label.innerText = "Strong";
+  label.className = "strength strong";
+  bar.className = "strong";
+  bar.style.width = "100%";
+}
+
+function setupPasswordToggle(toggleButton) {
+  toggleButton.addEventListener("click", () => {
+    const input = document.getElementById(toggleButton.dataset.target);
+    const showing = input.type === "text";
+
+    input.type = showing ? "password" : "text";
+    toggleButton.classList.toggle("is-visible", !showing);
+    toggleButton.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+  });
+}
+
 async function login(e) {
   e.preventDefault();
 
@@ -128,6 +213,13 @@ async function login(e) {
     btn.innerText = "Sign In";
   }
 }
+
+document.getElementById("password").addEventListener("input", (event) => {
+  updateLoginPasswordStrength(event.target.value);
+});
+
+document.querySelectorAll(".password-toggle").forEach(setupPasswordToggle);
+updateLoginPasswordStrength("");
 </script>
 
 </body>

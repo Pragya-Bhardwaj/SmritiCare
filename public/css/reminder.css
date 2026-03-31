@@ -11,14 +11,14 @@
 
 .reminders-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .reminder-card {
   position: relative;
   transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  background: var(--surface-tint);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border);
 }
 
 .reminder-card::before {
@@ -27,11 +27,11 @@
 
 .reminder-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(150, 98, 84, 0.2);
+  box-shadow: 0 20px 34px rgba(72, 88, 138, 0.12);
 }
 
 .reminder-card.done {
-  background: var(--surface-tint);
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .reminder-card.done .reminder-content h3 {
@@ -48,7 +48,7 @@
 
 .reminder-content h3 {
   font-size: 1rem;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .reminder-content p {
@@ -63,7 +63,7 @@
 .reminder-toggle {
   width: 22px;
   height: 22px;
-  accent-color: var(--brand-500);
+  accent-color: var(--brand-600);
 }
 
 .time-select {

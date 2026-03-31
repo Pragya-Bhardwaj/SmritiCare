@@ -3,6 +3,8 @@ const Location = require("../models/Location");
 const SafeZone = require("../models/SafeZone");
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
+const fs = require("fs");
+const path = require("path");
 
 /* MAIL SETUP */
 const transporter = nodemailer.createTransport({
@@ -13,10 +15,196 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+const EMAIL_LOGO_CID = "smriticare-logo";
+
+function getEmailLogoAttachment() {
+  const imageDir = path.join(__dirname, "../public/images");
+  const candidates = [
+    "email-logo.png",
+    "email-logo.jpg",
+    "email-logo.jpeg",
+    "email-logo.webp",
+    "email-logo.svg",
+    "smriticare-logo.png",
+    "smriticare-logo.jpg",
+    "smriticare-logo.jpeg",
+    "smriticare-logo.webp",
+    "smriticare-logo.svg"
+  ];
+
+  for (const name of candidates) {
+    const fullPath = path.join(imageDir, name);
+    if (fs.existsSync(fullPath)) {
+      return {
+        filename: name,
+        path: fullPath,
+        cid: EMAIL_LOGO_CID
+      };
+    }
+  }
+
+  return null;
+}
+
 /**
- * Send safe zone alert email to caregiver
+ * Send safe zone alert email using the current SmritiCare email theme.
  */
 async function sendSafeZoneAlert(caregiver, patient, distance, safeZone) {
+  try {
+    const alertTime = new Date().toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+    const roundedDistance = Math.round(distance);
+    const siteUrl = process.env.APP_URL || process.env.APP_BASE_URL || "http://localhost:3000";
+    const dashboardUrl = `${siteUrl}/caregiver/location`;
+    const logoAttachment = getEmailLogoAttachment();
+    const logoSrc = logoAttachment ? `cid:${EMAIL_LOGO_CID}` : null;
+    const brandVisualMarkup = logoSrc
+      ? `<div style="width: 56px; height: 56px; border-radius: 18px; overflow: hidden; background-color: rgba(255, 255, 255, 0.92); padding: 10px; box-sizing: border-box; box-shadow: 0 12px 28px rgba(57, 72, 118, 0.14);">
+           <img src="${logoSrc}" alt="SmritiCare logo" style="display: block; width: 100%; height: 100%; object-fit: contain;" />
+         </div>`
+      : `<div style="width: 56px; height: 56px; border-radius: 18px; background-color: rgba(255, 255, 255, 0.88); color: #171b33; font-size: 20px; font-weight: 800; text-align: center; line-height: 56px; box-shadow: 0 12px 28px rgba(57, 72, 118, 0.14);">
+           SC
+         </div>`;
+    const subject = `Safe Zone Alert: ${patient.name} has left the safe zone`;
+    const text = [
+      "SmritiCare Safe Zone Alert",
+      "",
+      `${patient.name} is ${roundedDistance} meters outside ${safeZone.name}.`,
+      `Time: ${alertTime}`,
+      `Address: ${safeZone.address}`,
+      "",
+      "Recommended actions:",
+      `- Check the live location dashboard: ${dashboardUrl}`,
+      `- Contact ${patient.name} to confirm they are safe`,
+      "- Monitor their location over the next few minutes"
+    ].join("\n");
+
+    await transporter.sendMail({
+      from: `"SmritiCare Alert" <${process.env.EMAIL_USER}>`,
+      to: caregiver.email,
+      subject,
+      text,
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Safe Zone Alert</title>
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #dbe3fb; font-family: 'Segoe UI', Arial, sans-serif;">
+            <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #dbe3fb; padding: 28px 14px;">
+              <tr>
+                <td align="center">
+                  <table role="presentation" style="width: 100%; max-width: 680px; border-collapse: collapse; background: linear-gradient(135deg, #fcfdff 0%, #eef3ff 56%, #fff8ea 100%); border: 1px solid #e5ebf7; border-radius: 32px; overflow: hidden; box-shadow: 0 26px 70px rgba(63, 78, 122, 0.18);">
+                    <tr>
+                      <td style="padding: 28px 32px 18px;">
+                        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                          <tr>
+                            <td style="width: 72px; vertical-align: middle;">
+                              ${brandVisualMarkup}
+                            </td>
+                            <td style="vertical-align: middle;">
+                              <p style="margin: 0; color: #1d2340; font-size: 23px; font-weight: 800; letter-spacing: -0.03em;">SmritiCare Hub</p>
+                              <p style="margin: 5px 0 0; font-size: 14px; color: #7280a0;">Bring every care detail into one calm flow</p>
+                            </td>
+                            <td style="width: 118px; vertical-align: middle;" align="right">
+                              <span style="display: inline-block; background: #171b33; color: #ffffff; border: 1px solid #171b33; border-radius: 999px; padding: 10px 16px; font-size: 11px; font-weight: 800; letter-spacing: 0.12em;">
+                                LIVE ALERT
+                              </span>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 32px 18px;">
+                        <div style="background: rgba(255, 255, 255, 0.72); border: 1px solid #e5ebf7; border-radius: 30px; padding: 28px;">
+                          <p style="margin: 0 0 16px; color: #6d7ca1; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;">Safe zone monitoring</p>
+                          <h1 style="margin: 0; color: #1d2340; font-size: 34px; line-height: 1.06; letter-spacing: -0.06em;">${patient.name} moved outside the safe zone.</h1>
+                          <p style="margin: 14px 0 0; color: #66738f; font-size: 16px; line-height: 1.65;">
+                            ${patient.name} is currently ${roundedDistance} meters beyond <strong style="color: #1d2340;">${safeZone.name}</strong>. Review the live map and check in if needed.
+                          </p>
+                          <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 22px; background: linear-gradient(180deg, #ffffff 0%, #eff4ff 100%); border: 1px solid #d6e1fb; border-radius: 24px;">
+                            <tr>
+                              <td style="padding: 16px 18px; border-bottom: 1px solid #d6e1fb; color: #56627f; font-size: 14px;">
+                                <strong style="color: #1d2340;">Patient</strong><br />
+                                ${patient.name}
+                              </td>
+                              <td style="padding: 16px 18px; border-bottom: 1px solid #d6e1fb; color: #56627f; font-size: 14px;">
+                                <strong style="color: #1d2340;">Distance</strong><br />
+                                ${roundedDistance}m outside safe zone
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 16px 18px; border-bottom: 1px solid #d6e1fb; color: #56627f; font-size: 14px;">
+                                <strong style="color: #1d2340;">Time</strong><br />
+                                ${alertTime}
+                              </td>
+                              <td style="padding: 16px 18px; border-bottom: 1px solid #d6e1fb; color: #56627f; font-size: 14px;">
+                                <strong style="color: #1d2340;">Safe zone</strong><br />
+                                ${safeZone.name}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="padding: 16px 18px; color: #56627f; font-size: 14px; line-height: 1.65;">
+                                <strong style="color: #1d2340;">Address</strong><br />
+                                ${safeZone.address}
+                              </td>
+                            </tr>
+                          </table>
+                          <div style="margin-top: 18px; background-color: #f3f7ff; border-left: 4px solid #88c7ff; border-radius: 16px; padding: 14px 16px;">
+                            <p style="margin: 0; color: #56627f; font-size: 14px; line-height: 1.6;">
+                              Review the dashboard, contact ${patient.name} if possible, and keep an eye on their location for the next few minutes.
+                            </p>
+                          </div>
+                          <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 18px;">
+                            <tr>
+                              <td style="padding: 0;">
+                                <a href="${dashboardUrl}" style="display: inline-block; background-color: #171b33; color: #ffffff; border: 1px solid #171b33; text-decoration: none; font-weight: 800; font-size: 14px; padding: 14px 24px; border-radius: 999px; box-shadow: 0 16px 28px rgba(23, 27, 51, 0.18);">
+                                  View Live Location
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 32px 32px;">
+                        <p style="margin: 0; color: #7f8ba5; font-size: 12px; line-height: 1.6;">
+                          This automated alert was sent because you are registered as the caregiver for ${patient.name}.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+      attachments: logoAttachment ? [logoAttachment] : undefined
+    });
+
+    console.log(`Safe zone alert sent to ${caregiver.email}`);
+  } catch (err) {
+    console.error("Failed to send safe zone alert:", err);
+    throw new Error("Failed to send alert email");
+  }
+}
+
+/**
+ * Legacy safe zone alert email kept for reference while the new theme rolls out.
+ */
+async function sendSafeZoneAlertLegacy(caregiver, patient, distance, safeZone) {
   try {
     const alertTime = new Date().toLocaleString('en-US', {
       weekday: 'long',
