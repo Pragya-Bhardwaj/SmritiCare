@@ -53,10 +53,10 @@ const {
   deleteCalendarEvent
 } = require("../utils/googleCalendar");
 
-/* ─────────────────────────────────────────
+/* 
    HELPER: Sync a reminder to both calendars
    Returns { caregiver: eventId, patient: eventId }
-───────────────────────────────────────── */
+ */
 async function syncToGoogleCalendars(reminder, caregiverUser, patientUser) {
   const eventIds = { caregiver: null, patient: null };
 

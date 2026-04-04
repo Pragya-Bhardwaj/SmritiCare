@@ -21,37 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   startBrowserNotificationWatcher();
   checkGoogleCalendarStatus();
   handleCalendarUrlParams();
-
-  // Unsync Google Calendar button logic
-  const unsyncBtn = document.getElementById("unsyncCalendarBtn");
-  const unsyncStatus = document.getElementById("unsyncStatus");
-  if (unsyncBtn) {
-    unsyncBtn.addEventListener("click", async () => {
-      unsyncBtn.disabled = true;
-      unsyncStatus.style.display = "none";
-      try {
-        const res = await fetch("/reminder/api/reminders/calendar/disconnect", {
-          method: "POST",
-          credentials: "include"
-        });
-        const data = await res.json();
-        if (data.success) {
-          unsyncStatus.textContent = "Google Calendar disconnected.";
-          unsyncStatus.style.display = "inline";
-          checkGoogleCalendarStatus();
-        } else {
-          unsyncStatus.textContent = data.message || "Failed to disconnect.";
-          unsyncStatus.style.display = "inline";
-          unsyncStatus.style.color = "red";
-        }
-      } catch (err) {
-        unsyncStatus.textContent = "Error disconnecting calendar.";
-        unsyncStatus.style.display = "inline";
-        unsyncStatus.style.color = "red";
-      }
-      unsyncBtn.disabled = false;
-    });
-  }
+  setupGoogleCalendarToggle();
 });
 
 /* ─────────────────────────────────────────
@@ -90,6 +60,45 @@ async function checkGoogleCalendarStatus() {
   }
 }
 
+function setupGoogleCalendarToggle() {
+  const actionDiv = document.getElementById("gcalAction");
+  if (!actionDiv) return;
+
+  actionDiv.addEventListener("click", async (event) => {
+    const actionButton = event.target.closest("[data-gcal-action]");
+    if (!actionButton) return;
+
+    const action = actionButton.getAttribute("data-gcal-action");
+
+    if (action === "connect") {
+      window.location.href = "/auth/google/connect";
+      return;
+    }
+
+    if (action === "disconnect") {
+      actionButton.disabled = true;
+      try {
+        const res = await fetch("/reminder/api/reminders/calendar/disconnect", {
+          method: "POST",
+          credentials: "include"
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast("Google Calendar disconnected.", "success");
+          checkGoogleCalendarStatus();
+        } else {
+          showToast(data.message || "Failed to disconnect Google Calendar.", "error");
+        }
+      } catch (err) {
+        showToast("Error disconnecting Google Calendar.", "error");
+      } finally {
+        actionButton.disabled = false;
+      }
+    }
+  });
+}
+
 function renderGcalBanner(isConnected) {
   const actionDiv  = document.getElementById("gcalAction");
   const statusText = document.getElementById("gcalStatusText");
@@ -98,22 +107,15 @@ function renderGcalBanner(isConnected) {
   if (isConnected) {
     statusText.textContent = "Reminders are syncing to your Google Calendar automatically";
     actionDiv.innerHTML = `
-      <span class="gcal-connected-badge">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-          <circle cx="10" cy="10" r="10" fill="#22c55e"/>
-          <path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Connected
-      </span>`;
+      <button type="button" class="gcal-connect-btn is-disconnect" data-gcal-action="disconnect">
+        Unsync Google Calendar
+      </button>`;
   } else {
     statusText.textContent = "Connect once to auto-sync all reminders to your Google Calendar";
     actionDiv.innerHTML = `
-      <a href="/auth/google/connect" class="gcal-connect-btn">
-        <svg width="16" height="16" viewBox="0 0 48 48">
-          <path fill="#4285F4" d="M43.6 20H24v8h11.3C33.5 32.5 29.2 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.2 2.8l5.7-5.7C33.8 7.1 29.1 5 24 5 13.5 5 5 13.5 5 24s8.5 19 19 19c10.9 0 18.5-7.6 18.5-18.5 0-1.2-.1-2.4-.4-3.5z"/>
-        </svg>
-        Connect Google Calendar
-      </a>`;
+      <button type="button" class="gcal-connect-btn" data-gcal-action="connect">
+        Sync Google Calendar
+      </button>`;
   }
 }
 

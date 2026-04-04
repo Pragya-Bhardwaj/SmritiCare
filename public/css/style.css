@@ -881,7 +881,7 @@ button:disabled,
 }
 
 .location-controls .btn-secondary,
-.gcal-connect-btn#unsyncCalendarBtn,
+.gcal-connect-btn.is-disconnect,
 .btn-toggle.btn-disable {
   background: rgba(255, 255, 255, 0.86) !important;
   color: var(--text-strong) !important;

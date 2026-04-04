@@ -122,8 +122,6 @@ function renderMedications() {
           <p class="small notes">${escapeHtml(m.notes || "")}</p>
         </div>
 
-        <span class="status pending">Scheduled</span>
-
         <div class="actions">
           <button class="edit-btn" onclick="openEditModal('${m._id}')">Edit</button>
           <button class="delete-btn" onclick="openDeleteModal('${m._id}')">Delete</button>
