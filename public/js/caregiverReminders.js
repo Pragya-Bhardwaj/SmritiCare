@@ -13,6 +13,7 @@ let allReminders = [];
 const MISSED_GRACE_MINUTES = 30;
 const BROWSER_NOTIFICATION_CHECK_MS = 30 * 1000;
 let browserNotificationTimer = null;
+let isSavingReminder = false;
 
 /* INITIALIZATION */
 document.addEventListener("DOMContentLoaded", async () => {
@@ -416,6 +417,7 @@ function openDeleteModal(reminderId) {
 
 function closeReminderModal() {
   document.getElementById("reminderModal").classList.add("hidden");
+  setReminderSavingState(false);
 }
 
 function closeDeleteModal() {
@@ -426,6 +428,8 @@ function closeDeleteModal() {
    SAVE REMINDER (ADD / EDIT)
 ───────────────────────────────────────── */
 async function saveReminder() {
+  if (isSavingReminder) return;
+
   const title      = document.getElementById("reminderTitle").value.trim();
   const hour       = document.getElementById('reminderHour').value;
   const minute     = document.getElementById('reminderMinute').value;
@@ -460,6 +464,9 @@ async function saveReminder() {
     payload.yearDate = yearDate;
   }
   if (frequency === "Once") payload.onceDate = onceDate;
+
+  isSavingReminder = true;
+  setReminderSavingState(true);
 
   try {
     if (isEdit) {
@@ -508,7 +515,18 @@ async function saveReminder() {
   } catch (err) {
     console.error("Save reminder error:", err);
     alert("Failed to save reminder");
+  } finally {
+    isSavingReminder = false;
+    setReminderSavingState(false);
   }
+}
+
+function setReminderSavingState(isSaving) {
+  const saveBtn = document.getElementById("saveReminderBtn");
+  if (!saveBtn) return;
+
+  saveBtn.disabled = isSaving;
+  saveBtn.textContent = isSaving ? "Saving..." : "Save";
 }
 
 /* ─────────────────────────────────────────
